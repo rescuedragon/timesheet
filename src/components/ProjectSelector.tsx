@@ -72,7 +72,8 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const [projectUsageCount, setProjectUsageCount] = useState<Record<string, number>>({});
   const [subprojectUsageCount, setSubprojectUsageCount] = useState<Record<string, number>>({});
   const [combinationUsageCount, setCombinationUsageCount] = useState<Record<string, number>>({});
-  const [pendingQuickStart, setPendingQuickStart] = useState<{ project: Project; subproject: Subproject; index: number } | null>(null);
+  const [pendingQuickStart, setPendingQuickStart] = useState<{ projectId: string; subprojectId: string; index: number } | null>(null);
+  const quickStartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { colorCodedProjectsEnabled } = useSettings();
 
   // Create refs for callbacks
@@ -215,7 +216,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   }, [selectedProject, onSubprojectSelect]);
 
   const handleCombinationClick = useCallback((project: Project, subproject: Subproject, index: number) => {
-    if (pendingQuickStart && pendingQuickStart.project.id === project.id && pendingQuickStart.subproject.id === subproject.id) {
+    if (pendingQuickStart && pendingQuickStart.projectId === project.id && pendingQuickStart.subprojectId === subproject.id) {
       // Second click: confirm and start timer
       handleProjectSelect(project.id);
       handleSubprojectSelect(subproject.id);
@@ -234,7 +235,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
       return;
     }
     // First click: show confirmation on this button and clear selection
-    setPendingQuickStart({ project, subproject, index });
+    setPendingQuickStart({ projectId: project.id, subprojectId: subproject.id, index });
     handleProjectSelect('');
     handleSubprojectSelect('');
   }, [handleProjectSelect, handleSubprojectSelect, stopwatchRef, handleStartNewTimerForProject, pendingQuickStart]);
@@ -470,6 +471,33 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     : frequentProjects.slice(0, 6);
   const bottomGridItems = frequentCombinations;
 
+  const handleQuickStartClick = (project: Project, subproject: Subproject, index: number) => {
+    if (
+      pendingQuickStart &&
+      pendingQuickStart.projectId === project.id &&
+      pendingQuickStart.subprojectId === subproject.id
+    ) {
+      // Second click within 5 seconds: start timer
+      if (typeof handleStartNewTimerForProject === 'function') {
+        handleStartNewTimerForProject(project.id, subproject.id);
+      }
+      setPendingQuickStart(null);
+      if (quickStartTimeoutRef.current) {
+        clearTimeout(quickStartTimeoutRef.current);
+        quickStartTimeoutRef.current = null;
+      }
+      return;
+    }
+    // First click: show confirmation and set timeout
+    setPendingQuickStart({ projectId: project.id, subprojectId: subproject.id, index });
+    if (quickStartTimeoutRef.current) {
+      clearTimeout(quickStartTimeoutRef.current);
+    }
+    quickStartTimeoutRef.current = setTimeout(() => {
+      setPendingQuickStart(null);
+    }, 5000);
+  };
+
   return (
     <div className="w-full h-full flex flex-col p-3 m-0 min-h-0">
       {/* Top half: Most Frequent Projects/Subprojects */}
@@ -566,55 +594,68 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
           {bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-[1.05rem] bg-gray-100/60 shadow-none h-full w-full" />
           ))}
-          {bottomGridItems.map((item, idx) => (
-            <button
-              key={item.project.id + '-' + item.subproject.id}
-              onClick={() => {
-                if (typeof handleStartNewTimerForProject === 'function') {
-                  handleStartNewTimerForProject(item.project.id, item.subproject.id);
+          {bottomGridItems.map((item, idx) => {
+            const isPending =
+              pendingQuickStart &&
+              pendingQuickStart.projectId === item.project.id &&
+              pendingQuickStart.subprojectId === item.subproject.id;
+            return (
+              <button
+                key={item.project.id + '-' + item.subproject.id}
+                onClick={() => handleQuickStartClick(item.project, item.subproject, idx)}
+                className={
+                  'w-full h-full flex-1 min-h-0 flex items-center justify-between shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 text-base font-semibold select-none cursor-pointer relative overflow-hidden isolation-isolate rounded-[1.05rem] group' +
+                  (colorCodedProjectsEnabled ? ' glassmorphism-btn' : '') +
+                  ' hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/40' +
+                  (isPending ? ' bg-black text-white' : '')
                 }
-              }}
-              className={
-                'w-full h-full flex-1 min-h-0 flex items-center justify-between shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 text-base font-semibold select-none cursor-pointer relative overflow-hidden isolation-isolate rounded-[1.05rem] group' +
-                (colorCodedProjectsEnabled ? ' glassmorphism-btn' : '') +
-                ' hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/40'
-              }
-              style={{
-                fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
-                background: colorCodedProjectsEnabled
-                  ? (() => {
-                      const base = item.project && item.project.name
-                        ? generateProjectColor(item.project.name)
-                        : '#6366f1';
-                      return base;
-                    })()
-                  : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
-                color: colorCodedProjectsEnabled
-                  ? (() => {
-                      const base = item.project && item.project.name
-                        ? generateProjectColor(item.project.name)
-                        : '#6366f1';
-                      return tinycolor2(base).isLight() ? '#222' : '#fff';
-                    })()
-                  : '#222',
-                fontSize: '0.88em',
-                boxShadow: '0 4.8px 25.6px 0 rgba(80,80,160,0.10), 0 1.2px 6.4px 0 rgba(0,0,0,0.08)'
-              }}
-            >
-              <span className="z-10 flex flex-col items-start justify-center text-left pl-4">
-                <span className="block text-base font-semibold mb-0.5 leading-tight">{item.project.name}</span>
-                <span className="block text-sm font-normal opacity-80 leading-tight">{item.subproject.name}</span>
-              </span>
-              <span className="z-10 pr-2 flex items-center justify-center">
-                <Timer size={20} strokeWidth={2.2} />
-              </span>
-              {/* Glassy/shine hover effect */}
-              {colorCodedProjectsEnabled && (
-                <span className="absolute inset-0 rounded-[1.05rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" style={{overflow: 'hidden'}} />
-              )}
-              <span className="absolute inset-0 rounded-[1.05rem] pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)', overflow: 'hidden'}} />
-            </button>
-          ))}
+                style={
+                  isPending
+                    ? { background: '#000', color: '#fff', fontSize: '1.1em', justifyContent: 'center' }
+                    : {
+                        fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
+                        background: colorCodedProjectsEnabled
+                          ? (() => {
+                              const base = item.project && item.project.name
+                                ? generateProjectColor(item.project.name)
+                                : '#6366f1';
+                              return base;
+                            })()
+                          : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
+                        color: colorCodedProjectsEnabled
+                          ? (() => {
+                              const base = item.project && item.project.name
+                                ? generateProjectColor(item.project.name)
+                                : '#6366f1';
+                              return tinycolor2(base).isLight() ? '#222' : '#fff';
+                            })()
+                          : '#222',
+                        fontSize: '0.88em',
+                        boxShadow: '0 4.8px 25.6px 0 rgba(80,80,160,0.10), 0 1.2px 6.4px 0 rgba(0,0,0,0.08)'
+                      }
+                }
+              >
+                {isPending ? (
+                  <span className="w-full text-center font-bold text-lg">Tap to run timer</span>
+                ) : (
+                  <>
+                    <span className="z-10 flex flex-col items-start justify-center text-left pl-4">
+                      <span className="block text-base font-semibold mb-0.5 leading-tight">{item.project.name}</span>
+                      <span className="block text-sm font-normal opacity-80 leading-tight">{item.subproject.name}</span>
+                    </span>
+                    <span className="z-10 pr-2 flex items-center justify-center">
+                      <Timer size={20} strokeWidth={2.2} />
+                    </span>
+                    {/* Glassy/shine hover effect */}
+                    {colorCodedProjectsEnabled && (
+                      <span className="absolute inset-0 rounded-[1.05rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" style={{overflow: 'hidden'}} />
+                    )}
+                    <span className="absolute inset-0 rounded-[1.05rem] pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)', overflow: 'hidden'}} />
+                  </>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

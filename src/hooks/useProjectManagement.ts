@@ -10,51 +10,31 @@ const getDefaultProjects = (): Project[] => [
   {
     id: '1',
     name: 'Website Redesign',
-    subprojects: [
-      { id: '1-1', name: 'Wireframing', totalTime: 0 },
-      { id: '1-2', name: 'UI Implementation', totalTime: 0 },
-      { id: '1-3', name: 'Accessibility Review', totalTime: 0 }
-    ],
+    subprojects: Array.from({ length: 15 }, (_, i) => ({ id: `1-${i+1}`, name: `Subproject ${i+1}`, totalTime: 0 })),
     totalTime: 0
   },
   {
     id: '2',
     name: 'Mobile App Launch',
-    subprojects: [
-      { id: '2-1', name: 'iOS Build', totalTime: 0 },
-      { id: '2-2', name: 'Android Build', totalTime: 0 },
-      { id: '2-3', name: 'App Store Submission', totalTime: 0 }
-    ],
+    subprojects: Array.from({ length: 15 }, (_, i) => ({ id: `2-${i+1}`, name: `Subproject ${i+1}`, totalTime: 0 })),
     totalTime: 0
   },
   {
     id: '3',
     name: 'Marketing Campaign',
-    subprojects: [
-      { id: '3-1', name: 'Content Creation', totalTime: 0 },
-      { id: '3-2', name: 'Social Media Ads', totalTime: 0 },
-      { id: '3-3', name: 'Email Blasts', totalTime: 0 }
-    ],
+    subprojects: Array.from({ length: 15 }, (_, i) => ({ id: `3-${i+1}`, name: `Subproject ${i+1}`, totalTime: 0 })),
     totalTime: 0
   },
   {
     id: '4',
     name: 'Data Analytics Platform',
-    subprojects: [
-      { id: '4-1', name: 'ETL Pipeline', totalTime: 0 },
-      { id: '4-2', name: 'Dashboard UI', totalTime: 0 },
-      { id: '4-3', name: 'Reporting Engine', totalTime: 0 }
-    ],
+    subprojects: Array.from({ length: 15 }, (_, i) => ({ id: `4-${i+1}`, name: `Subproject ${i+1}`, totalTime: 0 })),
     totalTime: 0
   },
   {
     id: '5',
     name: 'E-commerce Store',
-    subprojects: [
-      { id: '5-1', name: 'Product Catalog', totalTime: 0 },
-      { id: '5-2', name: 'Checkout Flow', totalTime: 0 },
-      { id: '5-3', name: 'Order Management', totalTime: 0 }
-    ],
+    subprojects: Array.from({ length: 15 }, (_, i) => ({ id: `5-${i+1}`, name: `Subproject ${i+1}`, totalTime: 0 })),
     totalTime: 0
   },
   {
