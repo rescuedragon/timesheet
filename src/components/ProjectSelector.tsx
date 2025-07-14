@@ -472,11 +472,11 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   return (
     <div className="w-full h-full flex flex-col p-4 m-0 min-h-0">
       {/* Top half: Most Frequent Projects/Subprojects */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="text-xl font-bold mb-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-center" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
+      <div className="flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm pb-3">
+        <div className="text-xl font-bold mb-2 px-3 py-2 rounded-t-2xl bg-gray-100 dark:bg-gray-800 text-center" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
           {showSubprojects ? 'Most Frequent Subprojects' : 'Most Frequent Projects'}
         </div>
-        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full">
+        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full px-4">
           {topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none h-full w-full" />
           ))}
@@ -516,11 +516,11 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         </div>
       </div>
       {/* Bottom half: Quick Start Combinations */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="text-xl font-bold mt-2 mb-2 px-3 py-2 text-center rounded-xl bg-gray-100 dark:bg-gray-800" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
+      <div className="flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm mt-4 pb-3">
+        <div className="text-xl font-bold mt-0 mb-2 px-3 py-2 text-center rounded-t-2xl bg-gray-100 dark:bg-gray-800" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
           Quick Start Combinations
         </div>
-        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full">
+        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full px-4">
           {bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none h-full w-full" />
           ))}
