@@ -3,6 +3,7 @@ import { Search, Play, ChevronDown } from 'lucide-react';
 import { StopwatchPanelRef } from './StopwatchPanel';
 import ShinyText from './common/ShinyText';
 import { generateProjectColor } from '../lib/projectColors';
+import tinycolor2 from 'tinycolor2';
 import { useSettings } from '@/hooks/useSettings';
 
 // ========== Interfaces ==========
@@ -497,19 +498,34 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               style={{
                 fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
                 background: colorCodedProjectsEnabled
-                  ? (showSubprojects && selectedProject
-                      ? `linear-gradient(120deg, ${generateProjectColor(selectedProject.name)} 0%, #6366f1 100%)`
-                      : (!showSubprojects && item.name
-                        ? `linear-gradient(120deg, ${generateProjectColor(item.name)} 0%, #6366f1 100%)`
-                        : 'linear-gradient(120deg, #6366f1 0%, #a5b4fc 100%)'))
+                  ? (() => {
+                      const base = showSubprojects && selectedProject
+                        ? generateProjectColor(selectedProject.name)
+                        : (!showSubprojects && item.name
+                          ? generateProjectColor(item.name)
+                          : '#6366f1');
+                      return base;
+                    })()
                   : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
-                color: colorCodedProjectsEnabled ? '#fff' : '#222',
+                color: colorCodedProjectsEnabled
+                  ? (() => {
+                      const base = showSubprojects && selectedProject
+                        ? generateProjectColor(selectedProject.name)
+                        : (!showSubprojects && item.name
+                          ? generateProjectColor(item.name)
+                          : '#6366f1');
+                      return tinycolor2(base).isLight() ? '#222' : '#fff';
+                    })()
+                  : '#222',
                 fontSize: '1.1em',
                 boxShadow: '0 6px 32px 0 rgba(80,80,160,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.08)'
               }}
             >
               <span className="z-10">{item.name}</span>
               {/* Glassy/shine hover effect */}
+              {colorCodedProjectsEnabled && (
+                <span className="absolute inset-0 rounded-[1.25rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" />
+              )}
               <span className="absolute inset-0 rounded-[1.25rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)'}} />
             </button>
           ))}
@@ -539,11 +555,21 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               style={{
                 fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
                 background: colorCodedProjectsEnabled
-                  ? (item.project && item.project.name
-                      ? `linear-gradient(120deg, ${generateProjectColor(item.project.name)} 0%, #6366f1 100%)`
-                      : 'linear-gradient(120deg, #6366f1 0%, #a5b4fc 100%)')
+                  ? (() => {
+                      const base = item.project && item.project.name
+                        ? generateProjectColor(item.project.name)
+                        : '#6366f1';
+                      return base;
+                    })()
                   : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
-                color: colorCodedProjectsEnabled ? '#fff' : '#222',
+                color: colorCodedProjectsEnabled
+                  ? (() => {
+                      const base = item.project && item.project.name
+                        ? generateProjectColor(item.project.name)
+                        : '#6366f1';
+                      return tinycolor2(base).isLight() ? '#222' : '#fff';
+                    })()
+                  : '#222',
                 fontSize: '1.1em',
                 boxShadow: '0 6px 32px 0 rgba(80,80,160,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.08)'
               }}
