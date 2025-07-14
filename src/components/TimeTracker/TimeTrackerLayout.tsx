@@ -62,10 +62,11 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
 }) => {
     // Responsive layout: top, search row, main row, bottom
     const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
+    // Wrap all main content in a 90% width container
     return (
-        <div className="w-full max-w-5xl mx-auto h-full flex flex-col gap-y-6 bg-transparent">
+        <div className="w-[90%] mx-auto box-border">
             {/* 1. Currently Tracking (top, full width, fixed height) */}
-            <div className="w-full flex-shrink-0 currently-tracking-material" style={{ minHeight: '90px', maxHeight: '120px', background: 'linear-gradient(90deg, #4285F4 0%, #34A853 100%)', color: '#fff' }}>
+            <div className="w-full flex-shrink-0 currently-tracking-material mt-6 mb-6 rounded-2xl box-border" style={{ minHeight: '90px', maxHeight: '120px', background: 'linear-gradient(90deg, #4285F4 0%, #34A853 100%)', color: '#fff' }}>
                 <CurrentTrackingDisplay
                     selectedProject={selectedProject}
                     selectedSubproject={selectedSubproject}
@@ -75,9 +76,9 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
             </div>
 
             {/* 2. Search Row (projects left, subprojects right) */}
-            <div className="w-full grid grid-cols-2 gap-x-2 min-w-0 items-stretch bg-white/10 backdrop-blur-md rounded-2xl" style={{height: '400px'}}>
+            <div className="h-full grid grid-cols-2 gap-x-2 items-stretch bg-white/10 backdrop-blur-md rounded-2xl overflow-x-auto box-border max-w-full py-4 px-4">
                 {/* Left: Tabbed panel for Projects/Quick Start */}
-                <div className="min-w-0 min-h-0 flex flex-col items-stretch justify-stretch p-0 m-0 h-full w-full">
+                <div className="min-h-0 flex flex-col items-stretch justify-stretch p-0 m-0 h-full box-border max-w-full">
                     <div className="flex mb-2">
                         <button
                             className={`flex-1 py-2 rounded-t-xl font-semibold transition-all ${leftTab === 'projects' ? 'bg-primary text-white' : 'bg-white/30 text-black'}`}
@@ -134,7 +135,7 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
                     </div>
                 </div>
                 {/* Right: StopwatchPanel */}
-                <div className="min-w-0 min-h-0 flex flex-col items-center justify-center timer-circle-material rounded-xl p-6 h-full w-full">
+                <div className="min-h-0 flex flex-col items-center justify-center timer-circle-material rounded-xl p-6 h-full box-border max-w-full">
                     <StopwatchPanel
                         ref={stopwatchRef}
                         selectedProject={selectedProject}
@@ -151,7 +152,7 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
             </div>
 
             {/* 4. Paused/Queued Section (bottom, full width, matches top height) */}
-            <div className="w-full flex-shrink-0" style={{ minHeight: '90px', maxHeight: '120px' }}>
+            <div className="w-full flex-shrink-0 mt-6 mb-2 rounded-2xl box-border" style={{ minHeight: '90px', maxHeight: '120px' }}>
                 <QueuedProjects
                     queuedProjects={queuedProjects}
                     onResumeProject={onResumeProject}

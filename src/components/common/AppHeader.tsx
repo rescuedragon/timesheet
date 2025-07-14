@@ -16,12 +16,12 @@ const AppHeader: React.FC<AppHeaderProps> = ({ children }) => {
       </div>
       
       {/* App Title */}
-      <div className="container mx-auto px-8 py-16">
-        <div className="text-center mb-12 animate-fade-in">
+      <>
+        <div className="text-center mb-4 animate-fade-in">
           <h1 className="text-6xl font-light text-foreground mb-6 tracking-tight">Timesheet</h1>
         </div>
         {children}
-      </div>
+      </>
     </header>
   );
 };

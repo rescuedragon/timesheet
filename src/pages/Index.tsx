@@ -81,7 +81,7 @@ const Index = React.memo(() => {
   }
 
   return (
-    <div className="min-h-screen w-full h-full p-0 m-0 bg-transparent relative">
+    <>
       <HeaderControls
         isDarkMode={isDarkMode}
         onDarkModeToggle={handleDarkModeToggle}
@@ -92,7 +92,7 @@ const Index = React.memo(() => {
       <AppHeader>
         <MainTabs activeTab={activeTab} onTabChange={setActiveTab} timeLogs={timeLogs} addTimeLog={addTimeLog} setTimeLogs={setTimeLogs} replaceTimeLogs={replaceTimeLogs} />
       </AppHeader>
-    </div>
+    </>
   );
 });
 

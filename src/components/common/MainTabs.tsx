@@ -16,7 +16,7 @@ interface MainTabsProps {
 
 const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, addTimeLog, setTimeLogs, replaceTimeLogs }) => {
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full animate-slide-up">
+    <Tabs value={activeTab} onValueChange={onTabChange} className="w-[95%] mx-auto animate-slide-up">
       <TabsList className="grid w-full grid-cols-3 mb-4 h-16 rounded-2xl bg-muted/30 p-2 shadow-2xl backdrop-blur-xl border border-border/20">
         <TabsTrigger 
           value="tracker" 

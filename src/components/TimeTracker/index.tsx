@@ -221,39 +221,34 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
             {/* Subtle background pattern */}
             {/* Remove background pattern overlay to ensure full transparency */}
 
-            <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-6 bg-transparent">
-                {/* Main Layout */}
-                <div className="w-full max-w-7xl mb-8">
-                    <TimeTrackerLayout
-                        projects={projects}
-                        selectedProjectId={selectedProjectId}
-                        selectedSubprojectId={selectedSubprojectId}
-                        onProjectSelect={handleProjectSelect}
-                        onSubprojectSelect={setSelectedSubprojectId}
-                        onAddProject={addProject}
-                        onAddSubproject={addSubproject}
-                        selectedProject={selectedProject}
-                        selectedSubproject={selectedSubproject}
-                        onLogTime={handleLogTime}
-                        onPauseProject={handlePauseProject}
-                        resumedProject={resumedProject}
-                        onResumedProjectHandled={handleResumedProjectHandled}
-                        currentFocus={currentFocus}
-                        onFocusChange={setCurrentFocus}
-                        projectSelectorRef={projectSelectorRef}
-                        stopwatchRef={stopwatchRef}
-                        handleStartNewTimerForProject={handleStartNewTimerForProject}
-                        onTimerStopped={handleTimerStopped}
-                        isTimerRunning={isTimerRunning}
-                        onAddTimeLog={onAddTimeLog}
-                        queuedProjects={queuedProjects}
-                        onResumeProject={handleResumeProject}
-                        onStopProject={handleStopQueuedProject}
-                    />
-                </div>
+            <TimeTrackerLayout
+                projects={projects}
+                selectedProjectId={selectedProjectId}
+                selectedSubprojectId={selectedSubprojectId}
+                onProjectSelect={handleProjectSelect}
+                onSubprojectSelect={setSelectedSubprojectId}
+                onAddProject={addProject}
+                onAddSubproject={addSubproject}
+                selectedProject={selectedProject}
+                selectedSubproject={selectedSubproject}
+                onLogTime={handleLogTime}
+                onPauseProject={handlePauseProject}
+                resumedProject={resumedProject}
+                onResumedProjectHandled={handleResumedProjectHandled}
+                currentFocus={currentFocus}
+                onFocusChange={setCurrentFocus}
+                projectSelectorRef={projectSelectorRef}
+                stopwatchRef={stopwatchRef}
+                handleStartNewTimerForProject={handleStartNewTimerForProject}
+                onTimerStopped={handleTimerStopped}
+                isTimerRunning={isTimerRunning}
+                onAddTimeLog={onAddTimeLog}
+                queuedProjects={queuedProjects}
+                onResumeProject={handleResumeProject}
+                onStopProject={handleStopQueuedProject}
+            />
 
                 {/* Queued Projects - removed, now handled by TimeTrackerLayout */}
-            </div>
         </div>
     );
 };
