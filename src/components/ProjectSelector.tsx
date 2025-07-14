@@ -490,15 +490,27 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   onProjectSelect(item.id);
                 }
               }}
-              className={'w-full h-full flex-1 min-h-0 flex items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer' + ' ' + (showSubprojects ? 'hover:bg-blue-100 dark:hover:bg-blue-900' : 'hover:bg-gray-200 dark:hover:bg-gray-800')}
+              className={
+                'w-full h-full flex-1 min-h-0 flex items-center justify-center rounded-[1.25rem] shadow-lg transition-all duration-200 text-lg font-semibold text-white select-none cursor-pointer relative overflow-hidden group' +
+                ' hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/40'
+              }
               style={{
-                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
                 fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
-                background: showSubprojects && selectedProject ? `linear-gradient(135deg, ${generateProjectColor(selectedProject.name)} 0%, #f3f4f6 100%)` : (!showSubprojects && item.name ? `linear-gradient(135deg, ${generateProjectColor(item.name)} 0%, #f3f4f6 100%)` : undefined),
-                fontSize: '0.85em',
+                background: colorCodedProjectsEnabled
+                  ? (showSubprojects && selectedProject
+                      ? `linear-gradient(120deg, ${generateProjectColor(selectedProject.name)} 0%, #6366f1 100%)`
+                      : (!showSubprojects && item.name
+                        ? `linear-gradient(120deg, ${generateProjectColor(item.name)} 0%, #6366f1 100%)`
+                        : 'linear-gradient(120deg, #6366f1 0%, #a5b4fc 100%)'))
+                  : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
+                color: colorCodedProjectsEnabled ? '#fff' : '#222',
+                fontSize: '1.1em',
+                boxShadow: '0 6px 32px 0 rgba(80,80,160,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.08)'
               }}
             >
-              {item.name}
+              <span className="z-10">{item.name}</span>
+              {/* Glassy/shine hover effect */}
+              <span className="absolute inset-0 rounded-[1.25rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)'}} />
             </button>
           ))}
         </div>
@@ -520,16 +532,28 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   handleStartNewTimerForProject(item.project.id, item.subproject.id);
                 }
               }}
-              className={'w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800'}
+              className={
+                'w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center rounded-[1.25rem] shadow-lg transition-all duration-200 text-lg font-semibold text-white select-none cursor-pointer relative overflow-hidden group' +
+                ' hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/40'
+              }
               style={{
-                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
                 fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
-                background: item.project && item.project.name ? `linear-gradient(135deg, ${generateProjectColor(item.project.name)} 0%, #f3f4f6 100%)` : undefined,
-                fontSize: '0.85em',
+                background: colorCodedProjectsEnabled
+                  ? (item.project && item.project.name
+                      ? `linear-gradient(120deg, ${generateProjectColor(item.project.name)} 0%, #6366f1 100%)`
+                      : 'linear-gradient(120deg, #6366f1 0%, #a5b4fc 100%)')
+                  : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
+                color: colorCodedProjectsEnabled ? '#fff' : '#222',
+                fontSize: '1.1em',
+                boxShadow: '0 6px 32px 0 rgba(80,80,160,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.08)'
               }}
             >
-              <span className="text-base font-semibold mb-1" style={{ fontSize: '0.85em' }}>{item.project.name}</span>
-              <span className="text-sm font-normal opacity-80" style={{ fontSize: '0.85em' }}>{item.subproject.name}</span>
+              <span className="z-10 text-center">
+                <span className="block text-base font-semibold mb-1">{item.project.name}</span>
+                <span className="block text-sm font-normal opacity-80">{item.subproject.name}</span>
+              </span>
+              {/* Glassy/shine hover effect */}
+              <span className="absolute inset-0 rounded-[1.25rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)'}} />
             </button>
           ))}
         </div>
