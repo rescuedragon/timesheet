@@ -161,6 +161,7 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
             onChange={(e) => {
               setProjectSearch(e.target.value);
               setProjectDropdownSearch(e.target.value);
+              setShowProjectDropdown(true);
             }}
             onClick={() => {
               setShowProjectDropdown(true);
@@ -172,7 +173,7 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
               setShowProjectDropdown(true);
               setProjectDropdownIndex(-1);
             }}
-            onBlur={() => setFocusedInput(null)}
+            onBlur={() => setTimeout(() => setShowProjectDropdown(false), 150)}
             className="w-full h-16 px-5 py-4 pr-12 text-white bg-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
             style={{ fontSize: '1.125rem' }}
           />
@@ -182,35 +183,35 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
           <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
             <Search size={24} strokeWidth={2} />
           </div>
-        </div>
-        {showProjectDropdown && (
-          <div className="absolute top-full left-0 mt-3 z-40 w-full">
-            <div className="dropdown-glass w-full">
-              {filteredProjects.length > 0 ? (
-                filteredProjects.map((project, idx) => (
-                  <div
-                    key={project.id}
-                    ref={el => projectDropdownRefs.current[idx] = el}
-                    onClick={() => {
-                      onProjectSelect(project.id);
-                      setShowProjectDropdown(false);
-                      setProjectDropdownIndex(-1);
-                    }}
-                    className={`dropdown-item-glass${projectDropdownIndex === idx ? ' selected' : ''}`}
-                  >
-                    <div className="item-content">
-                      <div className="item-text">{project.name}</div>
+          {/* Apple-style glassmorphism dropdown */}
+          {showProjectDropdown && (
+            <div className="absolute top-full left-0 mt-2 w-full z-50">
+              <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border border-white/40 dark:border-gray-700/40 rounded-2xl shadow-2xl py-1.5 max-h-64 overflow-y-auto transition-all duration-200">
+                {filteredProjects.length > 0 ? (
+                  filteredProjects.map((project, idx) => (
+                    <div
+                      key={project.id}
+                      ref={el => projectDropdownRefs.current[idx] = el}
+                      onClick={() => {
+                        onProjectSelect(project.id);
+                        setShowProjectDropdown(false);
+                        setProjectDropdownIndex(-1);
+                      }}
+                      className={`px-5 py-3 cursor-pointer flex items-center text-base font-medium transition-all duration-150 rounded-xl ${projectDropdownIndex === idx ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'} text-gray-900 dark:text-gray-100`}
+                      style={{ userSelect: 'none' }}
+                    >
+                      <span className="truncate">{project.name}</span>
                     </div>
+                  ))
+                ) : (
+                  <div className="px-5 py-4 text-gray-400 text-base text-center select-none">
+                    {projectDropdownSearch ? 'No projects match your search' : 'No projects available'}
                   </div>
-                ))
-              ) : (
-                <div className="dropdown-item-glass text-center text-gray-400 select-none">
-                  {projectDropdownSearch ? 'No projects match your search' : 'No projects available'}
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {/* Subproject Search */}
       <div className="w-1/2 m-0 p-0 h-full">
@@ -223,6 +224,7 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
             onChange={(e) => {
               setSubprojectSearch(e.target.value);
               setSubprojectDropdownSearch(e.target.value);
+              setShowSubprojectDropdown(true);
             }}
             onClick={() => {
               setShowSubprojectDropdown(true);
@@ -233,7 +235,7 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
               setShowSubprojectDropdown(true);
               setSubprojectDropdownIndex(-1);
             }}
-            onBlur={() => setFocusedInput(null)}
+            onBlur={() => setTimeout(() => setShowSubprojectDropdown(false), 150)}
             onKeyDown={handleSubprojectInputKeyDown}
             className="w-full h-16 px-5 py-4 pr-12 text-white bg-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
             style={{ fontSize: '1.125rem' }}
@@ -244,35 +246,35 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
           <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
             <Search size={24} strokeWidth={2} />
           </div>
-        </div>
-        {showSubprojectDropdown && selectedProject && (
-          <div className="absolute top-full left-0 mt-3 z-40 w-full">
-            <div className="dropdown-glass w-full">
-              {filteredSubprojects.length > 0 ? (
-                filteredSubprojects.map((subproject, idx) => (
-                  <div
-                    key={subproject.id}
-                    ref={el => subprojectDropdownRefs.current[idx] = el}
-                    onClick={() => {
-                      onSubprojectSelect(subproject.id);
-                      setShowSubprojectDropdown(false);
-                      setSubprojectDropdownIndex(-1);
-                    }}
-                    className={`dropdown-item-glass${subprojectDropdownIndex === idx ? ' selected' : ''}`}
-                  >
-                    <div className="item-content">
-                      <div className="item-text">{subproject.name}</div>
+          {/* Apple-style glassmorphism dropdown for subproject */}
+          {showSubprojectDropdown && selectedProject && (
+            <div className="absolute top-full left-0 mt-2 w-full z-50">
+              <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border border-white/40 dark:border-gray-700/40 rounded-2xl shadow-2xl py-1.5 max-h-64 overflow-y-auto transition-all duration-200">
+                {filteredSubprojects.length > 0 ? (
+                  filteredSubprojects.map((subproject, idx) => (
+                    <div
+                      key={subproject.id}
+                      ref={el => subprojectDropdownRefs.current[idx] = el}
+                      onClick={() => {
+                        onSubprojectSelect(subproject.id);
+                        setShowSubprojectDropdown(false);
+                        setSubprojectDropdownIndex(-1);
+                      }}
+                      className={`px-5 py-3 cursor-pointer flex items-center text-base font-medium transition-all duration-150 rounded-xl ${subprojectDropdownIndex === idx ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'} text-gray-900 dark:text-gray-100`}
+                      style={{ userSelect: 'none' }}
+                    >
+                      <span className="truncate">{subproject.name}</span>
                     </div>
+                  ))
+                ) : (
+                  <div className="px-5 py-4 text-gray-400 text-base text-center select-none">
+                    No subprojects found
                   </div>
-                ))
-              ) : (
-                <div className="dropdown-item-glass text-center text-gray-400 select-none">
-                  No subprojects found
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
