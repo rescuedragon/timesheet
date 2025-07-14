@@ -60,6 +60,24 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
       subproject.name.toLowerCase().includes(subprojectDropdownSearch.toLowerCase())
     ) || [], [selectedProject, subprojectDropdownSearch]);
 
+  // Keep projectSearch in sync with selectedProjectId
+  useEffect(() => {
+    const selected = projects.find(p => p.id === selectedProjectId);
+    if (selected) {
+      setProjectSearch(selected.name);
+    }
+  }, [selectedProjectId, projects]);
+
+  // Keep subprojectSearch in sync with selectedSubprojectId
+  useEffect(() => {
+    const selected = selectedProject?.subprojects.find(s => s.id === selectedSubprojectId);
+    if (selected) {
+      setSubprojectSearch(selected.name);
+    } else {
+      setSubprojectSearch('');
+    }
+  }, [selectedSubprojectId, selectedProject]);
+
   // Keyboard navigation for project dropdown
   const handleProjectInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showProjectDropdown) return;
@@ -131,9 +149,9 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
   }, [subprojectDropdownIndex, showSubprojectDropdown]);
 
   return (
-    <div className="flex w-full gap-[1%] items-stretch">
+    <div className="flex w-full items-stretch gap-2">
       {/* Main Project Search */}
-      <div className="w-[49%] m-0 p-0 h-full">
+      <div className="w-1/2 m-0 p-0 h-full">
         <div className="bg-gray-900 rounded-xl w-full h-full min-h-16 flex items-center relative">
           <input
             ref={projectInputRef}
@@ -195,7 +213,7 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
         )}
       </div>
       {/* Subproject Search */}
-      <div className="w-[49%] flex-shrink-0 m-0 p-0 h-full">
+      <div className="w-1/2 m-0 p-0 h-full">
         <div className="bg-gray-900 rounded-xl w-full h-full min-h-16 flex items-center relative">
           <input
             ref={subprojectInputRef}

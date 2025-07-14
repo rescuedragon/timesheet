@@ -49,7 +49,8 @@ const StopwatchPanel = forwardRef<StopwatchPanelRef, StopwatchPanelProps>(({
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col items-center justify-center w-full h-full relative overflow-hidden min-h-[500px]"
+      className="flex flex-col items-center justify-center w-full h-[90%] relative overflow-hidden min-h-[425px]"
+      style={{ height: '90%' }}
     >
       <StopwatchContainer
         selectedProject={selectedProject}

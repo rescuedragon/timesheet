@@ -470,16 +470,15 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const bottomGridItems = frequentCombinations;
 
   return (
-    <div className="w-full h-full flex flex-col items-stretch justify-stretch p-4">
-      {/* Top half: Frequent Projects/Subprojects */}
-      <div className="flex-1 flex flex-col justify-stretch">
-        <div className={`text-2xl font-bold mb-4 px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 transition-opacity duration-300 ${headerFade ? 'opacity-100' : 'opacity-0'}`}
-          style={{ minHeight: '2.5rem', textAlign: 'center', letterSpacing: '-0.01em' }}>
+    <div className="w-full h-full flex flex-col p-4 m-0 min-h-0">
+      {/* Top half: Most Frequent Projects/Subprojects */}
+      <div className="flex-1 min-h-0 flex flex-col">
+        <div className="text-xl font-bold mb-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-center" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
           {showSubprojects ? 'Most Frequent Subprojects' : 'Most Frequent Projects'}
         </div>
-        <div className="flex-1 grid grid-cols-2 grid-rows-3 gap-2 md:gap-4 w-full h-full">
+        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full">
           {topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none" />
+            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none h-full w-full" />
           ))}
           {topGridItems.map((item, idx) => (
             <button
@@ -491,16 +490,12 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   onProjectSelect(item.id);
                 }
               }}
-              className={
-                'w-full h-full flex items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-xl font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer' +
-                ' ' + (showSubprojects ? 'hover:bg-blue-100 dark:hover:bg-blue-900' : 'hover:bg-gray-200 dark:hover:bg-gray-800')
-              }
+              className={'w-full h-full flex-1 min-h-0 flex items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer' + ' ' + (showSubprojects ? 'hover:bg-blue-100 dark:hover:bg-blue-900' : 'hover:bg-gray-200 dark:hover:bg-gray-800')}
               style={{
-                minHeight: '5.2rem',
-                minWidth: 0,
                 boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
                 fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
-                background: !showSubprojects && item.name ? `linear-gradient(135deg, ${generateProjectColor(item.name)} 0%, #f3f4f6 100%)` : undefined,
+                background: showSubprojects && selectedProject ? `linear-gradient(135deg, ${generateProjectColor(selectedProject.name)} 0%, #f3f4f6 100%)` : (!showSubprojects && item.name ? `linear-gradient(135deg, ${generateProjectColor(item.name)} 0%, #f3f4f6 100%)` : undefined),
+                fontSize: '0.85em',
               }}
             >
               {item.name}
@@ -509,13 +504,13 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         </div>
       </div>
       {/* Bottom half: Quick Start Combinations */}
-      <div className="flex-1 flex flex-col justify-stretch mt-4">
-        <div className="text-2xl font-bold mb-4 px-4 py-3 text-center rounded-xl bg-gray-100 dark:bg-gray-800" style={{ minHeight: '2.5rem', letterSpacing: '-0.01em' }}>
+      <div className="flex-1 min-h-0 flex flex-col">
+        <div className="text-xl font-bold mt-2 mb-2 px-3 py-2 text-center rounded-xl bg-gray-100 dark:bg-gray-800" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
           Quick Start Combinations
         </div>
-        <div className="flex-1 grid grid-cols-2 grid-rows-3 gap-2 md:gap-4 w-full h-full">
+        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full">
           {bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none" />
+            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none h-full w-full" />
           ))}
           {bottomGridItems.map((item, idx) => (
             <button
@@ -525,17 +520,16 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   handleStartNewTimerForProject(item.project.id, item.subproject.id);
                 }
               }}
-              className={'w-full h-full flex flex-col items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-xl font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800'}
+              className={'w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800'}
               style={{
-                minHeight: '5.2rem',
-                minWidth: 0,
                 boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
                 fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
                 background: item.project && item.project.name ? `linear-gradient(135deg, ${generateProjectColor(item.project.name)} 0%, #f3f4f6 100%)` : undefined,
+                fontSize: '0.85em',
               }}
             >
-              <span className="text-base font-semibold mb-1">{item.project.name}</span>
-              <span className="text-sm font-normal opacity-80">{item.subproject.name}</span>
+              <span className="text-base font-semibold mb-1" style={{ fontSize: '0.85em' }}>{item.project.name}</span>
+              <span className="text-sm font-normal opacity-80" style={{ fontSize: '0.85em' }}>{item.subproject.name}</span>
             </button>
           ))}
         </div>

@@ -56,8 +56,8 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
 }) => {
     return (
         <div className="w-full flex flex-col gap-6">
-            {/* Project and Subproject Search Bar Container - Only search bars, side by side */}
-            <div className="w-full max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg relative">
+            {/* Search Bar remains above the split */}
+            <div className="w-full max-w-7xl mx-auto relative">
                 <ProjectSubprojectSearchBar
                     projects={projects}
                     selectedProjectId={selectedProjectId}
@@ -67,10 +67,10 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
                 />
             </div>
 
-            {/* ProjectSelector and StopwatchPanel side by side */}
-            <div className="w-full max-w-7xl mx-auto mt-6 flex gap-6">
-                {/* Left: ProjectSelector (frequent projects, subprojects, quick start) */}
-                <div className="w-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-0 m-0">
+            {/* Strict 50/50 split, both panels w-1/2, h-[90%], min-h-0 */}
+            <div className="w-full max-w-7xl mx-auto flex flex-row gap-6 h-[76.5vh] min-h-0">
+                {/* Left: ProjectSelector */}
+                <div className="w-1/2 h-full min-h-0 flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-0 m-0">
                     <ProjectSelector
                         ref={projectSelectorRef}
                         projects={projects}
@@ -87,8 +87,8 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
                         isTimerRunning={isTimerRunning}
                     />
                 </div>
-                {/* Right: StopwatchPanel (circle timer) */}
-                <div className="w-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 flex items-center justify-center">
+                {/* Right: StopwatchPanel */}
+                <div className="w-1/2 h-full min-h-0 flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
                     <StopwatchPanel
                         ref={stopwatchRef}
                         selectedProject={selectedProject}

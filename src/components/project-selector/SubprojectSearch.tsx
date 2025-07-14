@@ -28,6 +28,16 @@ const SubprojectSearch: React.FC<SubprojectSearchProps> = React.memo(({
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   
+  // Sync searchTerm with selectedSubprojectId
+  React.useEffect(() => {
+    if (selectedSubprojectId) {
+      const selected = selectedProject.subprojects.find(s => s.id === selectedSubprojectId);
+      setSearchTerm(selected ? selected.name : '');
+    } else {
+      setSearchTerm('');
+    }
+  }, [selectedSubprojectId, selectedProject.subprojects]);
+
   const filteredSubprojects = React.useMemo(() => 
     selectedProject.subprojects.filter(subproject =>
       subproject.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -36,7 +46,7 @@ const SubprojectSearch: React.FC<SubprojectSearchProps> = React.memo(({
   const handleSubprojectClick = useCallback((subprojectId: string) => {
     onSubprojectSelect(subprojectId);
     setIsOpen(false);
-    setSearchTerm('');
+    // Don't clear searchTerm here - let useEffect handle it
   }, [onSubprojectSelect]);
 
   return (
@@ -45,7 +55,7 @@ const SubprojectSearch: React.FC<SubprojectSearchProps> = React.memo(({
         <input
           type="text"
           placeholder={`Search in ${selectedProject.name}...`}
-          value={searchTerm}
+          value={isOpen ? searchTerm : (selectedSubprojectId ? (selectedProject.subprojects.find(s => s.id === selectedSubprojectId)?.name || '') : searchTerm)}
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 150)}
