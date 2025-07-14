@@ -105,10 +105,11 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
   return (
     <>
       <div className="bg-white dark:bg-gray-850 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 w-full">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 w-full p-4 rounded-t-xl">
-          <div className="text-lg font-semibold text-gray-800 dark:text-white tracking-tight">
-            Paused Projects
-          </div>
+        {/* Paused Projects header */}
+        <div className="relative text-xl font-bold px-2.5 py-3 rounded-t-xl flex items-center justify-center text-center" style={{ minHeight: '2.1rem', fontSize: '1.02rem', letterSpacing: '-0.01em', background: 'rgba(150, 150, 160, 0.88)' }}>
+          <span className="relative z-10">Paused Projects</span>
+          {/* Glassmorphism overlay */}
+          <span className="absolute inset-0 rounded-t-xl bg-white/30 backdrop-blur-md border-b border-white/40 pointer-events-none z-0" />
         </div>
         <div className="w-full p-4">
           <div className="w-full space-y-4">

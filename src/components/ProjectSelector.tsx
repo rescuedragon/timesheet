@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useCallback, useRef } from 'react';
-import { Search, Play, ChevronDown, Timer } from 'lucide-react';
+import { Search, Play, ChevronDown, Timer, ChevronLeft } from 'lucide-react';
 import { StopwatchPanelRef } from './StopwatchPanel';
 import ShinyText from './common/ShinyText';
 import { generateProjectColor } from '../lib/projectColors';
@@ -471,15 +471,36 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const bottomGridItems = frequentCombinations;
 
   return (
-    <div className="w-full h-full flex flex-col p-4 m-0 min-h-0">
+    <div className="w-full h-full flex flex-col p-3 m-0 min-h-0">
       {/* Top half: Most Frequent Projects/Subprojects */}
-      <div className="flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm pb-3">
-        <div className="text-xl font-bold mb-2 px-3 py-2 rounded-t-2xl bg-gray-100 dark:bg-gray-800 text-center" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
-          {showSubprojects ? 'Most Frequent Subprojects' : 'Most Frequent Projects'}
+      <div className="flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm pb-2.5" style={{height: '40%', minHeight: 0}}>
+        <div className="relative text-xl font-bold mb-1.5 px-2.5 py-1.5 rounded-t-2xl flex items-center justify-between" style={{ minHeight: '1.36rem', fontSize: '1.02rem', letterSpacing: '-0.01em', background: 'rgba(150, 150, 160, 0.88)' }}>
+          {/* Left spacer for symmetry */}
+          <div style={{ minWidth: 28 }} />
+          {/* Centered header text */}
+          <div className="flex-1 flex items-center justify-center w-full">
+            <span className="relative z-10">{showSubprojects ? 'Frequently used Subprojects' : 'Frequently used Projects'}</span>
+          </div>
+          {/* Back button (right, only in subproject view) */}
+          <div className="flex items-center" style={{ minWidth: 28 }}>
+            {showSubprojects && (
+              <button
+                type="button"
+                className="p-1 rounded hover:bg-gray-200 transition z-10"
+                onClick={() => onProjectSelect('')}
+                tabIndex={0}
+                aria-label="Back to Frequently used Projects"
+              >
+                <ChevronLeft size={18} strokeWidth={2.2} />
+              </button>
+            )}
+          </div>
+          {/* Glassmorphism overlay */}
+          <span className="absolute inset-0 rounded-t-2xl bg-white/30 backdrop-blur-md border-b border-white/40 pointer-events-none z-0" />
         </div>
-        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full px-4">
+        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-1.5 w-full h-full px-3.5">
           {topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none h-full w-full" />
+            <div key={i} className="rounded-[1.05rem] bg-gray-100/60 shadow-none h-full w-full" />
           ))}
           {topGridItems.map((item, idx) => (
             <button
@@ -492,7 +513,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                 }
               }}
               className={
-                'w-full h-full flex-1 min-h-0 flex items-center justify-center rounded-[1.25rem] shadow-lg transition-all duration-200 text-lg font-semibold text-white select-none cursor-pointer relative overflow-hidden group' +
+                'w-full h-full flex-1 min-h-0 flex items-center justify-center rounded-[1.05rem] shadow-lg transition-all duration-200 text-base font-semibold text-white select-none cursor-pointer relative overflow-hidden group' +
                 ' hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/40'
               }
               style={{
@@ -517,28 +538,33 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       return tinycolor2(base).isLight() ? '#222' : '#fff';
                     })()
                   : '#222',
-                fontSize: '1.1em',
-                boxShadow: '0 6px 32px 0 rgba(80,80,160,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.08)'
+                fontSize: '0.88em',
+                boxShadow: '0 4.8px 25.6px 0 rgba(80,80,160,0.10), 0 1.2px 6.4px 0 rgba(0,0,0,0.08)'
               }}
             >
               <span className="z-10">{item.name}</span>
               {/* Glassy/shine hover effect */}
               {colorCodedProjectsEnabled && (
-                <span className="absolute inset-0 rounded-[1.25rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" />
+                <span className="absolute inset-0 rounded-[1.05rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" />
               )}
-              <span className="absolute inset-0 rounded-[1.25rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)'}} />
+              <span className="absolute inset-0 rounded-[1.05rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)'}} />
             </button>
           ))}
         </div>
       </div>
       {/* Bottom half: Quick Start Combinations */}
-      <div className="flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm mt-4 pb-3">
-        <div className="text-xl font-bold mt-0 mb-2 px-3 py-2 text-center rounded-t-2xl bg-gray-100 dark:bg-gray-800" style={{ minHeight: '1.7rem', fontSize: '1.275rem', letterSpacing: '-0.01em' }}>
-          Quick Start Combinations
+      <div className="flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm mt-3.5 pb-2.5" style={{height: '40%', minHeight: 0}}>
+        <div className="relative text-xl font-bold mt-0 mb-1.5 px-2.5 py-1.5 text-center rounded-t-2xl flex items-center justify-center gap-2" style={{ minHeight: '1.36rem', fontSize: '1.02rem', letterSpacing: '-0.01em', background: 'rgba(150, 150, 160, 0.88)' }}>
+          <span className="relative z-10 flex items-center gap-2">
+            <Timer size={18} strokeWidth={2.2} className="inline-block align-middle" />
+            Quick Start
+          </span>
+          {/* Glassmorphism overlay */}
+          <span className="absolute inset-0 rounded-t-2xl bg-white/30 backdrop-blur-md border-b border-white/40 pointer-events-none z-0" />
         </div>
-        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-2 w-full h-full px-4">
+        <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-3 gap-1.5 w-full h-full px-3.5">
           {bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none h-full w-full" />
+            <div key={i} className="rounded-[1.05rem] bg-gray-100/60 shadow-none h-full w-full" />
           ))}
           {bottomGridItems.map((item, idx) => (
             <button
@@ -549,7 +575,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                 }
               }}
               className={
-                'w-full h-full flex-1 min-h-0 flex items-center justify-between shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 text-lg font-semibold select-none cursor-pointer relative overflow-hidden isolation-isolate rounded-[1.25rem] group' +
+                'w-full h-full flex-1 min-h-0 flex items-center justify-between shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 text-base font-semibold select-none cursor-pointer relative overflow-hidden isolation-isolate rounded-[1.05rem] group' +
                 (colorCodedProjectsEnabled ? ' glassmorphism-btn' : '') +
                 ' hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/40'
               }
@@ -571,22 +597,22 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       return tinycolor2(base).isLight() ? '#222' : '#fff';
                     })()
                   : '#222',
-                fontSize: '1.1em',
-                boxShadow: '0 6px 32px 0 rgba(80,80,160,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.08)'
+                fontSize: '0.88em',
+                boxShadow: '0 4.8px 25.6px 0 rgba(80,80,160,0.10), 0 1.2px 6.4px 0 rgba(0,0,0,0.08)'
               }}
             >
-              <span className="z-10 flex flex-col items-start justify-center text-left pl-6">
+              <span className="z-10 flex flex-col items-start justify-center text-left pl-4">
                 <span className="block text-base font-semibold mb-0.5 leading-tight">{item.project.name}</span>
                 <span className="block text-sm font-normal opacity-80 leading-tight">{item.subproject.name}</span>
               </span>
-              <span className="z-10 pr-3 flex items-center justify-center">
-                <Timer size={26} strokeWidth={2.2} />
+              <span className="z-10 pr-2 flex items-center justify-center">
+                <Timer size={20} strokeWidth={2.2} />
               </span>
               {/* Glassy/shine hover effect */}
               {colorCodedProjectsEnabled && (
-                <span className="absolute inset-0 rounded-[1.25rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" style={{overflow: 'hidden'}} />
+                <span className="absolute inset-0 rounded-[1.05rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" style={{overflow: 'hidden'}} />
               )}
-              <span className="absolute inset-0 rounded-[1.25rem] pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)', overflow: 'hidden'}} />
+              <span className="absolute inset-0 rounded-[1.05rem] pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)', overflow: 'hidden'}} />
             </button>
           ))}
         </div>
