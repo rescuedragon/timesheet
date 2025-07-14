@@ -217,33 +217,11 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
     const selectedSubproject = selectedProject?.subprojects.find(s => s.id === selectedSubprojectId);
 
     return (
-        <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <div className="relative min-h-screen bg-transparent">
             {/* Subtle background pattern */}
-            <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-                style={{
-                    backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0)`,
-                    backgroundSize: '24px 24px'
-                }} />
+            {/* Remove background pattern overlay to ensure full transparency */}
 
-            <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-6">
-                {/* Current Selection Display with ClickSpark */}
-                <div className="w-full max-w-7xl mb-8">
-                    <ClickSpark
-                        sparkColor='#fff'
-                        sparkSize={10}
-                        sparkRadius={15}
-                        sparkCount={8}
-                        duration={400}
-                    >
-                        <CurrentSelectionDisplay
-                            selectedProject={selectedProject}
-                            selectedSubproject={selectedSubproject}
-                            isTimerRunning={isTimerRunning}
-                            currentTime={currentTime}
-                        />
-                    </ClickSpark>
-                </div>
-
+            <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-6 bg-transparent">
                 {/* Main Layout */}
                 <div className="w-full max-w-7xl mb-8">
                     <TimeTrackerLayout
@@ -268,18 +246,13 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
                         onTimerStopped={handleTimerStopped}
                         isTimerRunning={isTimerRunning}
                         onAddTimeLog={onAddTimeLog}
-                    />
-                </div>
-
-                {/* Queued Projects */}
-                <div className="w-full max-w-7xl">
-                    <QueuedProjects
                         queuedProjects={queuedProjects}
                         onResumeProject={handleResumeProject}
                         onStopProject={handleStopQueuedProject}
-                        onLogTime={handleLogTime}
                     />
                 </div>
+
+                {/* Queued Projects - removed, now handled by TimeTrackerLayout */}
             </div>
         </div>
     );

@@ -81,7 +81,7 @@ const Index = React.memo(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-modern relative">
+    <div className="min-h-screen w-full h-full p-0 m-0 bg-transparent relative">
       <HeaderControls
         isDarkMode={isDarkMode}
         onDarkModeToggle={handleDarkModeToggle}

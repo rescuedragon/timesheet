@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-blue)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -13,11 +13,11 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-modern-md hover:shadow-modern-lg",
         outline:
-          "border-2 border-border bg-background hover:bg-secondary hover:text-secondary-foreground hover:border-primary/30 shadow-modern-sm hover:shadow-modern-md",
+          "border-2 border-border bg-background hover:bg-[var(--accent-lavender)] hover:text-secondary-foreground hover:border-[var(--accent-blue)]/30 shadow-modern-sm hover:shadow-modern-md",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-modern-sm hover:shadow-modern-md",
-        ghost: "hover:bg-secondary hover:text-secondary-foreground",
-        link: "text-primary underline-offset-4 hover:underline hover:text-primary-hover",
+        ghost: "hover:bg-[var(--accent-lavender)] hover:text-secondary-foreground",
+        link: "text-primary underline-offset-4 hover:underline hover:text-[var(--accent-blue)]",
         success: "bg-success text-white hover:bg-success/90 shadow-modern-md hover:shadow-modern-lg",
         warning: "bg-warning text-white hover:bg-warning/90 shadow-modern-md hover:shadow-modern-lg",
       },

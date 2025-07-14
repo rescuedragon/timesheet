@@ -311,7 +311,7 @@ const PersonalJournal: React.FC = React.memo(() => {
   }, [entries]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white text-black p-6 font-sans">
+    <div className="w-full h-full min-h-0 min-w-0 bg-transparent text-black font-sans">
       <style>
         {`
           .task-completed {
@@ -340,7 +340,7 @@ const PersonalJournal: React.FC = React.memo(() => {
         setNotifications={setNotifications}
       />
       
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full h-full">
         {/* Top Navigation */}
         <div className="px-6 py-4 mb-8">
           <div className="flex items-center justify-end">

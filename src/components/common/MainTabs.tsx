@@ -17,7 +17,7 @@ interface MainTabsProps {
 const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, addTimeLog, setTimeLogs, replaceTimeLogs }) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full animate-slide-up">
-      <TabsList className="grid w-full grid-cols-3 mb-10 h-16 rounded-2xl bg-muted/30 p-2 shadow-2xl backdrop-blur-xl border border-border/20">
+      <TabsList className="grid w-full grid-cols-3 mb-4 h-16 rounded-2xl bg-muted/30 p-2 shadow-2xl backdrop-blur-xl border border-border/20">
         <TabsTrigger 
           value="tracker" 
           className="rounded-2xl font-medium text-base h-12 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-xl transition-all duration-150 ease-out hover:bg-accent/50"
@@ -40,7 +40,7 @@ const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, a
       </TabsList>
       
       <TabsContent value="tracker" className="animate-fade-in transition-all duration-200 ease-out">
-        <TimeTracker timeLogs={timeLogs} addTimeLog={addTimeLog} />
+        <TimeTracker onAddTimeLog={addTimeLog} />
       </TabsContent>
       
       <TabsContent value="data" className="animate-fade-in transition-all duration-200 ease-out">

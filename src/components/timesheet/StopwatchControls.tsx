@@ -30,41 +30,38 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
         <button
           onClick={onStart}
           disabled={!canStart}
-          className={`${buttonBaseStyle} bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_20px_rgba(255,255,255,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_8px_30px_rgba(255,255,255,0.15)]`}
+          className={`${buttonBaseStyle} bg-black text-white shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:bg-neutral-900 active:bg-neutral-950 border border-neutral-800`} // Matte black
           style={minWidth}
         >
           <span className="relative z-10 flex items-center justify-center">
             <Play className="h-5 w-5 mr-3" strokeWidth={2} />
             Start
           </span>
-          <span className="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900 dark:from-gray-200 dark:to-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
         </button>
       ) : (
         <button
           onClick={onStop}
           disabled={!canPauseOrStop}
-          className={`${buttonBaseStyle} bg-red-600 dark:bg-red-500 text-white shadow-[0_4px_20px_rgba(239,68,68,0.3)] hover:shadow-[0_8px_30px_rgba(239,68,68,0.4)]`}
+          className={`${buttonBaseStyle} bg-black text-white shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:bg-neutral-900 active:bg-neutral-950 border border-neutral-800`} // Matte black
           style={minWidth}
         >
           <span className="relative z-10 flex items-center justify-center">
             <Square className="h-5 w-5 mr-3" strokeWidth={2} />
             Stop
           </span>
-          <span className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-600 dark:from-red-600 dark:to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
         </button>
       )}
       
       <button
         onClick={onPause}
         disabled={!canPauseOrStop}
-        className={`${buttonBaseStyle} bg-blue-600 dark:bg-blue-500 text-white shadow-[0_4px_20px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_30px_rgba(37,99,235,0.4)]`}
+        className={`${buttonBaseStyle} bg-white/90 text-black border border-border shadow-[0_4px_20px_rgba(0,0,0,0.10)] hover:bg-white active:bg-gray-100 backdrop-blur-xl`} // Glassmorphism, matches header
         style={minWidth}
       >
         <span className="relative z-10 flex items-center justify-center">
           <Pause className="h-5 w-5 mr-3" strokeWidth={2} />
           Pause
         </span>
-        <span className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-600 dark:from-blue-600 dark:to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
       </button>
     </div>
   );

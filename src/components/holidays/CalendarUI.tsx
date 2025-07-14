@@ -91,7 +91,7 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
 
   return (
     <div className="w-full">
-      <div className="bg-white rounded-xl shadow-2xl border border-black/5 overflow-hidden backdrop-blur-sm">
+      <div className="bg-white/10 rounded-xl shadow-2xl border border-black/5 overflow-hidden backdrop-blur-md">
         <div className="p-6 shadow-inner" style={{ backgroundColor: containerBgColor, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.1)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

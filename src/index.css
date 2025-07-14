@@ -8,57 +8,54 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Google Material Design System - Clean White & Black */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 15%;
+    /* Material-inspired Google Color Palette */
+    --background: 210 20% 98%; /* Light blue-gray */
+    --foreground: 222 47% 11%; /* Google dark blue */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 15%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 15%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --primary-hover: 0 0% 15%;
+    --primary: 217 89% 61%; /* Google Blue */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 89% 51%;
 
-    --secondary: 0 0% 98%;
-    --secondary-foreground: 0 0% 15%;
-    --secondary-hover: 0 0% 96%;
+    --secondary: 10 79% 62%; /* Google Red */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 10 79% 52%;
 
-    --muted: 0 0% 98%;
-    --muted-foreground: 0 0% 45%;
-
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 15%;
-    --accent-hover: 0 0% 94%;
-
+    --success: 142 71% 45%; /* Google Green */
+    --warning: 45 100% 51%; /* Google Yellow */
+    --info: 201 100% 50%; /* Google Cyan */
     --destructive: 0 85% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 25 95% 53%;
-    --warning-foreground: 0 0% 9%;
+    --muted: 210 16% 93%;
+    --muted-foreground: 222 20% 40%;
 
-    --border: 0 0% 91%;
-    --input: 0 0% 96%;
-    --ring: 0 0% 9%;
+    --accent: 277 73% 67%; /* Google Purple */
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 277 73% 57%;
 
-    --success: 142 71% 45%;
-    --info: 221 83% 53%;
+    --border: 210 16% 85%;
+    --input: 210 16% 93%;
+    --ring: 217 89% 61%;
 
     --radius: 12px;
 
-    /* Google Material Design Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 99%) 0%, hsl(0 0% 97%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(0 0% 96%) 100%);
+    /* Material Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 89% 61%) 0%, hsl(277 73% 67%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(10 79% 62%) 0%, hsl(45 100% 51%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(201 100% 50%) 0%, hsl(142 71% 45%) 100%);
 
-    /* Enhanced Google Material Design Shadows */
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    /* Material Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 1px 2px 0 rgba(60, 64, 67, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(60, 64, 67, 0.10), 0 2px 4px -1px rgba(60, 64, 67, 0.08);
+    --shadow-lg: 0 10px 15px -3px rgba(60, 64, 67, 0.12), 0 4px 6px -2px rgba(60, 64, 67, 0.10);
+    --shadow-xl: 0 20px 25px -5px rgba(60, 64, 67, 0.14), 0 10px 10px -5px rgba(60, 64, 67, 0.12);
+    --shadow-2xl: 0 25px 50px -12px rgba(60, 64, 67, 0.18);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 0%;
@@ -137,17 +134,40 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
-    font-family: 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    line-height: 1.6;
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    box-sizing: border-box;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  #root,
+  .App,
+  .container,
+  .wrapper,
+  .content {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
   }
 
   /* Google Material Design Typography */
   h1, h2, h3, h4, h5, h6 {
     @apply font-medium tracking-tight text-foreground;
-    font-family: 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Roboto', 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
   }
 
   h1 { @apply text-4xl font-normal; }
@@ -156,6 +176,31 @@ All colors MUST be HSL.
   h4 { @apply text-xl font-medium; }
   h5 { @apply text-lg font-medium; }
   h6 { @apply text-base font-medium; }
+
+  /* Accent backgrounds for headers, timer, and 'Currently Tracking' */
+  .header-material {
+    background: var(--gradient-primary);
+    color: var(--primary-foreground);
+    box-shadow: var(--shadow-md);
+  }
+  .timer-circle-material {
+    background: var(--gradient-accent);
+    color: var(--accent-foreground);
+    box-shadow: var(--shadow-lg);
+  }
+  .currently-tracking-material {
+    background: linear-gradient(90deg, #4285F4 0%, #34A853 100%);
+    color: #fff;
+    box-shadow: 0 4px 24px 0 rgba(60,64,67,0.10);
+    border-radius: 1.25rem;
+  }
+
+  .search-section-material {
+    background: linear-gradient(90deg, #e3f0ff 0%, #f3e7ff 50%, #e0ffe3 100%);
+    border-radius: 1.25rem;
+    box-shadow: 0 2px 12px 0 rgba(60,64,67,0.08);
+    padding: 0.5rem 0.5rem;
+  }
 
   /* Enhanced modern animations */
   .animate-fade-in {
@@ -240,8 +285,10 @@ All colors MUST be HSL.
 
   /* Enhanced card styles */
   .card-modern {
-    @apply bg-card border-border/60 shadow-lg hover:shadow-2xl transition-all duration-500;
-    backdrop-filter: blur(20px);
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
   }
 
   /* Enhanced button hover effects */
@@ -312,9 +359,10 @@ All colors MUST be HSL.
 
   /* Glass morphism effect */
   .glass-effect {
-    backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
   }
 
   .dark .glass-effect {
@@ -499,4 +547,65 @@ All colors MUST be HSL.
     .dropdown {
         border-radius: 20px;
     }
+}
+
+@keyframes vibrate {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+.animate-vibrate {
+  animation: vibrate 0.4s linear infinite;
+}
+
+/* Flip animation for Quick Start confirmation */
+.quickstart-flip {
+  perspective: 800px;
+}
+.quickstart-flip-inner {
+  transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.quickstart-flip-front, .quickstart-flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.quickstart-flip-back {
+  transform: rotateY(180deg);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  top: 0;
+  left: 0;
+  border-radius: 1.05rem;
+  font-size: 1.35em;
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
+}
+.quickstart-flip.flipped .quickstart-flip-inner {
+  transform: rotateY(180deg);
+}
+
+/* UI Cosmetic Redesign Accent Colors */
+:root {
+  --accent-blue: #4F8CFF;
+  --accent-lavender: #E6E6FA;
 }

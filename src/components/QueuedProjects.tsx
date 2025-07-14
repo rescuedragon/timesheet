@@ -104,21 +104,20 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-850 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 w-full">
+      <div className="bg-white/10 dark:bg-gray-850 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 w-full backdrop-blur-md">
         {/* Paused Projects header */}
-        <div className="relative text-xl font-bold px-2.5 py-3 rounded-t-xl flex items-center justify-center text-center" style={{ minHeight: '2.1rem', fontSize: '1.02rem', letterSpacing: '-0.01em', background: 'rgba(150, 150, 160, 0.88)' }}>
+        <div className="relative text-xl font-bold px-2.5 py-3 rounded-t-xl flex items-center justify-center text-center" style={{ minHeight: '2.1rem', fontSize: '1.02rem', letterSpacing: '-0.01em', background: 'rgba(150, 150, 160, 0.18)' }}>
           <span className="relative z-10">Paused Projects</span>
           {/* Glassmorphism overlay */}
-          <span className="absolute inset-0 rounded-t-xl bg-white/30 backdrop-blur-md border-b border-white/40 pointer-events-none z-0" />
+          <span className="absolute inset-0 rounded-t-xl bg-white/10 backdrop-blur-md border-b border-white/20 pointer-events-none z-0" />
         </div>
         <div className="w-full p-4">
           <div className="w-full space-y-4">
             {queuedProjects.map(project => (
               <div 
                 key={project.id} 
-                className="flex items-stretch bg-white dark:bg-gray-800 w-full rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden"
-                style={getProjectBackgroundStyle(project.projectName)}
-              >
+                className="flex items-stretch w-full bg-transparent border-none rounded-none shadow-none overflow-visible"
+                style={{...getProjectBackgroundStyle(project.projectName), background: 'transparent', border: 'none', borderRadius: 0, boxShadow: 'none'}}>
                 {/* Project name container (left 15%) */}
                 <div className="w-[15%] min-w-[100px] bg-gray-900 dark:bg-gray-900 flex flex-col items-center justify-center text-white p-3">
                   <div className="font-bold text-center text-sm">
@@ -148,16 +147,15 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
                     <Button
                       size="sm"
                       onClick={() => onResumeProject(project)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                      className="bg-black text-white hover:bg-neutral-900 active:bg-neutral-950 border border-neutral-800 px-4 py-2 rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.18)]"
                     >
                       <Play className="h-3 w-3 mr-1.5" />
                       <span>Resume</span>
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
                       onClick={() => handleStopClick(project)}
-                      className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-750 px-4 py-2 rounded-lg"
+                      className="bg-black text-white hover:bg-neutral-900 active:bg-neutral-950 border border-neutral-800 px-4 py-2 rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.18)]"
                     >
                       <Square className="h-3 w-3 mr-1.5" />
                       <span>Stop</span>
