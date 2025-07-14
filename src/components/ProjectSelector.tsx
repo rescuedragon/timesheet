@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useCallback, useRef } from 'react';
-import { Search, Play, ChevronDown } from 'lucide-react';
+import { Search, Play, ChevronDown, Timer } from 'lucide-react';
 import { StopwatchPanelRef } from './StopwatchPanel';
 import ShinyText from './common/ShinyText';
 import { generateProjectColor } from '../lib/projectColors';
@@ -549,7 +549,8 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                 }
               }}
               className={
-                'w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center rounded-[1.25rem] shadow-lg transition-all duration-200 text-lg font-semibold text-white select-none cursor-pointer relative overflow-hidden group' +
+                'w-full h-full flex-1 min-h-0 flex items-center justify-between shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 text-lg font-semibold select-none cursor-pointer relative overflow-hidden isolation-isolate rounded-[1.25rem] group' +
+                (colorCodedProjectsEnabled ? ' glassmorphism-btn' : '') +
                 ' hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/40'
               }
               style={{
@@ -574,12 +575,18 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                 boxShadow: '0 6px 32px 0 rgba(80,80,160,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.08)'
               }}
             >
-              <span className="z-10 text-center">
-                <span className="block text-base font-semibold mb-1">{item.project.name}</span>
-                <span className="block text-sm font-normal opacity-80">{item.subproject.name}</span>
+              <span className="z-10 flex flex-col items-start justify-center text-left pl-6">
+                <span className="block text-base font-semibold mb-0.5 leading-tight">{item.project.name}</span>
+                <span className="block text-sm font-normal opacity-80 leading-tight">{item.subproject.name}</span>
+              </span>
+              <span className="z-10 pr-3 flex items-center justify-center">
+                <Timer size={26} strokeWidth={2.2} />
               </span>
               {/* Glassy/shine hover effect */}
-              <span className="absolute inset-0 rounded-[1.25rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)'}} />
+              {colorCodedProjectsEnabled && (
+                <span className="absolute inset-0 rounded-[1.25rem] bg-white/50 backdrop-blur-lg border-2 border-white/60 pointer-events-none z-0" style={{overflow: 'hidden'}} />
+              )}
+              <span className="absolute inset-0 rounded-[1.25rem] pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)', overflow: 'hidden'}} />
             </button>
           ))}
         </div>
