@@ -183,34 +183,32 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
           <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
             <Search size={24} strokeWidth={2} />
           </div>
-          {/* Apple-style glassmorphism dropdown */}
-          {showProjectDropdown && (
-            <div className="absolute top-full left-0 mt-2 w-full z-50">
-              <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border border-white/40 dark:border-gray-700/40 rounded-2xl shadow-2xl py-1.5 max-h-64 overflow-y-auto transition-all duration-200">
-                {filteredProjects.length > 0 ? (
-                  filteredProjects.map((project, idx) => (
-                    <div
-                      key={project.id}
-                      ref={el => projectDropdownRefs.current[idx] = el}
-                      onClick={() => {
-                        onProjectSelect(project.id);
-                        setShowProjectDropdown(false);
-                        setProjectDropdownIndex(-1);
-                      }}
-                      className={`px-5 py-3 cursor-pointer flex items-center text-base font-medium transition-all duration-150 rounded-xl ${projectDropdownIndex === idx ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'} text-gray-900 dark:text-gray-100`}
-                      style={{ userSelect: 'none' }}
-                    >
-                      <span className="truncate">{project.name}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-5 py-4 text-gray-400 text-base text-center select-none">
-                    {projectDropdownSearch ? 'No projects match your search' : 'No projects available'}
+          {/* Apple-style Elite dropdown for project */}
+          <div className={showProjectDropdown ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0 }}>
+            {filteredProjects.length > 0 ? (
+              filteredProjects.map((project, idx) => (
+                <div
+                  key={project.id}
+                  className={`dropdown-item${projectDropdownIndex === idx ? ' selected' : ''}`}
+                  onClick={() => {
+                    onProjectSelect(project.id);
+                    setShowProjectDropdown(false);
+                    setProjectDropdownIndex(-1);
+                  }}
+                  tabIndex={0}
+                >
+                  <div className="item-content">
+                    <div className="item-text">{project.name}</div>
+                    {/* <div className="item-description">Optional description</div> */}
                   </div>
-                )}
+                </div>
+              ))
+            ) : (
+              <div className="dropdown-item">
+                No projects found
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
       {/* Subproject Search */}
@@ -246,34 +244,32 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
           <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
             <Search size={24} strokeWidth={2} />
           </div>
-          {/* Apple-style glassmorphism dropdown for subproject */}
-          {showSubprojectDropdown && selectedProject && (
-            <div className="absolute top-full left-0 mt-2 w-full z-50">
-              <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border border-white/40 dark:border-gray-700/40 rounded-2xl shadow-2xl py-1.5 max-h-64 overflow-y-auto transition-all duration-200">
-                {filteredSubprojects.length > 0 ? (
-                  filteredSubprojects.map((subproject, idx) => (
-                    <div
-                      key={subproject.id}
-                      ref={el => subprojectDropdownRefs.current[idx] = el}
-                      onClick={() => {
-                        onSubprojectSelect(subproject.id);
-                        setShowSubprojectDropdown(false);
-                        setSubprojectDropdownIndex(-1);
-                      }}
-                      className={`px-5 py-3 cursor-pointer flex items-center text-base font-medium transition-all duration-150 rounded-xl ${subprojectDropdownIndex === idx ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'} text-gray-900 dark:text-gray-100`}
-                      style={{ userSelect: 'none' }}
-                    >
-                      <span className="truncate">{subproject.name}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-5 py-4 text-gray-400 text-base text-center select-none">
-                    No subprojects found
+          {/* Apple-style Elite dropdown for subproject */}
+          <div className={showSubprojectDropdown && selectedProject ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0, zIndex: 1000 }}>
+            {filteredSubprojects.length > 0 ? (
+              filteredSubprojects.map((subproject, idx) => (
+                <div
+                  key={subproject.id}
+                  className={`dropdown-item${subprojectDropdownIndex === idx ? ' selected' : ''}`}
+                  onClick={() => {
+                    onSubprojectSelect(subproject.id);
+                    setShowSubprojectDropdown(false);
+                    setSubprojectDropdownIndex(-1);
+                  }}
+                  tabIndex={0}
+                >
+                  <div className="item-content">
+                    <div className="item-text">{subproject.name}</div>
+                    {/* <div className="item-description">Optional description</div> */}
                   </div>
-                )}
+                </div>
+              ))
+            ) : (
+              <div className="dropdown-item">
+                No subprojects found
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

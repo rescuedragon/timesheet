@@ -8,6 +8,7 @@ import SettingsHolidays from './settings/SettingsHolidays';
 import SettingsUserAccess from './settings/SettingsUserAccess';
 import SettingsManagerAccess from './settings/SettingsManagerAccess';
 import { useSettings } from '@/hooks/useSettings';
+import { useState } from 'react';
 
 const Settings: React.FC = () => {
   const {
@@ -25,8 +26,29 @@ const Settings: React.FC = () => {
     handleFrequentSubprojectsToggle
   } = useSettings();
 
+  // Local state for pending changes
+  const [pendingProgressBarEnabled, setPendingProgressBarEnabled] = useState(progressBarEnabled);
+  const [pendingProgressBarColor, setPendingProgressBarColor] = useState(progressBarColor);
+  const [pendingColorCodedProjectsEnabled, setPendingColorCodedProjectsEnabled] = useState(colorCodedProjectsEnabled);
+  const [pendingFrequentSubprojectsEnabled, setPendingFrequentSubprojectsEnabled] = useState(frequentSubprojectsEnabled);
+  const [pendingProjects, setPendingProjects] = useState(projects);
+  const [pendingHolidays, setPendingHolidays] = useState(holidays);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Save handler
+  const handleSave = () => {
+    handleProgressBarToggle(pendingProgressBarEnabled);
+    handleProgressBarColorChange(pendingProgressBarColor);
+    handleColorCodedProjectsToggle(pendingColorCodedProjectsEnabled);
+    handleFrequentSubprojectsToggle(pendingFrequentSubprojectsEnabled);
+    setProjects(pendingProjects);
+    setHolidays(pendingHolidays);
+    window.dispatchEvent(new CustomEvent('settings-changed'));
+    setDialogOpen(false); // Close dialog after saving
+  };
+
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="p-4 rounded-2xl shadow-2xl hover:shadow-2xl bg-card/90 backdrop-blur-xl border border-border/30 hover:border-border/50 transition-all duration-300">
           <SettingsIcon className="h-5 w-5" />
@@ -46,30 +68,36 @@ const Settings: React.FC = () => {
           </TabsList>
           
           <TabsContent value="projects" className="space-y-4">
-            <SettingsProjects projects={projects} setProjects={setProjects} />
+            <SettingsProjects projects={pendingProjects} setProjects={setPendingProjects} />
           </TabsContent>
 
           <TabsContent value="holidays" className="space-y-4">
-            <SettingsHolidays holidays={holidays} setHolidays={setHolidays} />
+            <SettingsHolidays holidays={pendingHolidays} setHolidays={setPendingHolidays} />
           </TabsContent>
           
           <TabsContent value="user" className="space-y-4">
             <SettingsUserAccess
-              progressBarEnabled={progressBarEnabled}
-              progressBarColor={progressBarColor}
-              colorCodedProjectsEnabled={colorCodedProjectsEnabled}
-              frequentSubprojectsEnabled={frequentSubprojectsEnabled}
-              onProgressBarToggle={handleProgressBarToggle}
-              onProgressBarColorChange={handleProgressBarColorChange}
-              onColorCodedProjectsToggle={handleColorCodedProjectsToggle}
-              onFrequentSubprojectsToggle={handleFrequentSubprojectsToggle}
+              progressBarEnabled={pendingProgressBarEnabled}
+              progressBarColor={pendingProgressBarColor}
+              colorCodedProjectsEnabled={pendingColorCodedProjectsEnabled}
+              frequentSubprojectsEnabled={pendingFrequentSubprojectsEnabled}
+              onProgressBarToggle={setPendingProgressBarEnabled}
+              onProgressBarColorChange={setPendingProgressBarColor}
+              onColorCodedProjectsToggle={setPendingColorCodedProjectsEnabled}
+              onFrequentSubprojectsToggle={setPendingFrequentSubprojectsEnabled}
             />
           </TabsContent>
           
           <TabsContent value="manager" className="space-y-4">
-            <SettingsManagerAccess holidays={holidays} setHolidays={setHolidays} />
+            <SettingsManagerAccess holidays={pendingHolidays} setHolidays={setPendingHolidays} />
           </TabsContent>
         </Tabs>
+        {/* Save Button */}
+        <div className="flex justify-end mt-6">
+          <Button onClick={handleSave} className="px-8 py-3 text-base font-semibold rounded-xl shadow-lg bg-black text-white hover:bg-gray-900 transition-all duration-200">
+            Save
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -39,11 +39,26 @@ export const useSettings = () => {
   const handleProgressBarToggle = (enabled: boolean) => {
     setProgressBarEnabled(enabled);
     localStorage.setItem('progressbar-enabled', JSON.stringify(enabled));
+    window.dispatchEvent(new CustomEvent('settings-changed'));
   };
 
   const handleProgressBarColorChange = (color: string) => {
     setProgressBarColor(color);
     localStorage.setItem('progressbar-color', color);
+    window.dispatchEvent(new CustomEvent('settings-changed'));
+  };
+
+  // Update setProjects and setHolidays to dispatch event
+  const setProjectsWithEvent = (projects: any[]) => {
+    setProjects(projects);
+    localStorage.setItem('timesheet-projects', JSON.stringify(projects));
+    window.dispatchEvent(new CustomEvent('settings-changed'));
+  };
+
+  const setHolidaysWithEvent = (holidays: any[]) => {
+    setHolidays(holidays);
+    localStorage.setItem('timesheet-holidays', JSON.stringify(holidays));
+    window.dispatchEvent(new CustomEvent('settings-changed'));
   };
 
   const handleColorCodedProjectsToggle = (enabled: boolean) => {
@@ -64,9 +79,9 @@ export const useSettings = () => {
     colorCodedProjectsEnabled,
     frequentSubprojectsEnabled,
     projects,
-    setProjects,
+    setProjects: setProjectsWithEvent,
     holidays,
-    setHolidays,
+    setHolidays: setHolidaysWithEvent,
     handleProgressBarToggle,
     handleProgressBarColorChange,
     handleColorCodedProjectsToggle,
