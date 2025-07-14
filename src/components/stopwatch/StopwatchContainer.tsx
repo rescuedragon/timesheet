@@ -15,6 +15,7 @@ interface StopwatchContainerProps {
   onResumedProjectHandled: () => void;
   startFnRef?: React.MutableRefObject<(() => void) | undefined>;
   onTimerStopped?: () => void;
+  onAddTimeLog: (newLog: any) => void;
 }
 
 const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
@@ -25,15 +26,28 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
   resumedProject,
   onResumedProjectHandled,
   startFnRef,
-  onTimerStopped
+  onTimerStopped,
+  onAddTimeLog
 }) => {
   const [showDescriptionDialog, setShowDescriptionDialog] = React.useState(false);
   const [description, setDescription] = React.useState('');
   const [pendingLogData, setPendingLogData] = React.useState<{duration: number, startTime: Date, endTime: Date} | null>(null);
 
   const handleConfirmLog = () => {
-    if (pendingLogData) {
-      onLogTime(pendingLogData.duration, description, pendingLogData.startTime, pendingLogData.endTime);
+    if (pendingLogData && selectedProject && selectedSubproject) {
+      const newLog = {
+        id: Date.now().toString(),
+        projectId: selectedProject.id,
+        subprojectId: selectedSubproject.id,
+        projectName: selectedProject.name,
+        subprojectName: selectedSubproject.name,
+        duration: pendingLogData.duration,
+        description,
+        date: new Date().toISOString().split('T')[0],
+        startTime: pendingLogData.startTime.toLocaleTimeString(),
+        endTime: pendingLogData.endTime.toLocaleTimeString()
+      };
+      onAddTimeLog(newLog);
     }
     setShowDescriptionDialog(false);
     setDescription('');

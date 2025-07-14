@@ -38,7 +38,7 @@ export interface TimeLog {
     endTime: string;
 }
 
-const TimeTracker = () => {
+const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) => {
     const {
         projects,
         addProject,
@@ -132,7 +132,20 @@ const TimeTracker = () => {
 
         if (!project || !subproject) return;
 
-        logTime(duration, description, startTime, endTime, targetProjectId, targetSubprojectId, project.name, subproject.name);
+        // Compose the new log object
+        const newLog = {
+            id: Date.now().toString(),
+            projectId: targetProjectId,
+            subprojectId: targetSubprojectId,
+            projectName: project.name,
+            subprojectName: subproject.name,
+            duration,
+            description,
+            date: new Date().toISOString().split('T')[0],
+            startTime: startTime.toLocaleTimeString(),
+            endTime: endTime.toLocaleTimeString()
+        };
+        onAddTimeLog(newLog);
     };
 
     const switchToExcelView = () => {
@@ -212,48 +225,54 @@ const TimeTracker = () => {
                     backgroundSize: '24px 24px'
                 }} />
 
-            <div className="relative z-10 w-full max-w-full px-0 py-0 flex flex-col gap-0">
+            <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-6">
                 {/* Current Selection Display with ClickSpark */}
-                <ClickSpark
-                    sparkColor='#fff'
-                    sparkSize={10}
-                    sparkRadius={15}
-                    sparkCount={8}
-                    duration={400}
-                >
-                    <CurrentSelectionDisplay
-                        selectedProject={selectedProject}
-                        selectedSubproject={selectedSubproject}
-                        isTimerRunning={isTimerRunning}
-                        currentTime={currentTime}
-                    />
-                </ClickSpark>
+                <div className="w-full max-w-7xl mb-8">
+                    <ClickSpark
+                        sparkColor='#fff'
+                        sparkSize={10}
+                        sparkRadius={15}
+                        sparkCount={8}
+                        duration={400}
+                    >
+                        <CurrentSelectionDisplay
+                            selectedProject={selectedProject}
+                            selectedSubproject={selectedSubproject}
+                            isTimerRunning={isTimerRunning}
+                            currentTime={currentTime}
+                        />
+                    </ClickSpark>
+                </div>
 
                 {/* Main Layout */}
-                <TimeTrackerLayout
-                    projects={projects}
-                    selectedProjectId={selectedProjectId}
-                    selectedSubprojectId={selectedSubprojectId}
-                    onProjectSelect={handleProjectSelect}
-                    onSubprojectSelect={setSelectedSubprojectId}
-                    onAddProject={addProject}
-                    onAddSubproject={addSubproject}
-                    selectedProject={selectedProject}
-                    selectedSubproject={selectedSubproject}
-                    onLogTime={handleLogTime}
-                    onPauseProject={handlePauseProject}
-                    resumedProject={resumedProject}
-                    onResumedProjectHandled={handleResumedProjectHandled}
-                    currentFocus={currentFocus}
-                    onFocusChange={setCurrentFocus}
-                    projectSelectorRef={projectSelectorRef}
-                    stopwatchRef={stopwatchRef}
-                    handleStartNewTimerForProject={handleStartNewTimerForProject}
-                    onTimerStopped={handleTimerStopped}
-                />
+                <div className="w-full max-w-7xl mb-8">
+                    <TimeTrackerLayout
+                        projects={projects}
+                        selectedProjectId={selectedProjectId}
+                        selectedSubprojectId={selectedSubprojectId}
+                        onProjectSelect={handleProjectSelect}
+                        onSubprojectSelect={setSelectedSubprojectId}
+                        onAddProject={addProject}
+                        onAddSubproject={addSubproject}
+                        selectedProject={selectedProject}
+                        selectedSubproject={selectedSubproject}
+                        onLogTime={handleLogTime}
+                        onPauseProject={handlePauseProject}
+                        resumedProject={resumedProject}
+                        onResumedProjectHandled={handleResumedProjectHandled}
+                        currentFocus={currentFocus}
+                        onFocusChange={setCurrentFocus}
+                        projectSelectorRef={projectSelectorRef}
+                        stopwatchRef={stopwatchRef}
+                        handleStartNewTimerForProject={handleStartNewTimerForProject}
+                        onTimerStopped={handleTimerStopped}
+                        isTimerRunning={isTimerRunning}
+                        onAddTimeLog={onAddTimeLog}
+                    />
+                </div>
 
                 {/* Queued Projects */}
-                <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+                <div className="w-full max-w-7xl">
                     <QueuedProjects
                         queuedProjects={queuedProjects}
                         onResumeProject={handleResumeProject}

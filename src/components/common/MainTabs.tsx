@@ -8,9 +8,13 @@ import Holidays from '../Holidays';
 interface MainTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
+  timeLogs: any[];
+  addTimeLog: (newLog: any) => void;
+  setTimeLogs: React.Dispatch<any>;
+  replaceTimeLogs: (logs: any[]) => void;
 }
 
-const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange }) => {
+const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, addTimeLog, setTimeLogs, replaceTimeLogs }) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full animate-slide-up">
       <TabsList className="grid w-full grid-cols-3 mb-10 h-16 rounded-2xl bg-muted/30 p-2 shadow-2xl backdrop-blur-xl border border-border/20">
@@ -36,11 +40,11 @@ const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange }) => {
       </TabsList>
       
       <TabsContent value="tracker" className="animate-fade-in transition-all duration-200 ease-out">
-        <TimeTracker />
+        <TimeTracker timeLogs={timeLogs} addTimeLog={addTimeLog} />
       </TabsContent>
       
       <TabsContent value="data" className="animate-fade-in transition-all duration-200 ease-out">
-        <ExcelView />
+        <ExcelView timeLogs={timeLogs} addTimeLog={addTimeLog} setTimeLogs={setTimeLogs} replaceTimeLogs={replaceTimeLogs} />
       </TabsContent>
       
       <TabsContent value="holidays" className="animate-fade-in transition-all duration-200 ease-out">

@@ -455,339 +455,91 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     }
   }));
 
+  // Apple-inspired unified container with animated header and 3x2 squircle grid
+  const [headerFade, setHeaderFade] = useState(true);
+  useEffect(() => {
+    setHeaderFade(false);
+    const timeout = setTimeout(() => setHeaderFade(true), 150);
+    return () => clearTimeout(timeout);
+  }, [selectedProjectId]);
+
+  const showSubprojects = !!selectedProjectId && selectedProject;
+  const topGridItems = showSubprojects
+    ? (selectedProject?.subprojects.slice(0, 6) || [])
+    : frequentProjects.slice(0, 6);
+  const bottomGridItems = frequentCombinations;
+
   return (
-    <div className="w-full h-full flex flex-col">
-      {/* Search Bars */}
-      <div className="flex w-full gap-4 mb-8 mt-[-1%]" style={{ width: '100%' }}>
-        {/* Main Project Search */}
-        <div className="w-full flex-shrink-0 flex-grow-0 relative" style={{ marginLeft: '-2%' }}>
-          <div className="relative w-full h-16">
-            <input
-              ref={projectInputRef}
-              type="text"
-              placeholder={undefined}
-              value={projectSearch}
-              onChange={(e) => {
-                setProjectSearch(e.target.value);
-                setProjectDropdownSearch(e.target.value);
-              }}
-              onClick={() => {
-                setShowProjectDropdown(true);
-                setProjectDropdownIndex(-1);
-              }}
-              onKeyDown={handleProjectInputKeyDown}
-              onFocus={() => {
-                setFocusedInput('project');
-                setShowProjectDropdown(true);
-                setProjectDropdownIndex(-1);
-              }}
-              onBlur={() => setFocusedInput(null)}
-              className="w-full h-16 px-5 py-4 pr-12 text-white bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
-              style={{ fontSize: '1.125rem' }}
-            />
-            <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              {projectSearch === '' && <ShinyText text="Search for main project" className="text-lg" />}
-            </div>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
-              <Search size={24} strokeWidth={2} />
-            </div>
-          </div>
-      
-          {showProjectDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-3 z-30">
-              <div className="dropdown-glass w-full">
-                {filteredProjects.length > 0 ? (
-                  filteredProjects.map((project, idx) => (
-                    <div
-                      key={project.id}
-                      ref={el => projectDropdownRefs.current[idx] = el}
-                      onClick={() => handleProjectSelect(project.id)}
-                      className={`dropdown-item-glass${projectDropdownIndex === idx ? ' selected' : ''}`}
-                    >
-                      <div className="item-content">
-                        <div className="item-text">{project.name}</div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="dropdown-item-glass text-center text-gray-400 select-none">
-                    {projectDropdownSearch ? 'No projects match your search' : 'No projects available'}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+    <div className="w-full h-full flex flex-col items-stretch justify-stretch p-4">
+      {/* Top half: Frequent Projects/Subprojects */}
+      <div className="flex-1 flex flex-col justify-stretch">
+        <div className={`text-2xl font-bold mb-4 px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 transition-opacity duration-300 ${headerFade ? 'opacity-100' : 'opacity-0'}`}
+          style={{ minHeight: '2.5rem', textAlign: 'center', letterSpacing: '-0.01em' }}>
+          {showSubprojects ? 'Most Frequent Subprojects' : 'Most Frequent Projects'}
         </div>
-        
-        {/* Subproject Search */}
-        <div className="w-full flex-shrink-0 flex-grow-0 relative">
-          <div className="relative w-full h-16">
-            <input
-              ref={subprojectInputRef}
-              type="text"
-              placeholder={undefined}
-              value={subprojectSearch}
-              onChange={(e) => {
-                setSubprojectSearch(e.target.value);
-                setSubprojectDropdownSearch(e.target.value);
-              }}
+        <div className="flex-1 grid grid-cols-2 grid-rows-3 gap-2 md:gap-4 w-full h-full">
+          {topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none" />
+          ))}
+          {topGridItems.map((item, idx) => (
+            <button
+              key={item.id}
               onClick={() => {
-                setShowSubprojectDropdown(true);
-                setSubprojectDropdownIndex(-1);
+                if (showSubprojects) {
+                  onSubprojectSelect(item.id);
+                } else {
+                  onProjectSelect(item.id);
+                }
               }}
-              onFocus={() => {
-                setFocusedInput('subproject');
-                setShowSubprojectDropdown(true);
-                setSubprojectDropdownIndex(-1);
+              className={
+                'w-full h-full flex items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-xl font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer' +
+                ' ' + (showSubprojects ? 'hover:bg-blue-100 dark:hover:bg-blue-900' : 'hover:bg-gray-200 dark:hover:bg-gray-800')
+              }
+              style={{
+                minHeight: '5.2rem',
+                minWidth: 0,
+                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
+                fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
+                background: !showSubprojects && item.name ? `linear-gradient(135deg, ${generateProjectColor(item.name)} 0%, #f3f4f6 100%)` : undefined,
               }}
-              onBlur={() => setFocusedInput(null)}
-              onKeyDown={handleSubprojectInputKeyDown}
-              className="w-full h-16 px-5 py-4 pr-12 text-white bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
-              style={{ fontSize: '1.125rem' }}
-            />
-            <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              {subprojectSearch === '' && <ShinyText text="Search for subproject" className="text-lg" />}
-            </div>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
-              <Search size={24} strokeWidth={2} />
-            </div>
-          </div>
-
-          {showSubprojectDropdown && selectedProject && (
-            <div className="absolute top-full left-0 right-0 mt-3 z-30">
-              <div className="dropdown-glass w-full">
-                {filteredSubprojects.length > 0 ? (
-                  filteredSubprojects.map((subproject, idx) => (
-                    <div
-                      key={subproject.id}
-                      ref={el => subprojectDropdownRefs.current[idx] = el}
-                      onClick={() => handleSubprojectSelect(subproject.id)}
-                      className={`dropdown-item-glass${subprojectDropdownIndex === idx ? ' selected' : ''}`}
-                    >
-                      <div className="item-content">
-                        <div className="item-text">{subproject.name}</div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="dropdown-item-glass text-center text-gray-400 select-none">
-                    No subprojects found
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+            >
+              {item.name}
+            </button>
+          ))}
         </div>
       </div>
-
-      {/* Dynamic Container for Projects/Subprojects */}
-      <div className="w-full mb-8 -mx-2 border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-md" style={{ minHeight: '220px' }}>
-        {/* Most Frequent Projects */}
-        {frequentProjects.length > 0 && !selectedProjectId && (
-          <div className="transition-all duration-500 ease-in-out">
-            <div className="bg-gray-300 px-6 py-3 rounded-t-xl">
-              <h3 className="text-lg font-bold text-gray-900 tracking-wider">Most Frequent Projects</h3>
-            </div>
-            <div className="p-3 h-full">
-              <div className="grid grid-cols-3 gap-3 w-full h-full">
-                {frequentProjects.map((project) => {
-                  const isSelected = selectedProjectId === project.id;
-                  const color = colorCodedProjectsEnabled ? generateProjectColor(project.name) : undefined;
-                  return (
-                    <button
-                      key={project.id}
-                      onClick={() => handleProjectSelect(project.id)}
-                      style={
-                        isSelected
-                          ? { background: '#18181b', color: '#fff' }
-                          : colorCodedProjectsEnabled
-                            ? { background: color, color: '#18181b' }
-                            : undefined
-                      }
-                      className={`w-full px-2 py-5 rounded-full text-base font-medium transition-all duration-200 text-center ${
-                        isSelected
-                          ? 'bg-gray-900 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm'
-                      }`}
-                    >
-                      {project.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Most Frequent Subprojects */}
-        {frequentSubprojectsEnabled && frequentSubprojects.length > 0 && selectedProjectId && !selectedSubprojectId && (
-          <div className="transition-all duration-500 ease-in-out">
-            <div className="bg-gray-300 px-6 py-3 rounded-t-xl flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900 tracking-wider">Most Frequent Subprojects</h3>
-              <button
-                onClick={() => {
-                  onProjectSelect('');
-                  onSubprojectSelect('');
-                }}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-md transition-all duration-200 flex items-center gap-1"
-              >
-                <ChevronDown className="w-4 h-4 rotate-90" />
-                Back to Projects
-              </button>
-            </div>
-            <div className="p-3 h-full">
-              <div className="grid grid-cols-3 gap-3 w-full h-full">
-                {frequentSubprojects.map((subproject) => {
-                  const isSelected = selectedSubprojectId === subproject.id;
-                  // Find the parent project for color
-                  const parentProject = allProjects.find(p => p.subprojects.some(s => s.id === subproject.id));
-                  const color = colorCodedProjectsEnabled && parentProject ? generateProjectColor(parentProject.name) : undefined;
-                  return (
-                    <button
-                      key={subproject.id}
-                      onClick={() => handleSubprojectSelect(subproject.id)}
-                      style={
-                        isSelected
-                          ? { background: '#18181b', color: '#fff' }
-                          : colorCodedProjectsEnabled && color
-                            ? { background: color, color: '#18181b' }
-                            : undefined
-                      }
-                      className={`w-full px-2 py-5 rounded-full text-base font-medium transition-all duration-200 text-center ${
-                        isSelected
-                          ? 'bg-gray-900 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm'
-                      }`}
-                    >
-                      {subproject.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Back to Projects after Subproject Selection */}
-        {frequentProjects.length > 0 && selectedProjectId && selectedSubprojectId && (
-          <div className="transition-all duration-500 ease-in-out">
-            <div className="bg-gray-300 px-6 py-3 rounded-t-xl">
-              <h3 className="text-lg font-bold text-gray-900 tracking-wider">Most Frequent Projects</h3>
-            </div>
-            <div className="p-3 h-full">
-              <div className="grid grid-cols-3 gap-3 w-full h-full">
-                {frequentProjects.map((project) => {
-                  const isSelected = selectedProjectId === project.id;
-                  const color = colorCodedProjectsEnabled ? generateProjectColor(project.name) : undefined;
-                  return (
-                    <button
-                      key={project.id}
-                      onClick={() => handleProjectSelect(project.id)}
-                      style={
-                        isSelected
-                          ? { background: '#18181b', color: '#fff' }
-                          : colorCodedProjectsEnabled
-                            ? { background: color, color: '#18181b' }
-                            : undefined
-                      }
-                      className={`w-full px-2 py-5 rounded-full text-base font-medium transition-all duration-200 text-center ${
-                        isSelected
-                          ? 'bg-gray-900 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm'
-                      }`}
-                    >
-                      {project.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Quick Start Combinations */}
-      {frequentCombinations.length > 0 && (
-        <div className="w-full mb-8 -mx-2 border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-md">
-          <div className="bg-gray-300 px-6 py-3 rounded-t-xl">
-            <h3 className="text-lg font-bold text-gray-900 tracking-wider">Quick Start Combinations</h3>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-              {frequentCombinations.map((combination, index) => {
-                const isSelected =
-                  pendingQuickStart &&
-                  pendingQuickStart.project.id === combination.project.id &&
-                  pendingQuickStart.subproject.id === combination.subproject.id;
-                const color = colorCodedProjectsEnabled ? generateProjectColor(combination.project.name) : undefined;
-                return (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      if (isSelected) {
-                        if (typeof handleStartNewTimerForProject === 'function') {
-                          handleStartNewTimerForProject(combination.project.id, combination.subproject.id);
-                        } else {
-                          handleProjectSelect(combination.project.id);
-                          setTimeout(() => handleSubprojectSelect(combination.subproject.id, combination.project), 0);
-                        }
-                        setPendingQuickStart(null);
-                      } else {
-                        setPendingQuickStart({ project: combination.project, subproject: combination.subproject, index });
-                        handleProjectSelect(combination.project.id);
-                        handleSubprojectSelect(combination.subproject.id, combination.project);
-                      }
-                    }}
-                    style={
-                      isSelected
-                        ? { background: '#18181b', color: '#fff' }
-                        : colorCodedProjectsEnabled
-                          ? { background: color, color: '#18181b' }
-                          : undefined
-                    }
-                    className={`group flex items-center justify-between w-full h-full p-4 rounded-lg transition-all duration-200 border border-transparent focus:outline-none focus:ring-2 focus:ring-black ${
-                      isSelected
-                        ? 'bg-black shadow-lg'
-                        : 'bg-gray-50 hover:bg-gray-100 hover:shadow-md hover:border-gray-200'
-                    }`}
-                  >
-                    {isSelected ? (
-                      <span className="text-white text-base font-medium w-full text-center transition-colors duration-300">
-                        Tap to start timer for {combination.project.name} - {combination.subproject.name}
-                      </span>
-                    ) : (
-                      <>
-                        <div className="flex flex-col items-start">
-                          <span className="text-sm font-semibold group-hover:text-gray-900">
-                            {combination.project.name}
-                          </span>
-                          <span className="text-xs font-normal group-hover:text-gray-700">
-                            {combination.subproject.name}
-                          </span>
-                        </div>
-                        <div className="ml-3 p-2 bg-white group-hover:bg-gray-900 rounded-full transition-all duration-200 shadow-sm">
-                          <Play size={14} className="text-gray-600 group-hover:text-white fill-current" />
-                        </div>
-                      </>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+      {/* Bottom half: Quick Start Combinations */}
+      <div className="flex-1 flex flex-col justify-stretch mt-4">
+        <div className="text-2xl font-bold mb-4 px-4 py-3 text-center rounded-xl bg-gray-100 dark:bg-gray-800" style={{ minHeight: '2.5rem', letterSpacing: '-0.01em' }}>
+          Quick Start Combinations
         </div>
-      )}
-
-      {/* Click outside to close dropdowns */}
-      {(showProjectDropdown || showSubprojectDropdown) && (
-        <div
-          className="fixed inset-0 z-5"
-          onClick={() => {
-            setShowProjectDropdown(false);
-            setShowSubprojectDropdown(false);
-          }}
-        />
-      )}
+        <div className="flex-1 grid grid-cols-2 grid-rows-3 gap-2 md:gap-4 w-full h-full">
+          {bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-[1.25rem] bg-gray-100/60 shadow-none" />
+          ))}
+          {bottomGridItems.map((item, idx) => (
+            <button
+              key={item.project.id + '-' + item.subproject.id}
+              onClick={() => {
+                if (typeof handleStartNewTimerForProject === 'function') {
+                  handleStartNewTimerForProject(item.project.id, item.subproject.id);
+                }
+              }}
+              className={'w-full h-full flex flex-col items-center justify-center rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition-all duration-200 text-xl font-semibold text-gray-900 dark:text-gray-100 hover:scale-[1.03] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] focus:outline-none focus:ring-2 focus:ring-blue-400/40 select-none cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800'}
+              style={{
+                minHeight: '5.2rem',
+                minWidth: 0,
+                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
+                fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
+                background: item.project && item.project.name ? `linear-gradient(135deg, ${generateProjectColor(item.project.name)} 0%, #f3f4f6 100%)` : undefined,
+              }}
+            >
+              <span className="text-base font-semibold mb-1">{item.project.name}</span>
+              <span className="text-sm font-normal opacity-80">{item.subproject.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 });

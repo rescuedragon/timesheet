@@ -18,6 +18,8 @@ export const useTimeLogging = () => {
   // Save time logs whenever they change
   useEffect(() => {
     storageService.saveTimeLogs(timeLogs);
+    // Dispatch event to notify other components that time logs have been updated
+    window.dispatchEvent(new CustomEvent('time-logs-updated'));
   }, [timeLogs]);
 
   const logTime = useCallback((
@@ -43,7 +45,12 @@ export const useTimeLogging = () => {
       endTime: endTime.toLocaleTimeString()
     };
 
-    setTimeLogs(prev => [newTimeLog, ...prev]);
+    setTimeLogs(prev => {
+      const updated = [newTimeLog, ...prev];
+      storageService.saveTimeLogs(updated);
+      window.dispatchEvent(new CustomEvent('time-logs-updated'));
+      return updated;
+    });
     return newTimeLog;
   }, []);
 

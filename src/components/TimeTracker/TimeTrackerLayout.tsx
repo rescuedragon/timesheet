@@ -5,6 +5,7 @@ import { Project, Subproject } from './CurrentSelectionDisplay';
 import { QueuedProject } from '../QueuedProjects';
 import { ProjectSelectorRef } from '../ProjectSelector';
 import { StopwatchPanelRef } from '../StopwatchPanel';
+import ProjectSubprojectSearchBar from '../project-selector/ProjectSubprojectSearchBar';
 
 interface TimeTrackerLayoutProps {
     projects: Project[];
@@ -27,6 +28,7 @@ interface TimeTrackerLayoutProps {
     handleStartNewTimerForProject: (projectId: string, subprojectId: string) => void;
     onTimerStopped: () => void;
     isTimerRunning: boolean;
+    onAddTimeLog: (newLog: any) => void;
 }
 
 const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
@@ -49,29 +51,44 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
     stopwatchRef,
     handleStartNewTimerForProject,
     onTimerStopped,
-    isTimerRunning
+    isTimerRunning,
+    onAddTimeLog
 }) => {
     return (
-        <div className="w-full min-h-[600px] flex overflow-hidden px-10 py-10 mt-8">
-            <div className="flex-1">
-                <ProjectSelector
-                    ref={projectSelectorRef}
+        <div className="w-full flex flex-col gap-6">
+            {/* Project and Subproject Search Bar Container - Only search bars, side by side */}
+            <div className="w-full max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg relative">
+                <ProjectSubprojectSearchBar
                     projects={projects}
                     selectedProjectId={selectedProjectId}
                     selectedSubprojectId={selectedSubprojectId}
                     onProjectSelect={onProjectSelect}
                     onSubprojectSelect={onSubprojectSelect}
-                    onAddProject={onAddProject}
-                    onAddSubproject={onAddSubproject}
-                    currentFocus={currentFocus}
-                    onFocusChange={onFocusChange}
-                    stopwatchRef={stopwatchRef}
-                    handleStartNewTimerForProject={handleStartNewTimerForProject}
-                    isTimerRunning={isTimerRunning}
                 />
             </div>
-            <div className="flex-1 flex items-center justify-center">
-                <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 px-8 py-8 flex flex-col items-center justify-center w-full min-h-[600px] mt-16">
+
+            {/* ProjectSelector and StopwatchPanel side by side */}
+            <div className="w-full max-w-7xl mx-auto mt-6 flex gap-6">
+                {/* Left: ProjectSelector (frequent projects, subprojects, quick start) */}
+                <div className="w-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-0 m-0">
+                    <ProjectSelector
+                        ref={projectSelectorRef}
+                        projects={projects}
+                        selectedProjectId={selectedProjectId}
+                        selectedSubprojectId={selectedSubprojectId}
+                        onProjectSelect={onProjectSelect}
+                        onSubprojectSelect={onSubprojectSelect}
+                        onAddProject={onAddProject}
+                        onAddSubproject={onAddSubproject}
+                        currentFocus={currentFocus}
+                        onFocusChange={onFocusChange}
+                        stopwatchRef={stopwatchRef}
+                        handleStartNewTimerForProject={handleStartNewTimerForProject}
+                        isTimerRunning={isTimerRunning}
+                    />
+                </div>
+                {/* Right: StopwatchPanel (circle timer) */}
+                <div className="w-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 flex items-center justify-center">
                     <StopwatchPanel
                         ref={stopwatchRef}
                         selectedProject={selectedProject}
@@ -82,6 +99,7 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
                         onResumedProjectHandled={onResumedProjectHandled}
                         currentFocus={currentFocus}
                         onTimerStopped={onTimerStopped}
+                        onAddTimeLog={onAddTimeLog}
                     />
                 </div>
             </div>

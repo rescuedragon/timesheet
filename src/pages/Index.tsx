@@ -14,6 +14,24 @@ const Index = React.memo(() => {
   const [activeTab, setActiveTab] = useState('tracker');
   const [isDarkMode, setIsDarkMode] = useLocalStorage('dark-mode', false);
 
+  // --- LIFTED STATE ---
+  const [timeLogs, setTimeLogs] = useState(() => {
+    const saved = localStorage.getItem('timesheet-logs');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const addTimeLog = (newLog) => {
+    setTimeLogs(prev => {
+      const updated = newLog ? [newLog, ...prev] : prev;
+      localStorage.setItem('timesheet-logs', JSON.stringify(updated));
+      return updated;
+    });
+  };
+  const replaceTimeLogs = (logs) => {
+    setTimeLogs(logs);
+    localStorage.setItem('timesheet-logs', JSON.stringify(logs));
+  };
+  // --- END LIFTED STATE ---
+
   const handleLogin = useCallback(() => {
     setIsLoggedIn(true);
   }, [setIsLoggedIn]);
@@ -72,7 +90,7 @@ const Index = React.memo(() => {
       />
       
       <AppHeader>
-        <MainTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <MainTabs activeTab={activeTab} onTabChange={setActiveTab} timeLogs={timeLogs} addTimeLog={addTimeLog} setTimeLogs={setTimeLogs} replaceTimeLogs={replaceTimeLogs} />
       </AppHeader>
     </div>
   );

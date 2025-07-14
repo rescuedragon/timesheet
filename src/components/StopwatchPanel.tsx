@@ -13,6 +13,7 @@ interface StopwatchPanelProps {
   onResumedProjectHandled: () => void;
   currentFocus?: 'project' | 'subproject' | 'timer';
   onTimerStopped?: () => void;
+  onAddTimeLog: (newLog: any) => void;
 }
 
 export interface StopwatchPanelRef {
@@ -30,7 +31,8 @@ const StopwatchPanel = forwardRef<StopwatchPanelRef, StopwatchPanelProps>(({
   resumedProject,
   onResumedProjectHandled,
   currentFocus,
-  onTimerStopped
+  onTimerStopped,
+  onAddTimeLog
 }, ref) => {
   const containerRef = useRef<any>(null);
   const startFnRef = useRef<() => void>();
@@ -58,6 +60,7 @@ const StopwatchPanel = forwardRef<StopwatchPanelRef, StopwatchPanelProps>(({
         onResumedProjectHandled={onResumedProjectHandled}
         startFnRef={startFnRef}
         onTimerStopped={onTimerStopped}
+        onAddTimeLog={onAddTimeLog}
       />
     </div>
   );

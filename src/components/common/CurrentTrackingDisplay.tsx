@@ -38,8 +38,8 @@ const CurrentTrackingDisplay: React.FC<CurrentTrackingDisplayProps> = ({
     };
 
     return (
-        <div className="mb-4 p-4 rounded-3xl bg-black shadow-2xl border border-gray-800 transition-all duration-700 ease-out hover:shadow-3xl hover:scale-[1.01] hover:-translate-y-0.5">
-            <div className="flex items-center justify-between">
+        <div className="bg-black rounded-xl shadow-lg border border-gray-800 w-full">
+            <div className="flex items-center justify-between w-full p-6">
                 {/* Currently Tracking Indicator */}
                 <div className="flex items-center space-x-6 min-w-0">
                     <div className="relative">
