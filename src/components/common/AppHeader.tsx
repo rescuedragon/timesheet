@@ -14,14 +14,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({ children }) => {
           <Settings />
         </div>
       </div>
-      
-      {/* App Title */}
-      <>
-        <div className="text-center mb-4 animate-fade-in">
-          <h1 className="text-6xl font-light text-foreground mb-6 tracking-tight">Timesheet</h1>
-        </div>
-        {children}
-      </>
+      {/* Padding for header spacing */}
+      <div className="mb-4" />
+      {children}
     </header>
   );
 };

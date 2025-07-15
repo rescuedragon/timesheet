@@ -44,7 +44,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         <div className="absolute top-1/3 left-3/4 w-[220vmax] h-[220vmax] bg-[radial-gradient(circle,rgba(0,0,0,0.025)_0%,transparent_75%)] animate-[pulse_45s_ease-in-out_infinite]"></div>
       </div>
       
-      <style jsx global>{`
+      <style>{`
         @keyframes pulse {
           0%, 100% {
             transform: translate(0, 0) scale(1);
@@ -60,13 +60,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           }
         }
       `}</style>
-
-      {/* Title in Top Left */}
-      <div className="absolute top-8 left-8">
-        <h1 className="text-3xl font-medium text-gray-900 tracking-tight">
-          Timesheet
-        </h1>
-      </div>
 
       {/* Centered Login Card */}
       <div className="w-full max-w-md">

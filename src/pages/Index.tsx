@@ -12,7 +12,6 @@ import { storageService } from '@/services/storageService';
 const Index = React.memo(() => {
   const [isLoggedIn, setIsLoggedIn] = useLocalStorage('is-logged-in', false);
   const [activeTab, setActiveTab] = useState('tracker');
-  const [isDarkMode, setIsDarkMode] = useLocalStorage('dark-mode', false);
 
   // --- LIFTED STATE ---
   const [timeLogs, setTimeLogs] = useState(() => {
@@ -36,14 +35,6 @@ const Index = React.memo(() => {
     setIsLoggedIn(true);
   }, [setIsLoggedIn]);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
   const handleSwitchToExcel = useCallback(() => {
     setActiveTab('data');
   }, []);
@@ -61,10 +52,6 @@ const Index = React.memo(() => {
       window.removeEventListener('switchToDailyView', handleSwitchToDaily);
     };
   }, [handleSwitchToExcel, handleSwitchToDaily]);
-
-  const handleDarkModeToggle = useCallback(() => {
-    setIsDarkMode(!isDarkMode);
-  }, [isDarkMode, setIsDarkMode]);
 
   const handleClearStorage = useCallback(() => {
     localStorage.clear();
@@ -86,8 +73,6 @@ const Index = React.memo(() => {
       <div className="glass-bg-overlay" />
       {/* Background layers above */}
       <HeaderControls
-        isDarkMode={isDarkMode}
-        onDarkModeToggle={handleDarkModeToggle}
         onClearStorage={handleClearStorage}
         onForceReloadProjects={handleForceReloadProjects}
       />
