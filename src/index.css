@@ -190,7 +190,6 @@ All colors MUST be HSL.
   }
   .currently-tracking-material {
     /* background: linear-gradient(90deg, #4285F4 0%, #34A853 100%); */
-    background: linear-gradient(90deg, #4285F4 0%, #34A853 100%);
     color: #fff;
     box-shadow: 0 4px 24px 0 rgba(60,64,67,0.10);
     border-radius: 1.25rem;

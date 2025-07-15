@@ -233,13 +233,13 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     }));
     
     // Select project and subproject, then start timer
-    handleProjectSelect(project.id);
-    handleSubprojectSelect(subproject.id);
-    if (typeof handleStartNewTimerForProject === 'function') {
-      setTimeout(() => { handleStartNewTimerForProject(project.id, subproject.id); }, 100);
-    } else if (stopwatchRef && stopwatchRef.current && typeof stopwatchRef.current.handleStart === 'function') {
-      setTimeout(() => { stopwatchRef.current?.handleStart(); }, 100);
-    }
+      handleProjectSelect(project.id);
+      handleSubprojectSelect(subproject.id);
+      if (typeof handleStartNewTimerForProject === 'function') {
+        setTimeout(() => { handleStartNewTimerForProject(project.id, subproject.id); }, 100);
+      } else if (stopwatchRef && stopwatchRef.current && typeof stopwatchRef.current.handleStart === 'function') {
+        setTimeout(() => { stopwatchRef.current?.handleStart(); }, 100);
+      }
   }, [handleProjectSelect, handleSubprojectSelect, stopwatchRef, handleStartNewTimerForProject]);
 
   // Global search results - combines projects and subprojects
@@ -466,12 +466,12 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
 
   // Simplified quick start click handler
   const handleQuickStartClick = (project: Project, subproject: Subproject) => {
-    if (typeof handleStartNewTimerForProject === 'function') {
+      if (typeof handleStartNewTimerForProject === 'function') {
       // Select the project and subproject
-      onProjectSelect(project.id);
-      onSubprojectSelect(subproject.id);
-      handleStartNewTimerForProject(project.id, subproject.id);
-    }
+        onProjectSelect(project.id);
+        onSubprojectSelect(subproject.id);
+        handleStartNewTimerForProject(project.id, subproject.id);
+      }
   };
 
   // Global search handlers
@@ -572,8 +572,13 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     return () => clearTimeout(timeout);
   }, [selectedProjectId]);
 
-  // Always show projects in the projects tab
-  const topGridItems = frequentProjects.slice(0, 6);
+  // Always show projects in the projects tab - fallback to allProjects, then demoProjects if needed
+  let topGridItems = (frequentProjects.length > 0 ? frequentProjects : allProjects).slice(0, 6);
+  if (topGridItems.length < 6) {
+    // Fill with demo projects if not enough
+    const needed = 6 - topGridItems.length;
+    topGridItems = topGridItems.concat(demoProjects.slice(0, needed));
+  }
   const bottomGridItems = frequentCombinations;
 
   const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
@@ -663,46 +668,48 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
       {/* Content Area */}
       <div className="flex-1 px-4 pb-4">
         {leftTab === 'projects' && (
-          <div className="w-full h-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            {/* Header with back button when showing subprojects */}
+          <div className="w-full h-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative">
+            {/* Header with back button when showing subprojects - positioned as overlay */}
             {currentView === 'subprojects' && selectedProject && (
-              <div className="flex items-center gap-3 p-4 border-b border-gray-100">
-                <button
-                  onClick={() => setCurrentView('projects')}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{selectedProject.name}</h3>
-                  <p className="text-sm text-gray-500">Subprojects</p>
+              <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+                <div className="flex items-center gap-3 p-3">
+                  <button
+                    onClick={() => setCurrentView('projects')}
+                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 text-sm truncate">{selectedProject.name}</h3>
+                    <p className="text-xs text-gray-500">Subprojects</p>
+                  </div>
                 </div>
               </div>
             )}
             
-            <div className="grid grid-cols-2 gap-3 p-4 h-full">
+            <div className={`grid grid-cols-2 gap-3 p-4 h-full overflow-y-auto`}>
               {currentView === 'projects' ? (
                 // Show projects
                 <>
                   {topGridItems.length === 0 && 
                     Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="h-24 bg-gray-50 rounded-xl border border-gray-100" />
+                      <div key={i} className="h-30 bg-gray-50 rounded-xl border border-gray-100" />
                     ))
                   }
                   {topGridItems.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        onProjectSelect(item.id);
+            <button
+              key={item.id}
+              onClick={() => {
+                  onProjectSelect(item.id);
                         // Navigate to subprojects view for this project
                         setCurrentView('subprojects');
-                      }}
-                      className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      style={{
-                        background: colorCodedProjectsEnabled
-                          ? (() => {
+              }}
+                      className="h-30 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+              style={{
+                background: colorCodedProjectsEnabled
+                  ? (() => {
                               const base = item.name
-                                ? generateProjectColor(item.name)
+                          ? generateProjectColor(item.name)
                                 : '#4285F4';
                               return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
                             })()
@@ -711,12 +718,12 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                     >
                       <div className="h-full flex items-center justify-center px-3">
                         <span 
-                          className="font-semibold text-sm text-center leading-tight"
+                          className="font-semibold text-lg text-center leading-tight"
                           style={{
-                            color: colorCodedProjectsEnabled
-                              ? (() => {
+                color: colorCodedProjectsEnabled
+                  ? (() => {
                                   const base = item.name
-                                    ? generateProjectColor(item.name)
+                          ? generateProjectColor(item.name)
                                     : '#4285F4';
                                   return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
                                 })()
@@ -726,22 +733,22 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                           {item.name}
                         </span>
                       </div>
-                    </button>
-                  ))}
+            </button>
+          ))}
                 </>
               ) : (
                 // Show subprojects
                 <>
                   {selectedProject?.subprojects.length === 0 && 
                     Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="h-24 bg-gray-50 rounded-xl border border-gray-100" />
+                      <div key={i} className="h-25 bg-gray-50 rounded-xl border border-gray-100" />
                     ))
                   }
                   {selectedProject?.subprojects.slice(0, 6).map((subproject) => (
                     <button
                       key={subproject.id}
                       onClick={() => onSubprojectSelect(subproject.id)}
-                      className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      className="h-25 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
                       style={{
                         background: colorCodedProjectsEnabled
                           ? (() => {
@@ -755,7 +762,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                     >
                       <div className="h-full flex items-center justify-center px-3">
                         <span 
-                          className="font-semibold text-sm text-center leading-tight"
+                          className="font-semibold text-lg text-center leading-tight"
                           style={{
                             color: colorCodedProjectsEnabled
                               ? (() => {
@@ -798,10 +805,10 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                     style={{
                       background: isRunning
                         ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
-                        : colorCodedProjectsEnabled
-                          ? (() => {
-                              const base = item.project && item.project.name
-                                ? generateProjectColor(item.project.name)
+              : colorCodedProjectsEnabled
+                ? (() => {
+                    const base = item.project && item.project.name
+                      ? generateProjectColor(item.project.name)
                                 : '#4285F4';
                               return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
                             })()
@@ -814,10 +821,10 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                         style={{
                           color: isRunning
                             ? '#ffffff'
-                            : colorCodedProjectsEnabled
-                              ? (() => {
-                                  const base = item.project && item.project.name
-                                    ? generateProjectColor(item.project.name)
+              : colorCodedProjectsEnabled
+                ? (() => {
+                    const base = item.project && item.project.name
+                      ? generateProjectColor(item.project.name)
                                     : '#4285F4';
                                   return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
                                 })()
@@ -828,7 +835,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       </span>
                       <span 
                         className="text-xs text-center leading-tight opacity-80"
-                        style={{
+                    style={{
                           color: isRunning
                             ? '#e2e8f0'
                             : colorCodedProjectsEnabled
@@ -842,7 +849,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                         }}
                       >
                         {item.subproject.name}
-                      </span>
+                    </span>
                     </div>
                   </button>
                 );
@@ -850,7 +857,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
             </div>
           </div>
         )}
-      </div>
+          </div>
     </div>
   );
 });

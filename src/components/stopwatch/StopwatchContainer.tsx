@@ -63,12 +63,10 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
   return (
     <>
       {/* Project Info */}
-      <div className="mb-8 animate-fade-in">
-        <ProjectInfo 
-          selectedProject={selectedProject}
-          selectedSubproject={selectedSubproject}
-        />
-      </div>
+      <ProjectInfo 
+        selectedProject={selectedProject}
+        selectedSubproject={selectedSubproject}
+      />
       
       <StopwatchManager
         resumedProject={resumedProject}

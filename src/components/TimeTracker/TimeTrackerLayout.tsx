@@ -62,68 +62,63 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
 }) => {
     // Responsive layout: top, search row, main row, bottom
     const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
-    // Wrap all main content in a 90% width container
+    // Main container that auto-fits to screen size
     return (
-        <div className="w-[95%] mx-auto box-border">
-            {/* 1. Currently Tracking (top, full width, fixed height) */}
-            <div className="w-full flex-shrink-0 currently-tracking-material mt-6 mb-6 rounded-2xl box-border" style={{ minHeight: '90px', maxHeight: '120px', background: 'linear-gradient(90deg, #4285F4 0%, #34A853 100%)', color: '#fff' }}>
-                <CurrentTrackingDisplay
-                    selectedProject={selectedProject}
-                    selectedSubproject={selectedSubproject}
-                    isTimerRunning={isTimerRunning}
-                    currentTime={new Date()}
-                />
-            </div>
-
-            {/* 2. Search Row (projects left, subprojects right) */}
-            <div className="w-full flex flex-row items-stretch justify-stretch h-[400px]">
-                {/* Left: ProjectSelector */}
-                <div className="w-1/2 h-full flex flex-col">
-                    <ProjectSelector
-                        ref={projectSelectorRef}
-                        projects={projects}
-                        selectedProjectId={selectedProjectId}
-                        selectedSubprojectId={selectedSubprojectId}
-                        onProjectSelect={onProjectSelect}
-                        onSubprojectSelect={onSubprojectSelect}
-                        onAddProject={onAddProject}
-                        onAddSubproject={onAddSubproject}
-                        currentFocus={currentFocus}
-                        onFocusChange={onFocusChange}
-                        stopwatchRef={stopwatchRef}
-                        handleStartNewTimerForProject={handleStartNewTimerForProject}
-                        isTimerRunning={isTimerRunning}
-                        queuedProjects={queuedProjects}
-                        onResumeProject={onResumeProject}
-                        onStopProject={onStopProject}
-                        onLogTime={onLogTime}
-                    />
-                </div>
-                {/* Right: StopwatchPanel */}
-                <div className="w-1/2 h-full flex flex-col items-center justify-center">
-                    <StopwatchPanel
-                        ref={stopwatchRef}
+        <div className="w-full h-[90vh] flex flex-col min-h-0">
+            <div className="w-[95%] mx-auto flex flex-col min-h-0 flex-1 p-6 gap-6 h-full">
+                {/* Top: Currently Tracking (fixed height) */}
+                <div className="w-full flex-shrink-0 currently-tracking-material rounded-2xl box-border" style={{ minHeight: '120px', maxHeight: '160px', color: '#fff' }}>
+                    <CurrentTrackingDisplay
                         selectedProject={selectedProject}
                         selectedSubproject={selectedSubproject}
-                        onLogTime={onLogTime}
-                        onPauseProject={onPauseProject}
-                        resumedProject={resumedProject}
-                        onResumedProjectHandled={onResumedProjectHandled}
-                        currentFocus={currentFocus}
-                        onTimerStopped={onTimerStopped}
-                        onAddTimeLog={onAddTimeLog}
+                        isTimerRunning={isTimerRunning}
+                        currentTime={new Date()}
                     />
                 </div>
-            </div>
-
-            {/* 4. Paused/Queued Section (bottom, full width, matches top height) */}
-            <div className="w-full flex-shrink-0 mt-6 mb-2 rounded-2xl box-border" style={{ minHeight: '90px', maxHeight: '120px' }}>
-                <QueuedProjects
-                    queuedProjects={queuedProjects}
-                    onResumeProject={onResumeProject}
-                    onStopProject={onStopProject}
-                    onLogTime={onLogTime}
-                />
+                {/* Main Content Row: fills all available space */}
+                <div className="flex-1 min-h-0 flex flex-row">
+                    {/* Left Glass Subcontainer: ProjectSelector */}
+                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md bg-white/20 border border-white/40 rounded-2xl shadow-md">
+                        <div className="flex-1 min-h-0 flex flex-col">
+                            <ProjectSelector
+                                ref={projectSelectorRef}
+                                projects={projects}
+                                selectedProjectId={selectedProjectId}
+                                selectedSubprojectId={selectedSubprojectId}
+                                onProjectSelect={onProjectSelect}
+                                onSubprojectSelect={onSubprojectSelect}
+                                onAddProject={onAddProject}
+                                onAddSubproject={onAddSubproject}
+                                currentFocus={currentFocus}
+                                onFocusChange={onFocusChange}
+                                stopwatchRef={stopwatchRef}
+                                handleStartNewTimerForProject={handleStartNewTimerForProject}
+                                isTimerRunning={isTimerRunning}
+                                queuedProjects={queuedProjects}
+                                onResumeProject={onResumeProject}
+                                onStopProject={onStopProject}
+                                onLogTime={onLogTime}
+                            />
+                        </div>
+                    </div>
+                    {/* Right Glass Subcontainer: StopwatchPanel */}
+                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md bg-white/20 border border-white/40 rounded-2xl shadow-md">
+                        <div className="flex-1 min-h-0 flex flex-col">
+                            <StopwatchPanel
+                                ref={stopwatchRef}
+                                selectedProject={selectedProject}
+                                selectedSubproject={selectedSubproject}
+                                onLogTime={onLogTime}
+                                onPauseProject={onPauseProject}
+                                resumedProject={resumedProject}
+                                onResumedProjectHandled={onResumedProjectHandled}
+                                currentFocus={currentFocus}
+                                onTimerStopped={onTimerStopped}
+                                onAddTimeLog={onAddTimeLog}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
