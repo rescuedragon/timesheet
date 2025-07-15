@@ -614,6 +614,16 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     };
   }, [showGlobalDropdown]);
 
+  // Helper to get a visible dropdown color
+  function getDropdownColor(color: string) {
+    const tc = tinycolor2(color);
+    if (tc.isLight()) {
+      return tc.darken(10).toString();
+    } else {
+      return tc.brighten(20).toString();
+    }
+  }
+
   return (
     <div className="flex-1 min-h-0 flex flex-col w-full h-full">
       {/* Global Search Bar */}
@@ -684,8 +694,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                         key={project.id}
                         className={`dropdown-anim-item w-full px-4 py-3 text-left flex items-center gap-3 ${index === globalDropdownIndex ? 'bg-gray-100' : ''} ${index === 0 ? 'rounded-t-xl' : ''} ${index === allProjects.length - 1 ? 'rounded-b-xl' : ''}`}
                         style={{
-                          // Only set the CSS variable for border color
-                          ['--dropdown-border-color' as any]: colorCodedProjectsEnabled ? generateProjectColor(project.name) : '#222',
+                          ['--dropdown-border-color' as any]: colorCodedProjectsEnabled ? getDropdownColor(generateProjectColor(project.name)) : '#222',
                         }}
                         onClick={() => {
                           setDropdownMode('subprojects');
@@ -694,7 +703,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       >
                         <div
                           className="w-2 h-2 rounded-full"
-                          style={{ background: colorCodedProjectsEnabled ? generateProjectColor(project.name) : '#222' }}
+                          style={{ background: colorCodedProjectsEnabled ? getDropdownColor(generateProjectColor(project.name)) : '#222' }}
                         />
                         <div className="flex-1">
                           <div className="font-medium text-gray-900">{project.name}</div>
@@ -725,7 +734,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                         key={subproject.id}
                         className={`dropdown-anim-item w-full px-4 py-3 text-left flex items-center gap-3 ${index === 0 ? 'rounded-t-none' : ''} ${index === selectedDropdownProject.subprojects.length - 1 ? 'rounded-b-xl' : ''}`}
                         style={{
-                          ['--dropdown-border-color' as any]: colorCodedProjectsEnabled ? generateProjectColor(selectedDropdownProject.name) : '#222',
+                          ['--dropdown-border-color' as any]: colorCodedProjectsEnabled ? getDropdownColor(generateProjectColor(selectedDropdownProject.name)) : '#222',
                         }}
                         onClick={() => {
                           onSubprojectSelect(subproject.id);
@@ -737,7 +746,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       >
                         <div
                           className="w-2 h-2 rounded-full"
-                          style={{ background: colorCodedProjectsEnabled ? generateProjectColor(selectedDropdownProject.name) : '#222' }}
+                          style={{ background: colorCodedProjectsEnabled ? getDropdownColor(generateProjectColor(selectedDropdownProject.name)) : '#222' }}
                         />
                         <div className="flex-1">
                           <div className="font-medium text-gray-900">{subproject.name}</div>
