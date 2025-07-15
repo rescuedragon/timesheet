@@ -64,7 +64,7 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
     const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
     // Wrap all main content in a 90% width container
     return (
-        <div className="w-[90%] mx-auto box-border">
+        <div className="w-[95%] mx-auto box-border">
             {/* 1. Currently Tracking (top, full width, fixed height) */}
             <div className="w-full flex-shrink-0 currently-tracking-material mt-6 mb-6 rounded-2xl box-border" style={{ minHeight: '90px', maxHeight: '120px', background: 'linear-gradient(90deg, #4285F4 0%, #34A853 100%)', color: '#fff' }}>
                 <CurrentTrackingDisplay
@@ -76,66 +76,31 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
             </div>
 
             {/* 2. Search Row (projects left, subprojects right) */}
-            <div className="h-full grid grid-cols-2 gap-x-2 items-stretch bg-white/10 backdrop-blur-md rounded-2xl overflow-x-auto box-border max-w-full py-4 px-4">
-                {/* Left: Tabbed panel for Projects/Quick Start */}
-                <div className="min-h-0 flex flex-col items-stretch justify-stretch p-0 m-0 h-full box-border max-w-full">
-                    <div className="flex mb-2">
-                        <button
-                            className={`flex-1 py-2 rounded-t-xl font-semibold transition-all ${leftTab === 'projects' ? 'bg-primary text-white' : 'bg-white/30 text-black'}`}
-                            onClick={() => setLeftTab('projects')}
-                        >
-                            Frequently used Projects
-                        </button>
-                        <button
-                            className={`flex-1 py-2 rounded-t-xl font-semibold transition-all ${leftTab === 'quickstart' ? 'bg-primary text-white' : 'bg-white/30 text-black'}`}
-                            onClick={() => setLeftTab('quickstart')}
-                        >
-                            Quick Start
-                        </button>
-                    </div>
-                    <div className="flex-1 h-full w-full">
-                        {leftTab === 'projects' ? (
-                            <ProjectSelector
-                                ref={projectSelectorRef}
-                                projects={projects}
-                                selectedProjectId={selectedProjectId}
-                                selectedSubprojectId={selectedSubprojectId}
-                                onProjectSelect={onProjectSelect}
-                                onSubprojectSelect={onSubprojectSelect}
-                                onAddProject={onAddProject}
-                                onAddSubproject={onAddSubproject}
-                                currentFocus={currentFocus}
-                                onFocusChange={onFocusChange}
-                                stopwatchRef={stopwatchRef}
-                                handleStartNewTimerForProject={handleStartNewTimerForProject}
-                                isTimerRunning={isTimerRunning}
-                            />
-                        ) : (
-                            <ProjectSelector
-                                ref={projectSelectorRef}
-                                projects={projects}
-                                selectedProjectId={selectedProjectId}
-                                selectedSubprojectId={selectedSubprojectId}
-                                onProjectSelect={onProjectSelect}
-                                onSubprojectSelect={onSubprojectSelect}
-                                onAddProject={onAddProject}
-                                onAddSubproject={onAddSubproject}
-                                currentFocus={currentFocus}
-                                onFocusChange={onFocusChange}
-                                stopwatchRef={stopwatchRef}
-                                handleStartNewTimerForProject={handleStartNewTimerForProject}
-                                isTimerRunning={isTimerRunning}
-                                showQuickStartOnly={true}
-                                queuedProjects={queuedProjects}
-                                onResumeProject={onResumeProject}
-                                onStopProject={onStopProject}
-                                onLogTime={onLogTime}
-                            />
-                        )}
-                    </div>
+            <div className="w-full flex flex-row items-stretch justify-stretch h-[400px]">
+                {/* Left: ProjectSelector */}
+                <div className="w-1/2 h-full flex flex-col">
+                    <ProjectSelector
+                        ref={projectSelectorRef}
+                        projects={projects}
+                        selectedProjectId={selectedProjectId}
+                        selectedSubprojectId={selectedSubprojectId}
+                        onProjectSelect={onProjectSelect}
+                        onSubprojectSelect={onSubprojectSelect}
+                        onAddProject={onAddProject}
+                        onAddSubproject={onAddSubproject}
+                        currentFocus={currentFocus}
+                        onFocusChange={onFocusChange}
+                        stopwatchRef={stopwatchRef}
+                        handleStartNewTimerForProject={handleStartNewTimerForProject}
+                        isTimerRunning={isTimerRunning}
+                        queuedProjects={queuedProjects}
+                        onResumeProject={onResumeProject}
+                        onStopProject={onStopProject}
+                        onLogTime={onLogTime}
+                    />
                 </div>
                 {/* Right: StopwatchPanel */}
-                <div className="min-h-0 flex flex-col items-center justify-center timer-circle-material rounded-xl p-6 h-full box-border max-w-full">
+                <div className="w-1/2 h-full flex flex-col items-center justify-center">
                     <StopwatchPanel
                         ref={stopwatchRef}
                         selectedProject={selectedProject}

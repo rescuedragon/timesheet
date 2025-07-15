@@ -78,9 +78,11 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const [projectUsageCount, setProjectUsageCount] = useState<Record<string, number>>({});
   const [subprojectUsageCount, setSubprojectUsageCount] = useState<Record<string, number>>({});
   const [combinationUsageCount, setCombinationUsageCount] = useState<Record<string, number>>({});
-  // Add state for pending quick start confirmation and timer
-  const [pendingQuickStart, setPendingQuickStart] = useState<{ projectId: string; subprojectId: string; expiresAt: number } | null>(null);
-  const pendingQuickStartTimeout = useRef<NodeJS.Timeout | null>(null);
+  // Global search state
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [showGlobalDropdown, setShowGlobalDropdown] = useState(false);
+  const [globalDropdownIndex, setGlobalDropdownIndex] = useState<number>(-1);
+
   const { colorCodedProjectsEnabled } = useSettings();
 
   // Create refs for callbacks
@@ -223,29 +225,63 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   }, [selectedProject, onSubprojectSelect]);
 
   const handleCombinationClick = useCallback((project: Project, subproject: Subproject, index: number) => {
-    if (pendingQuickStart && pendingQuickStart.projectId === project.id && pendingQuickStart.subprojectId === subproject.id) {
-      // Second click: confirm and start timer
-      handleProjectSelect(project.id);
-      handleSubprojectSelect(subproject.id);
-      if (typeof handleStartNewTimerForProject === 'function') {
-        setTimeout(() => { handleStartNewTimerForProject(project.id, subproject.id); }, 100);
-      } else if (stopwatchRef && stopwatchRef.current && typeof stopwatchRef.current.handleStart === 'function') {
-        setTimeout(() => { stopwatchRef.current?.handleStart(); }, 100);
-      }
-      setPendingQuickStart(null);
-      // Track combination usage
-      const combinationKey = `${project.id}-${subproject.id}`;
-      setCombinationUsageCount(prev => ({
-        ...prev,
-        [combinationKey]: (prev[combinationKey] || 0) + 1
-      }));
-      return;
+    // Track combination usage
+    const combinationKey = `${project.id}-${subproject.id}`;
+    setCombinationUsageCount(prev => ({
+      ...prev,
+      [combinationKey]: (prev[combinationKey] || 0) + 1
+    }));
+    
+    // Select project and subproject, then start timer
+    handleProjectSelect(project.id);
+    handleSubprojectSelect(subproject.id);
+    if (typeof handleStartNewTimerForProject === 'function') {
+      setTimeout(() => { handleStartNewTimerForProject(project.id, subproject.id); }, 100);
+    } else if (stopwatchRef && stopwatchRef.current && typeof stopwatchRef.current.handleStart === 'function') {
+      setTimeout(() => { stopwatchRef.current?.handleStart(); }, 100);
     }
-    // First click: show confirmation on this button and clear selection
-    setPendingQuickStart({ projectId: project.id, subprojectId: subproject.id, expiresAt: Date.now() + 5000 });
-    handleProjectSelect('');
-    handleSubprojectSelect('');
-  }, [handleProjectSelect, handleSubprojectSelect, stopwatchRef, handleStartNewTimerForProject, pendingQuickStart]);
+  }, [handleProjectSelect, handleSubprojectSelect, stopwatchRef, handleStartNewTimerForProject]);
+
+  // Global search results - combines projects and subprojects
+  const globalSearchResults = React.useMemo(() => {
+    if (!globalSearch.trim()) return [];
+    
+    const searchTerm = globalSearch.toLowerCase();
+    const results: Array<{
+      type: 'project' | 'subproject';
+      project: Project;
+      subproject?: Subproject;
+      displayName: string;
+      id: string;
+    }> = [];
+    
+    // Search projects
+    allProjects.forEach(project => {
+      if (project.name.toLowerCase().includes(searchTerm)) {
+        results.push({
+          type: 'project',
+          project,
+          displayName: project.name,
+          id: project.id
+        });
+      }
+      
+      // Search subprojects within this project
+      project.subprojects.forEach(subproject => {
+        if (subproject.name.toLowerCase().includes(searchTerm)) {
+          results.push({
+            type: 'subproject',
+            project,
+            subproject,
+            displayName: `${project.name} > ${subproject.name}`,
+            id: `${project.id}-${subproject.id}`
+          });
+        }
+      });
+    });
+    
+    return results.slice(0, 10); // Limit to 10 results
+  }, [allProjects, globalSearch]);
 
   const filteredProjects = React.useMemo(() => 
     allProjects.filter(project =>
@@ -285,6 +321,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   // Add refs for inputs
   const projectInputRef = useRef<HTMLInputElement>(null);
   const subprojectInputRef = useRef<HTMLInputElement>(null);
+  const globalSearchInputRef = useRef<HTMLInputElement>(null);
 
   // Add refs for dropdown items
   const projectDropdownRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -300,17 +337,16 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !isTimerRunning && !focusedInput) {
-        setProjectSearch('');
-        onProjectSelect(''); // Deselect any project
-        setShowProjectDropdown(true);
-        projectInputRef.current?.focus();
+        setGlobalSearch('');
+        setShowGlobalDropdown(false);
+        globalSearchInputRef.current?.focus();
         e.preventDefault();
       }
     };
     
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isTimerRunning, onProjectSelect, focusedInput]);
+  }, [isTimerRunning, focusedInput]);
 
   // Handle keyboard navigation in project dropdown
   const handleProjectInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -425,108 +461,106 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     return () => window.removeEventListener('keydown', handleSpaceBar);
   }, [selectedProjectId, selectedSubprojectId, isTimerRunning, stopwatchRef, handleStartNewTimerForProject]);
 
-  // Helper to clear pending quick start
-  const clearPendingQuickStart = () => {
-    setPendingQuickStart(null);
-    if (pendingQuickStartTimeout.current) {
-      clearTimeout(pendingQuickStartTimeout.current);
-      pendingQuickStartTimeout.current = null;
-    }
-  };
 
-  // Effect to clear pending state if timer is stopped/paused
-  useEffect(() => {
-    // Only clear pendingQuickStart on timer start or after 5 seconds
-    if (pendingQuickStart) {
-      const now = Date.now();
-      if (now > pendingQuickStart.expiresAt) {
-        clearPendingQuickStart();
-      }
-    }
-  }, [pendingQuickStart]);
 
-  // Add a state to track if the flip should animate
-  const [quickStartFlipAnimating, setQuickStartFlipAnimating] = useState<string | null>(null);
 
-  // Update handleQuickStartClick to control animation
+  // Simplified quick start click handler
   const handleQuickStartClick = (project: Project, subproject: Subproject) => {
-    const key = `${project.id}-${subproject.id}`;
-    console.log('QuickStart click', { pendingQuickStart, key });
-    if (
-      pendingQuickStart &&
-      pendingQuickStart.projectId === project.id &&
-      pendingQuickStart.subprojectId === subproject.id
-    ) {
-      setQuickStartFlipAnimating(null); // Remove flip immediately, no animation
-      if (typeof handleStartNewTimerForProject === 'function') {
-        // Also select the project and subproject
-        onProjectSelect(project.id);
-        onSubprojectSelect(subproject.id);
-        handleStartNewTimerForProject(project.id, subproject.id);
-      }
-      clearPendingQuickStart();
-    } else {
-      // First click: show confirmation overlay
-      setQuickStartFlipAnimating(key); // Enable animation for this card
-      clearPendingQuickStart();
-      setPendingQuickStart({ projectId: project.id, subprojectId: subproject.id, expiresAt: Date.now() + 5000 });
-      pendingQuickStartTimeout.current = setTimeout(() => {
-        clearPendingQuickStart();
-        setQuickStartFlipAnimating(null);
-      }, 5000);
+    if (typeof handleStartNewTimerForProject === 'function') {
+      // Select the project and subproject
+      onProjectSelect(project.id);
+      onSubprojectSelect(subproject.id);
+      handleStartNewTimerForProject(project.id, subproject.id);
     }
   };
 
-  useEffect(() => {
-    if (quickStartFlipAnimating) {
-      // Find the project/subproject for the animating key
-      const [projectId, subprojectId] = quickStartFlipAnimating.split('-');
-      if (
-        isTimerRunning &&
-        selectedProjectId === projectId &&
-        selectedSubprojectId === subprojectId
-      ) {
-        setQuickStartFlipAnimating(null);
+  // Global search handlers
+  const handleGlobalSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGlobalSearch(value);
+    setShowGlobalDropdown(value.length > 0);
+    setGlobalDropdownIndex(-1);
+  };
+
+  const handleGlobalSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showGlobalDropdown) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setGlobalDropdownIndex(prev => {
+        const newIndex = prev < 0 ? 0 : prev + 1;
+        return newIndex < globalSearchResults.length ? newIndex : prev;
+      });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setGlobalDropdownIndex(prev => {
+        const newIndex = prev <= 0 ? 0 : prev - 1;
+        return newIndex;
+      });
+    } else if ((e.key === 'Enter' || e.key === 'Tab') && globalDropdownIndex >= 0) {
+      const result = globalSearchResults[globalDropdownIndex];
+      if (result) {
+        if (result.type === 'project') {
+          onProjectSelect(result.project.id);
+        } else if (result.type === 'subproject' && result.subproject) {
+          onProjectSelect(result.project.id);
+          onSubprojectSelect(result.subproject.id);
+        }
+        setGlobalSearch('');
+        setShowGlobalDropdown(false);
+        setGlobalDropdownIndex(-1);
       }
+      e.preventDefault();
+    } else if (e.key === 'Escape') {
+      setShowGlobalDropdown(false);
+      setGlobalDropdownIndex(-1);
     }
-  }, [isTimerRunning, selectedProjectId, selectedSubprojectId, quickStartFlipAnimating]);
+  };
+
+  const handleGlobalSearchResultClick = (result: typeof globalSearchResults[0]) => {
+    if (result.type === 'project') {
+      onProjectSelect(result.project.id);
+    } else if (result.type === 'subproject' && result.subproject) {
+      onProjectSelect(result.project.id);
+      onSubprojectSelect(result.subproject.id);
+    }
+    setGlobalSearch('');
+    setShowGlobalDropdown(false);
+    setGlobalDropdownIndex(-1);
+  };
 
   useImperativeHandle(ref, () => ({
     focusProjectSearch: () => {
-      projectInputRef.current?.focus();
+      globalSearchInputRef.current?.focus();
     },
     focusSubprojectSearch: () => {
-      subprojectInputRef.current?.focus();
+      globalSearchInputRef.current?.focus();
     },
     selectProject: (direction: 'up' | 'down') => {
-      // This is handled by the input keydown handlers
+      // This is handled by the global search keydown handlers
     },
     selectSubproject: (direction: 'up' | 'down') => {
-      // This is handled by the input keydown handlers
+      // This is handled by the global search keydown handlers
     },
     confirmProjectSelection: () => {
-      if (showProjectDropdown && projectDropdownIndex >= 0) {
-        const project = filteredProjects[projectDropdownIndex];
-        if (project) {
-          handleProjectSelect(project.id);
-          setShowProjectDropdown(false);
-          setProjectDropdownIndex(-1);
+      if (showGlobalDropdown && globalDropdownIndex >= 0) {
+        const result = globalSearchResults[globalDropdownIndex];
+        if (result) {
+          handleGlobalSearchResultClick(result);
         }
       }
     },
     confirmSubprojectSelection: () => {
-      if (showSubprojectDropdown && subprojectDropdownIndex >= 0) {
-        const subproject = filteredSubprojects[subprojectDropdownIndex];
-        if (subproject) {
-          handleSubprojectSelect(subproject.id);
-          setShowSubprojectDropdown(false);
-          setSubprojectDropdownIndex(-1);
+      if (showGlobalDropdown && globalDropdownIndex >= 0) {
+        const result = globalSearchResults[globalDropdownIndex];
+        if (result) {
+          handleGlobalSearchResultClick(result);
         }
       }
     },
     clearSelection: () => {
-      setProjectSearch('');
-      setSubprojectSearch('');
+      setGlobalSearch('');
+      setShowGlobalDropdown(false);
     }
   }));
 
@@ -538,202 +572,286 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     return () => clearTimeout(timeout);
   }, [selectedProjectId]);
 
-  const showSubprojects = !!selectedProjectId && selectedProject;
-  const topGridItems = showSubprojects
-    ? (selectedProject?.subprojects.slice(0, 6) || [])
-    : frequentProjects.slice(0, 6);
+  // Always show projects in the projects tab
+  const topGridItems = frequentProjects.slice(0, 6);
   const bottomGridItems = frequentCombinations;
 
+  const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
+  const [currentView, setCurrentView] = useState<'projects' | 'subprojects'>('projects');
+
   return (
-    <>
-      {/* Top half: Most Frequent Projects/Subprojects */}
-      <div className="w-full max-w-3xl mx-auto flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm pb-1">
-        {/* Accent border and reduced padding for header */}
-        <div className="relative text-xl font-bold mb-1 px-2 py-1 rounded-t-2xl flex items-center justify-between border-b" style={{ minHeight: '1.36rem', fontSize: '1.02rem', letterSpacing: '-0.01em', background: 'rgba(150, 150, 160, 0.88)', borderBottom: '2px solid #E6E6FA' }}>
-          {/* Left spacer for symmetry */}
-          <div style={{ minWidth: 28 }} />
-          {/* Centered header text */}
-          <div className="flex-1 flex items-center justify-center w-full">
-            <span className="relative z-10">{showSubprojects ? 'Frequently used Subprojects' : 'Frequently used Projects'}</span>
-          </div>
-          {/* Back button (right, only in subproject view) */}
-          <div className="flex items-center" style={{ minWidth: 28 }}>
-            {showSubprojects && (
+    <div className="w-full h-full flex flex-col">
+      {/* Global Search Bar */}
+      <div className="relative px-4 pt-4 pb-3">
+        <input
+          ref={globalSearchInputRef}
+          type="text"
+          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
+          placeholder="Search for projects and subprojects..."
+          value={globalSearch}
+          onChange={handleGlobalSearchChange}
+          onKeyDown={handleGlobalSearchKeyDown}
+          onFocus={() => {
+            setFocusedInput('project');
+            globalSearch.length > 0 && setShowGlobalDropdown(true);
+          }}
+          onBlur={() => {
+            setFocusedInput(null);
+            setTimeout(() => setShowGlobalDropdown(false), 200);
+          }}
+        />
+        
+        {/* Global Search Dropdown */}
+        {showGlobalDropdown && globalSearchResults.length > 0 && (
+          <div className="absolute top-full left-4 right-4 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
+            {globalSearchResults.map((result, index) => (
               <button
-                type="button"
-                className="p-1 rounded hover:bg-gray-200 transition z-10"
-                onClick={() => onProjectSelect('')}
-                tabIndex={0}
-                aria-label="Back to Frequently used Projects"
+                key={result.id}
+                className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                  index === globalDropdownIndex ? 'bg-gray-100' : ''
+                } ${index === 0 ? 'rounded-t-xl' : ''} ${index === globalSearchResults.length - 1 ? 'rounded-b-xl' : ''}`}
+                onClick={() => handleGlobalSearchResultClick(result)}
               >
-                <ChevronLeft size={18} strokeWidth={2.2} />
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${
+                    result.type === 'project' ? 'bg-blue-500' : 'bg-green-500'
+                  }`} />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">
+                      {result.type === 'project' ? result.project.name : result.subproject?.name}
+                    </div>
+                    {result.type === 'subproject' && (
+                      <div className="text-sm text-gray-500">
+                        {result.project.name}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">
+                    {result.type === 'project' ? 'Project' : 'Subproject'}
+                  </div>
+                </div>
               </button>
-                )}
-              </div>
-          {/* Glassmorphism overlay */}
-          <span className="absolute inset-0 rounded-t-2xl bg-white/30 backdrop-blur-md border-b border-white/40 pointer-events-none z-0" />
-        </div>
-        {/* Reduced grid padding */}
-        <div className="flex-1 min-h-[180px] grid grid-cols-2 grid-rows-3 gap-1.5 w-full px-1.5 pb-1">
-          {topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-[1.05rem] bg-gray-100/60 shadow-none h-full w-full" />
-          ))}
-          {topGridItems.map((item, idx) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                if (showSubprojects) {
-                  onSubprojectSelect(item.id);
-                } else {
-                  onProjectSelect(item.id);
-                }
-              }}
-              className={
-                'w-full h-full flex-1 min-h-0 flex items-center justify-center rounded-[1.05rem] shadow-lg transition-all duration-200 text-base font-semibold select-none cursor-pointer relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-primary/60' +
-                ' hover:scale-[1.04] active:scale-[0.98]'
-              }
-              style={{
-                fontFamily: 'Roboto, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif',
-                background: colorCodedProjectsEnabled
-                  ? (() => {
-                      const base = showSubprojects && selectedProject
-                        ? generateProjectColor(selectedProject.name)
-                        : (!showSubprojects && item.name
-                          ? generateProjectColor(item.name)
-                          : '#4285F4');
-                      return base;
-                    })()
-                  : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
-                color: colorCodedProjectsEnabled
-                  ? (() => {
-                      const base = showSubprojects && selectedProject
-                        ? generateProjectColor(selectedProject.name)
-                        : (!showSubprojects && item.name
-                          ? generateProjectColor(item.name)
-                          : '#4285F4');
-                      return tinycolor2(base).isLight() ? '#222' : '#fff';
-                    })()
-                  : '#222',
-                fontSize: '1em',
-                boxShadow: '0 4px 24px 0 rgba(60,64,67,0.12)',
-                border: '2px solid rgba(255,255,255,0.18)'
-              }}
-            >
-              <span className="z-10 font-bold drop-shadow-sm" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>{item.name}</span>
-              {/* Material ripple effect */}
-              <span className="absolute inset-0 pointer-events-none" style={{
-                background: 'rgba(255,255,255,0.04)',
-                borderRadius: 'inherit',
-                opacity: 0.7,
-              }} />
-            </button>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-      {/* Bottom half: Quick Start Combinations */}
-      <div className="w-full max-w-3xl mx-auto flex-1 min-h-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-900/60 shadow-sm mt-3.5 pb-2.5">
-        <div className="relative text-xl font-bold mt-0 mb-1.5 px-2.5 py-1.5 text-center rounded-t-2xl flex items-center justify-center gap-2" style={{ minHeight: '1.36rem', fontSize: '1.02rem', letterSpacing: '-0.01em', background: 'rgba(150, 150, 160, 0.88)' }}>
-          <span className="relative z-10 flex items-center gap-2">
-            <Timer size={18} strokeWidth={2.2} className="inline-block align-middle" />
-            Quick Start
-          </span>
-          {/* Glassmorphism overlay */}
-          <span className="absolute inset-0 rounded-t-2xl bg-white/30 backdrop-blur-md border-b border-white/40 pointer-events-none z-0" />
-            </div>
-        <div className="flex-1 min-h-[180px] grid grid-cols-2 grid-rows-3 gap-1.5 w-full px-3.5">
-          {bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-[1.05rem] bg-gray-100/60 shadow-none h-full w-full" />
-          ))}
-          {bottomGridItems.map((item, idx) => {
-            const isPending =
-              pendingQuickStart &&
-              pendingQuickStart.projectId === item.project.id &&
-              pendingQuickStart.subprojectId === item.subproject.id;
-            const isRunning = isTimerRunning && selectedProjectId === item.project.id && selectedSubprojectId === item.subproject.id;
-            const key = `${item.project.id}-${item.subproject.id}`;
-            // Flip animation for first click only
-            if (isPending && !isRunning) {
-                  return (
-                <div key={key} className={`quickstart-flip w-full h-full flex items-stretch ${quickStartFlipAnimating === key ? 'flipped' : ''}`} style={{ minHeight: 0 }}>
-                  <div className="quickstart-flip-inner w-full h-full flex">
-                    {/* Front: Empty (so it flips to the back) */}
-                    <div className="quickstart-flip-front w-full h-full" />
-                    {/* Back: Confirmation overlay */}
-                    <button
-                      type="button"
-                      onClick={() => handleQuickStartClick(item.project, item.subproject)}
-                      className="quickstart-flip-back w-full h-full flex items-center justify-center shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 text-2xl font-bold select-none cursor-pointer relative overflow-hidden isolation-isolate rounded-[1.05rem] bg-black text-white focus:outline-none"
-                      style={{ fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif', fontSize: '1.35em', boxShadow: '0 4.8px 25.6px 0 rgba(80,80,160,0.10), 0 1.2px 6.4px 0 rgba(0,0,0,0.08)' }}
-                    >
-                      Tap to run timer
-                    </button>
-              </div>
-            </div>
-              );
-            }
-            // Determine button color: black for pending or running, else normal
-            const buttonBg = (isPending || isRunning)
-              ? '#111'
-              : colorCodedProjectsEnabled
-                ? (() => {
-                    const base = item.project && item.project.name
-                      ? generateProjectColor(item.project.name)
-                      : '#6366f1';
-                    return base;
-                  })()
-                : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)';
-            const buttonColor = (isPending || isRunning)
-              ? '#fff'
-              : colorCodedProjectsEnabled
-                ? (() => {
-                    const base = item.project && item.project.name
-                      ? generateProjectColor(item.project.name)
-                      : '#6366f1';
-                    return tinycolor2(base).isLight() ? '#222' : '#fff';
-                  })()
-                : '#222';
-            return (
-              <div
-                key={key}
-                className={`quickstart-flip w-full h-full flex items-stretch ${isPending && !isRunning && quickStartFlipAnimating === key ? 'flipped' : ''}`}
-                style={{ minHeight: 0 }}
-              >
-                <div className="quickstart-flip-inner w-full h-full flex">
-                  {/* Front: Normal button or confirmation state */}
-                  <button
-                    type="button"
-                    onClick={() => handleQuickStartClick(item.project, item.subproject)}
-                    className={'quickstart-flip-front w-full h-full flex-1 flex items-center justify-between shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 text-base font-semibold select-none cursor-pointer relative overflow-hidden isolation-isolate rounded-[1.05rem] group focus:outline-none focus:ring-2 focus:ring-primary/60 hover:scale-[1.04] active:scale-[0.98]'}
-                    style={{
-                      fontFamily: 'Roboto, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif',
-                      background: isRunning ? '#111' : colorCodedProjectsEnabled ? (() => { const base = item.project && item.project.name ? generateProjectColor(item.project.name) : '#4285F4'; return base; })() : 'linear-gradient(120deg, #fff 0%, #f3f4f6 100%)',
-                      color: isRunning ? '#fff' : colorCodedProjectsEnabled ? (() => { const base = item.project && item.project.name ? generateProjectColor(item.project.name) : '#4285F4'; return tinycolor2(base).isLight() ? '#222' : '#fff'; })() : '#222',
-                      fontSize: '1em',
-                      boxShadow: '0 4px 24px 0 rgba(60,64,67,0.12)',
-                      border: '2px solid rgba(255,255,255,0.18)'
-                    }}
-                  >
-                    <span className="z-10 flex flex-col items-start justify-center text-left pl-4 font-bold drop-shadow-sm" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
-                      <span className="block text-base font-semibold mb-0.5 leading-tight">{item.project.name}</span>
-                      <span className="block text-sm font-normal opacity-80 leading-tight">{item.subproject.name}</span>
-                    </span>
-                    <span className={'z-10 pr-2 flex items-center justify-center' + (isRunning ? ' animate-vibrate' : '')}>
-                      <Timer size={20} strokeWidth={2.2} />
-                    </span>
-                    {/* Material ripple effect */}
-                    <span className="absolute inset-0 pointer-events-none" style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      borderRadius: 'inherit',
-                      opacity: 0.7,
-                    }} />
-                  </button>
+
+      {/* Tab Navigation */}
+      <div className="flex mx-4 mb-4 bg-gray-100 rounded-xl p-1">
+        <button
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
+            leftTab === 'projects' 
+              ? 'bg-white text-gray-900 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+          onClick={() => setLeftTab('projects')}
+        >
+          Frequently Used Projects
+        </button>
+        <button
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
+            leftTab === 'quickstart' 
+              ? 'bg-white text-gray-900 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+          onClick={() => setLeftTab('quickstart')}
+        >
+          Quick Start
+        </button>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 px-4 pb-4">
+        {leftTab === 'projects' && (
+          <div className="w-full h-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Header with back button when showing subprojects */}
+            {currentView === 'subprojects' && selectedProject && (
+              <div className="flex items-center gap-3 p-4 border-b border-gray-100">
+                <button
+                  onClick={() => setCurrentView('projects')}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">{selectedProject.name}</h3>
+                  <p className="text-sm text-gray-500">Subprojects</p>
                 </div>
               </div>
+            )}
+            
+            <div className="grid grid-cols-2 gap-3 p-4 h-full">
+              {currentView === 'projects' ? (
+                // Show projects
+                <>
+                  {topGridItems.length === 0 && 
+                    Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="h-24 bg-gray-50 rounded-xl border border-gray-100" />
+                    ))
+                  }
+                  {topGridItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        onProjectSelect(item.id);
+                        // Navigate to subprojects view for this project
+                        setCurrentView('subprojects');
+                      }}
+                      className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      style={{
+                        background: colorCodedProjectsEnabled
+                          ? (() => {
+                              const base = item.name
+                                ? generateProjectColor(item.name)
+                                : '#4285F4';
+                              return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
+                            })()
+                          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                      }}
+                    >
+                      <div className="h-full flex items-center justify-center px-3">
+                        <span 
+                          className="font-semibold text-sm text-center leading-tight"
+                          style={{
+                            color: colorCodedProjectsEnabled
+                              ? (() => {
+                                  const base = item.name
+                                    ? generateProjectColor(item.name)
+                                    : '#4285F4';
+                                  return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
+                                })()
+                              : '#1e293b'
+                          }}
+                        >
+                          {item.name}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              ) : (
+                // Show subprojects
+                <>
+                  {selectedProject?.subprojects.length === 0 && 
+                    Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="h-24 bg-gray-50 rounded-xl border border-gray-100" />
+                    ))
+                  }
+                  {selectedProject?.subprojects.slice(0, 6).map((subproject) => (
+                    <button
+                      key={subproject.id}
+                      onClick={() => onSubprojectSelect(subproject.id)}
+                      className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      style={{
+                        background: colorCodedProjectsEnabled
+                          ? (() => {
+                              const base = selectedProject.name
+                                ? generateProjectColor(selectedProject.name)
+                                : '#4285F4';
+                              return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
+                            })()
+                          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                      }}
+                    >
+                      <div className="h-full flex items-center justify-center px-3">
+                        <span 
+                          className="font-semibold text-sm text-center leading-tight"
+                          style={{
+                            color: colorCodedProjectsEnabled
+                              ? (() => {
+                                  const base = selectedProject.name
+                                    ? generateProjectColor(selectedProject.name)
+                                    : '#4285F4';
+                                  return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
+                                })()
+                              : '#1e293b'
+                          }}
+                        >
+                          {subproject.name}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {leftTab === 'quickstart' && (
+          <div className="w-full h-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="grid grid-cols-2 gap-3 p-4 h-full">
+              {bottomGridItems.length === 0 && 
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-24 bg-gray-50 rounded-xl border border-gray-100" />
+                ))
+              }
+              {bottomGridItems.map((item) => {
+                const isRunning = isTimerRunning && selectedProjectId === item.project.id && selectedSubprojectId === item.subproject.id;
+                const key = `${item.project.id}-${item.subproject.id}`;
+                
+                return (
+                  <button
+                    key={key}
+                    onClick={() => handleQuickStartClick(item.project, item.subproject)}
+                    className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    style={{
+                      background: isRunning
+                        ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+                        : colorCodedProjectsEnabled
+                          ? (() => {
+                              const base = item.project && item.project.name
+                                ? generateProjectColor(item.project.name)
+                                : '#4285F4';
+                              return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
+                            })()
+                          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                    }}
+                  >
+                    <div className="h-full flex flex-col items-center justify-center px-2">
+                      <span 
+                        className="font-semibold text-xs text-center leading-tight mb-1"
+                        style={{
+                          color: isRunning
+                            ? '#ffffff'
+                            : colorCodedProjectsEnabled
+                              ? (() => {
+                                  const base = item.project && item.project.name
+                                    ? generateProjectColor(item.project.name)
+                                    : '#4285F4';
+                                  return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
+                                })()
+                              : '#1e293b'
+                        }}
+                      >
+                        {item.project.name}
+                      </span>
+                      <span 
+                        className="text-xs text-center leading-tight opacity-80"
+                        style={{
+                          color: isRunning
+                            ? '#e2e8f0'
+                            : colorCodedProjectsEnabled
+                              ? (() => {
+                                  const base = item.project && item.project.name
+                                    ? generateProjectColor(item.project.name)
+                                    : '#4285F4';
+                                  return tinycolor2(base).isLight() ? '#475569' : '#e2e8f0';
+                                })()
+                              : '#64748b'
+                        }}
+                      >
+                        {item.subproject.name}
+                      </span>
+                    </div>
+                  </button>
                 );
               })}
             </div>
           </div>
-    </>
+        )}
+      </div>
+    </div>
   );
 });
 

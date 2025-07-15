@@ -15,7 +15,7 @@ const ExcelView: React.FC<{ timeLogs: any[]; addTimeLog: (newLog: any) => void; 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-[95%] mx-auto space-y-6">
       <ProgressBar
         currentHours={getCurrentDayTotal()}
         targetHours={8}

@@ -311,7 +311,7 @@ const PersonalJournal: React.FC = React.memo(() => {
   }, [entries]);
 
   return (
-    <div className="w-full h-full min-h-0 min-w-0 bg-transparent text-black font-sans">
+    <div className="w-[95%] mx-auto h-full min-h-0 min-w-0 bg-transparent text-black font-sans">
       <style>
         {`
           .task-completed {

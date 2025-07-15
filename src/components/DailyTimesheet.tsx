@@ -9,7 +9,6 @@ import { generateProjectColor, isColorCodedProjectsEnabled } from '@/lib/project
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import WeeklyTimesheet from './WeeklyTimesheet';
 
 interface DailyTimesheetProps {
   timeLogs: TimeLog[];
@@ -149,12 +148,8 @@ const DailyTimesheet: React.FC<DailyTimesheetProps> = ({ timeLogs, onSwitchToWee
     };
   }, []);
 
-  if (activeView === 'weekly') {
-    return <WeeklyTimesheet timeLogs={timeLogs} onUpdateTime={() => {}} />;
-  }
-
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="w-[95%] mx-auto space-y-8 animate-fade-in">
       {/* Header with Navigation */}
       <Card className="bg-gradient-secondary-modern border-border/20 shadow-2xl backdrop-blur-xl hover:border-border/40 transition-all duration-500">
         <CardHeader className="pb-6 border-b border-border/10">

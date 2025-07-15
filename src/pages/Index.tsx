@@ -82,6 +82,9 @@ const Index = React.memo(() => {
 
   return (
     <>
+      <div className="pastel-gradient-bg" />
+      <div className="glass-bg-overlay" />
+      {/* Background layers above */}
       <HeaderControls
         isDarkMode={isDarkMode}
         onDarkModeToggle={handleDarkModeToggle}

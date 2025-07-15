@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Material-inspired Google Color Palette */
+    /* Google Colors Theme */
     --background: 210 20% 98%; /* Light blue-gray */
     --foreground: 222 47% 11%; /* Google dark blue */
 
@@ -18,37 +18,37 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 217 89% 61%; /* Google Blue */
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 89% 51%;
+    --primary: 0 0% 0%; /* Matte Black */
+    --primary-foreground: 0 0% 98%;
+    --primary-hover: 0 0% 20%;
 
-    --secondary: 10 79% 62%; /* Google Red */
+    --secondary: 142 71% 45%; /* Google Green #34A853 */
     --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 10 79% 52%;
+    --secondary-hover: 142 71% 35%;
 
     --success: 142 71% 45%; /* Google Green */
-    --warning: 45 100% 51%; /* Google Yellow */
-    --info: 201 100% 50%; /* Google Cyan */
-    --destructive: 0 85% 60%;
+    --warning: 45 100% 51%; /* Google Yellow #FBBC04 */
+    --info: 217 89% 61%; /* Google Blue */
+    --destructive: 0 84% 60%; /* Google Red #EA4335 */
     --destructive-foreground: 0 0% 100%;
 
     --muted: 210 16% 93%;
     --muted-foreground: 222 20% 40%;
 
-    --accent: 277 73% 67%; /* Google Purple */
+    --accent: 220 60% 50%; /* Matte Cobalt Blue */
     --accent-foreground: 0 0% 100%;
-    --accent-hover: 277 73% 57%;
+    --accent-hover: 220 60% 40%;
 
     --border: 210 16% 85%;
     --input: 210 16% 93%;
-    --ring: 217 89% 61%;
+    --ring: 0 0% 0%; /* Matte Black */
 
     --radius: 12px;
 
-    /* Material Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 89% 61%) 0%, hsl(277 73% 67%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(10 79% 62%) 0%, hsl(45 100% 51%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(201 100% 50%) 0%, hsl(142 71% 45%) 100%);
+    /* Google Colors Gradients */
+    --gradient-primary: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+    --gradient-secondary: linear-gradient(135deg, #EA4335 0%, #FBBC04 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(220, 60%, 50%) 0%, #4285F4 100%);
 
     /* Material Shadows */
     --shadow-sm: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 1px 2px 0 rgba(60, 64, 67, 0.06);
@@ -68,7 +68,7 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Cred-inspired Dark Theme - Midnight Black with Dark Green Accents */
+    /* Google Colors Dark Theme */
     --background: 0 0% 4%;
     --foreground: 120 8% 88%;
 
@@ -78,38 +78,38 @@ All colors MUST be HSL.
     --popover: 0 0% 6%;
     --popover-foreground: 120 8% 88%;
 
-    --primary: 120 25% 20%;
+    --primary: 0 0% 0%; /* Matte Black */
     --primary-foreground: 0 0% 98%;
-    --primary-hover: 120 25% 25%;
+    --primary-hover: 0 0% 20%;
 
-    --secondary: 0 0% 8%;
-    --secondary-foreground: 120 8% 88%;
-    --secondary-hover: 0 0% 10%;
+    --secondary: 142 71% 45%; /* Google Green */
+    --secondary-foreground: 0 0% 98%;
+    --secondary-hover: 142 71% 55%;
 
     --muted: 0 0% 8%;
     --muted-foreground: 120 5% 65%;
 
-    --accent: 120 15% 12%;
-    --accent-foreground: 120 8% 88%;
-    --accent-hover: 120 15% 15%;
+    --accent: 220 60% 50%; /* Matte Cobalt Blue */
+    --accent-foreground: 0 0% 98%;
+    --accent-hover: 220 60% 40%;
 
-    --destructive: 0 85% 60%;
+    --destructive: 0 84% 60%; /* Google Red */
     --destructive-foreground: 0 0% 98%;
 
-    --warning: 25 95% 53%;
+    --warning: 45 100% 51%; /* Google Yellow */
     --warning-foreground: 0 0% 9%;
 
     --border: 120 8% 15%;
     --input: 0 0% 8%;
-    --ring: 120 25% 20%;
+    --ring: 0 0% 0%; /* Matte Black */
 
-    --success: 120 30% 25%;
-    --info: 221 83% 53%;
+    --success: 142 71% 45%; /* Google Green */
+    --info: 217 89% 61%; /* Google Blue */
 
-    /* Cred-inspired Dark Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(0 0% 6%) 0%, hsl(0 0% 4%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 8%) 0%, hsl(0 0% 6%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(120 15% 12%) 0%, hsl(0 0% 8%) 100%);
+    /* Google Colors Dark Gradients */
+    --gradient-primary: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+    --gradient-secondary: linear-gradient(135deg, #EA4335 0%, #FBBC04 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(220, 60%, 50%) 0%, #4285F4 100%);
 
     /* Enhanced shadows for dark mode */
     --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
@@ -120,12 +120,12 @@ All colors MUST be HSL.
 
     --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 120 8% 88%;
-    --sidebar-primary: 120 25% 20%;
+    --sidebar-primary: 0 0% 0%; /* Matte Black */
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 120 15% 12%;
-    --sidebar-accent-foreground: 120 8% 88%;
+    --sidebar-accent: 142 71% 45%; /* Google Green */
+    --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 120 8% 15%;
-    --sidebar-ring: 120 25% 20%;
+    --sidebar-ring: 0 0% 0%; /* Matte Black */
   }
 }
 
@@ -139,7 +139,7 @@ All colors MUST be HSL.
     height: 100vh;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    background: transparent !important;
     box-sizing: border-box;
   }
 
@@ -179,16 +179,17 @@ All colors MUST be HSL.
 
   /* Accent backgrounds for headers, timer, and 'Currently Tracking' */
   .header-material {
-    background: var(--gradient-primary);
+    /* background: var(--gradient-primary); */
     color: var(--primary-foreground);
     box-shadow: var(--shadow-md);
   }
   .timer-circle-material {
-    background: var(--gradient-accent);
+    /* background: var(--gradient-accent); */
     color: var(--accent-foreground);
     box-shadow: var(--shadow-lg);
   }
   .currently-tracking-material {
+    /* background: linear-gradient(90deg, #4285F4 0%, #34A853 100%); */
     background: linear-gradient(90deg, #4285F4 0%, #34A853 100%);
     color: #fff;
     box-shadow: 0 4px 24px 0 rgba(60,64,67,0.10);
@@ -196,7 +197,7 @@ All colors MUST be HSL.
   }
 
   .search-section-material {
-    background: linear-gradient(90deg, #e3f0ff 0%, #f3e7ff 50%, #e0ffe3 100%);
+    /* background: linear-gradient(90deg, #e3f0ff 0%, #f3e7ff 50%, #e0ffe3 100%); */
     border-radius: 1.25rem;
     box-shadow: 0 2px 12px 0 rgba(60,64,67,0.08);
     padding: 0.5rem 0.5rem;
@@ -254,11 +255,11 @@ All colors MUST be HSL.
 
   /* Enhanced table styles */
   .table-modern tbody tr:nth-child(even) {
-    @apply bg-muted/30;
+    /* @apply bg-muted/30; */
   }
 
   .table-modern tbody tr:hover {
-    @apply bg-accent/10 transition-colors duration-300;
+    /* @apply bg-accent/10 transition-colors duration-300; */
   }
 
   /* Progress bar enhancements */
@@ -268,14 +269,14 @@ All colors MUST be HSL.
   }
 
   .progress-animated::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    animation: shimmer 2s infinite;
+    /* content: ''; */
+    /* position: absolute; */
+    /* top: 0; */
+    /* left: -100%; */
+    /* width: 100%; */
+    /* height: 100%; */
+    /* background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); */
+    /* animation: shimmer 2s infinite; */
   }
 
   @keyframes shimmer {
@@ -304,17 +305,17 @@ All colors MUST be HSL.
 
   /* Enhanced gradient backgrounds */
   .bg-gradient-modern {
-    background: var(--gradient-primary);
+    /* background: var(--gradient-primary); */
     backdrop-filter: blur(20px);
   }
 
   .bg-gradient-secondary-modern {
-    background: var(--gradient-secondary);
+    /* background: var(--gradient-secondary); */
     backdrop-filter: blur(20px);
   }
 
   .bg-gradient-accent-modern {
-    background: var(--gradient-accent);
+    /* background: var(--gradient-accent); */
     backdrop-filter: blur(20px);
   }
 
@@ -393,7 +394,7 @@ All colors MUST be HSL.
 
 /* --- Elite Glassmorphic Dropdown Styles --- */
 .dropdown-glass {
-  background: rgba(255,255,255,0.80);
+  /* background: rgba(255,255,255,0.80); */
   border: 1px solid #e5e7eb;
   border-radius: 1.5rem;
   box-shadow: 0 32px 64px rgba(0,0,0,0.12), 0 8px 32px rgba(0,0,0,0.08);
@@ -412,7 +413,7 @@ All colors MUST be HSL.
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   border-left: 4px solid transparent;
-  background: transparent;
+  /* background: transparent; */
   font-size: 1.1rem;
   font-weight: 400;
   color: #111;
@@ -421,7 +422,7 @@ All colors MUST be HSL.
   transform: translateY(12px);
 }
 .dropdown-item-glass.selected, .dropdown-item-glass:hover {
-  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,249,250,0.7) 100%);
+  /* background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,249,250,0.7) 100%); */
   border-left: 4px solid #000;
   font-weight: 500;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -456,7 +457,7 @@ All colors MUST be HSL.
     top: calc(100% + 12px);
     left: 0;
     right: 0;
-    background: #ffffff;
+    /* background: #ffffff; */
     border-radius: 24px;
     box-shadow: 0 32px 64px rgba(0,0,0,0.12), 0 8px 32px rgba(0,0,0,0.08);
     border: 1px solid rgba(0,0,0,0.08);
@@ -608,4 +609,33 @@ All colors MUST be HSL.
 :root {
   --accent-blue: #4F8CFF;
   --accent-lavender: #E6E6FA;
+}
+
+.glass-bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.245);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+  /* Remove blur for clear background image */
+  /* backdrop-filter: blur(18px); */
+  /* -webkit-backdrop-filter: blur(18px); */
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.pastel-gradient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background: url('https://images.unsplash.com/photo-1615715035646-e92d1a56395b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
+  background-size: cover;
+  transition: background 0.5s;
 }
