@@ -11,6 +11,8 @@ interface TimerSectionProps {
   onStart: () => void;
   onPause: () => void;
   onStop: () => void;
+  selectedProject?: any;
+  selectedSubproject?: any;
 }
 
 const TimerSection: React.FC<TimerSectionProps> = ({
@@ -21,7 +23,9 @@ const TimerSection: React.FC<TimerSectionProps> = ({
   canPauseOrStop,
   onStart,
   onPause,
-  onStop
+  onStop,
+  selectedProject,
+  selectedSubproject
 }) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-12 px-6 z-10 w-full">
@@ -41,6 +45,7 @@ const TimerSection: React.FC<TimerSectionProps> = ({
           onStart={onStart}
           onPause={onPause}
           onStop={onStop}
+          compact={!!(selectedProject && selectedSubproject)}
         />
       </div>
     </div>

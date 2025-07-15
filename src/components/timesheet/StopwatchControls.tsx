@@ -11,6 +11,7 @@ interface StopwatchControlsProps {
   onStart: () => void;
   onPause: () => void;
   onStop: () => void;
+  compact?: boolean;
 }
 
 const StopwatchControls: React.FC<StopwatchControlsProps> = ({
@@ -19,10 +20,13 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
   canPauseOrStop,
   onStart,
   onPause,
-  onStop
+  onStop,
+  compact = false
 }) => {
-  const buttonBaseStyle = "relative h-14 px-8 rounded-2xl font-medium text-lg font-sans transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
-  const minWidth = { minWidth: '140px' };
+  const buttonBaseStyle = compact
+    ? "relative h-10 px-4 rounded-xl font-medium text-base font-sans transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+    : "relative h-14 px-8 rounded-2xl font-medium text-lg font-sans transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
+  const minWidth = compact ? { minWidth: '90px' } : { minWidth: '140px' };
 
   return (
     <div className="flex items-center gap-4 z-10">

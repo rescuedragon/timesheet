@@ -585,126 +585,122 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const [currentView, setCurrentView] = useState<'projects' | 'subprojects'>('projects');
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="flex-1 min-h-0 flex flex-col w-full h-full">
       {/* Global Search Bar */}
-      <div className="relative px-4 pt-4 pb-3">
+      <div className="relative w-full pt-4 pb-3">
         <input
           ref={globalSearchInputRef}
           type="text"
-          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
+          className="w-full block rounded-xl border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
           placeholder="Search for projects and subprojects..."
           value={globalSearch}
           onChange={handleGlobalSearchChange}
+          onFocus={() => setShowGlobalDropdown(true)}
           onKeyDown={handleGlobalSearchKeyDown}
-          onFocus={() => {
-            setFocusedInput('project');
-            globalSearch.length > 0 && setShowGlobalDropdown(true);
-          }}
-          onBlur={() => {
-            setFocusedInput(null);
-            setTimeout(() => setShowGlobalDropdown(false), 200);
-          }}
         />
-        
-        {/* Global Search Dropdown */}
-        {showGlobalDropdown && globalSearchResults.length > 0 && (
-          <div className="absolute top-full left-4 right-4 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
-            {globalSearchResults.map((result, index) => (
-              <button
-                key={result.id}
-                className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                  index === globalDropdownIndex ? 'bg-gray-100' : ''
-                } ${index === 0 ? 'rounded-t-xl' : ''} ${index === globalSearchResults.length - 1 ? 'rounded-b-xl' : ''}`}
-                onClick={() => handleGlobalSearchResultClick(result)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${
-                    result.type === 'project' ? 'bg-blue-500' : 'bg-green-500'
-                  }`} />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900">
-                      {result.type === 'project' ? result.project.name : result.subproject?.name}
+      </div>
+      
+      {/* Global Search Dropdown */}
+      {showGlobalDropdown && globalSearchResults.length > 0 && (
+        <div className="absolute top-full left-4 right-4 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
+          {globalSearchResults.map((result, index) => (
+            <button
+              key={result.id}
+              className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                index === globalDropdownIndex ? 'bg-gray-100' : ''
+              } ${index === 0 ? 'rounded-t-xl' : ''} ${index === globalSearchResults.length - 1 ? 'rounded-b-xl' : ''}`}
+              onClick={() => handleGlobalSearchResultClick(result)}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${
+                  result.type === 'project' ? 'bg-blue-500' : 'bg-green-500'
+                }`} />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">
+                    {result.type === 'project' ? result.project.name : result.subproject?.name}
+                  </div>
+                  {result.type === 'subproject' && (
+                    <div className="text-sm text-gray-500">
+                      {result.project.name}
                     </div>
-                    {result.type === 'subproject' && (
-                      <div className="text-sm text-gray-500">
-                        {result.project.name}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">
-                    {result.type === 'project' ? 'Project' : 'Subproject'}
-                  </div>
+                  )}
                 </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="flex mx-4 mb-4 bg-gray-100 rounded-xl p-1">
-        <button
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
-            leftTab === 'projects' 
-              ? 'bg-white text-gray-900 shadow-sm' 
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-          onClick={() => setLeftTab('projects')}
-        >
-          Frequently Used Projects
-        </button>
-        <button
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
-            leftTab === 'quickstart' 
-              ? 'bg-white text-gray-900 shadow-sm' 
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-          onClick={() => setLeftTab('quickstart')}
-        >
-          Quick Start
-        </button>
-      </div>
-
-      {/* Content Area */}
-      <div className="flex-1 px-4 pb-4">
-        {leftTab === 'projects' && (
-          <div className="w-full h-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative">
-            {/* Header with back button when showing subprojects - positioned as overlay */}
-            {currentView === 'subprojects' && selectedProject && (
-              <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-                <div className="flex items-center gap-3 p-3">
-                  <button
-                    onClick={() => setCurrentView('projects')}
-                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-sm truncate">{selectedProject.name}</h3>
-                    <p className="text-xs text-gray-500">Subprojects</p>
-                  </div>
+                <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">
+                  {result.type === 'project' ? 'Project' : 'Subproject'}
                 </div>
               </div>
-            )}
-            
-            <div className={`grid grid-cols-2 gap-3 p-4 h-full overflow-y-auto`}>
-              {currentView === 'projects' ? (
-                // Show projects
-                <>
-                  {topGridItems.length === 0 && 
-                    Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="h-30 bg-gray-50 rounded-xl border border-gray-100" />
-                    ))
-                  }
-                  {topGridItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                  onProjectSelect(item.id);
-                        // Navigate to subprojects view for this project
-                        setCurrentView('subprojects');
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Unified Tab + Grid Panel */}
+      <div className="w-full max-w-full mx-auto rounded-2xl shadow-xl bg-white/95 border border-gray-200 flex flex-col flex-1 min-h-0 h-full">
+        {/* Tab Navigation */}
+        <div className="flex mx-0 mb-0 bg-transparent rounded-t-2xl overflow-hidden">
+          <button
+            className={`flex-1 py-3 px-4 font-semibold text-sm transition-all duration-200 border-0 outline-none
+              ${leftTab === 'projects'
+                ? 'bg-white text-gray-900 shadow-none rounded-t-2xl rounded-b-none z-10'
+                : 'bg-gray-100 text-gray-600 hover:text-gray-900 shadow-sm rounded-2xl z-0'}
+            `}
+            style={{ borderBottom: leftTab === 'projects' ? '2px solid #fff' : '2px solid #e5e7eb' }}
+            onClick={() => setLeftTab('projects')}
+          >
+            Frequently Used Projects
+          </button>
+          <button
+            className={`flex-1 py-3 px-4 font-semibold text-sm transition-all duration-200 border-0 outline-none
+              ${leftTab === 'quickstart'
+                ? 'bg-white text-gray-900 shadow-none rounded-t-2xl rounded-b-none z-10'
+                : 'bg-gray-100 text-gray-600 hover:text-gray-900 shadow-sm rounded-2xl z-0'}
+            `}
+            style={{ borderBottom: leftTab === 'quickstart' ? '2px solid #fff' : '2px solid #e5e7eb' }}
+            onClick={() => setLeftTab('quickstart')}
+          >
+            Quick Start
+          </button>
+        </div>
+        {/* Content Area (Button Grid) */}
+        <div className="flex-1 w-full px-4 pb-4 pt-0">
+          {leftTab === 'projects' && (
+            <div className="w-full h-full bg-white rounded-b-2xl border-0 shadow-none overflow-hidden relative">
+              {/* Header with back button when showing subprojects - positioned as overlay */}
+              {currentView === 'subprojects' && selectedProject && (
+                <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+                  <div className="flex items-center gap-3 p-3">
+                    <button
+                      onClick={() => setCurrentView('projects')}
+                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-sm truncate">{selectedProject.name}</h3>
+                      <p className="text-xs text-gray-500">Subprojects</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className={`grid grid-cols-2 gap-3 p-4 h-full overflow-y-auto ${currentView === 'subprojects' ? '' : 'rounded-2xl'}`}>
+                {currentView === 'projects' ? (
+                  // Show projects
+                  <>
+                    {topGridItems.length === 0 && 
+                      Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />
+                      ))
+                    }
+                    {topGridItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                    onProjectSelect(item.id);
+                          // Navigate to subprojects view for this project
+                          setCurrentView('subprojects');
               }}
-                      className="h-30 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl shadow-md transition-all duration-200 hover:from-gray-100 hover:to-gray-200 hover:shadow-lg active:shadow-inner active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40"
               style={{
                 background: colorCodedProjectsEnabled
                   ? (() => {
@@ -716,7 +712,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                           : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
                       }}
                     >
-                      <div className="h-full flex items-center justify-center px-3">
+                      <div className="h-full w-full flex items-center justify-center px-3">
                         <span 
                           className="font-semibold text-lg text-center leading-tight"
                           style={{
@@ -733,27 +729,27 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                           {item.name}
                         </span>
                       </div>
-            </button>
-          ))}
-                </>
-              ) : (
-                // Show subprojects
-                <>
-                  {selectedProject?.subprojects.length === 0 && 
-                    Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="h-25 bg-gray-50 rounded-xl border border-gray-100" />
-                    ))
-                  }
-                  {selectedProject?.subprojects.slice(0, 6).map((subproject) => (
-                    <button
-                      key={subproject.id}
-                      onClick={() => onSubprojectSelect(subproject.id)}
-                      className="h-25 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      style={{
-                        background: colorCodedProjectsEnabled
-                          ? (() => {
-                              const base = selectedProject.name
-                                ? generateProjectColor(selectedProject.name)
+              </button>
+            ))}
+                  </>
+                ) : (
+                  // Show subprojects
+                  <>
+                    {selectedProject?.subprojects.length === 0 && 
+                      Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />
+                      ))
+                    }
+                    {selectedProject?.subprojects.slice(0, 6).map((subproject) => (
+                      <button
+                        key={subproject.id}
+                        onClick={() => onSubprojectSelect(subproject.id)}
+                        className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        style={{
+                          background: colorCodedProjectsEnabled
+                            ? (() => {
+                                const base = selectedProject.name
+                                  ? generateProjectColor(selectedProject.name)
                                 : '#4285F4';
                               return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
                             })()
@@ -779,32 +775,32 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       </div>
                     </button>
                   ))}
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {leftTab === 'quickstart' && (
-          <div className="w-full h-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="grid grid-cols-2 gap-3 p-4 h-full">
-              {bottomGridItems.length === 0 && 
-                Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-24 bg-gray-50 rounded-xl border border-gray-100" />
-                ))
-              }
-              {bottomGridItems.map((item) => {
-                const isRunning = isTimerRunning && selectedProjectId === item.project.id && selectedSubprojectId === item.subproject.id;
-                const key = `${item.project.id}-${item.subproject.id}`;
-                
-                return (
-                  <button
-                    key={key}
-                    onClick={() => handleQuickStartClick(item.project, item.subproject)}
-                    className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    style={{
-                      background: isRunning
-                        ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+          {leftTab === 'quickstart' && (
+            <div className="w-full h-full bg-white rounded-b-2xl border-0 shadow-none overflow-hidden">
+              <div className="grid grid-cols-2 gap-3 p-4 h-full">
+                {bottomGridItems.length === 0 && 
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />
+                  ))
+                }
+                {bottomGridItems.map((item) => {
+                  const isRunning = isTimerRunning && selectedProjectId === item.project.id && selectedSubprojectId === item.subproject.id;
+                  const key = `${item.project.id}-${item.subproject.id}`;
+                  
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleQuickStartClick(item.project, item.subproject)}
+                      className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      style={{
+                        background: isRunning
+                          ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
               : colorCodedProjectsEnabled
                 ? (() => {
                     const base = item.project && item.project.name
@@ -857,7 +853,8 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
             </div>
           </div>
         )}
-          </div>
+        </div>
+      </div>
     </div>
   );
 });

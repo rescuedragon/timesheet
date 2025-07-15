@@ -129,6 +129,8 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
                 onStart={actions.handleStart}
                 onPause={handlePause}
                 onStop={handleStop}
+                selectedProject={selectedProject}
+                selectedSubproject={selectedSubproject}
               />
 
               <TimeLogDialog
