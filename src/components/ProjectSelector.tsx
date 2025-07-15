@@ -83,6 +83,13 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const [showGlobalDropdown, setShowGlobalDropdown] = useState(false);
   const [globalDropdownIndex, setGlobalDropdownIndex] = useState<number>(-1);
 
+  // Add state for search bar focus
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  // Add state for dropdown mode and selected project for subprojects
+  const [dropdownMode, setDropdownMode] = useState<'projects' | 'subprojects'>('projects');
+  const [selectedDropdownProject, setSelectedDropdownProject] = useState<Project | null>(null);
+
   const { colorCodedProjectsEnabled } = useSettings();
 
   // Create refs for callbacks
@@ -584,56 +591,170 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
   const [currentView, setCurrentView] = useState<'projects' | 'subprojects'>('projects');
 
+  // Add ref for search wrapper
+  const searchWrapperRef = useRef<HTMLDivElement>(null);
+
+  // Add effect for outside click to close dropdown
+  useEffect(() => {
+    if (!showGlobalDropdown) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        searchWrapperRef.current &&
+        !searchWrapperRef.current.contains(event.target as Node)
+      ) {
+        setShowGlobalDropdown(false);
+        setIsSearchFocused(false);
+        setDropdownMode('projects');
+        setSelectedDropdownProject(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showGlobalDropdown]);
+
   return (
     <div className="flex-1 min-h-0 flex flex-col w-full h-full">
       {/* Global Search Bar */}
       <div className="relative w-full pt-4 pb-3">
-        <input
-          ref={globalSearchInputRef}
-          type="text"
-          className="w-full block rounded-xl border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
-          placeholder="Search for projects and subprojects..."
-          value={globalSearch}
-          onChange={handleGlobalSearchChange}
-          onFocus={() => setShowGlobalDropdown(true)}
-          onKeyDown={handleGlobalSearchKeyDown}
-        />
+        <div ref={searchWrapperRef} className="relative w-full search-wrapper" style={{ width: '100%', marginBottom: 0 }}>
+          <input
+            ref={globalSearchInputRef}
+            type="text"
+            className="search-input"
+            placeholder="Search for projects and subprojects..."
+            autoComplete="off"
+            spellCheck="false"
+            value={globalSearch}
+            onChange={handleGlobalSearchChange}
+            onFocus={() => { setShowGlobalDropdown(true); setIsSearchFocused(true); setDropdownMode('projects'); setSelectedDropdownProject(null); }}
+            onBlur={() => setIsSearchFocused(false)}
+            onKeyDown={handleGlobalSearchKeyDown}
+            style={{
+              width: '100%',
+              height: '60px',
+              background: 'rgba(255,255,255,0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '16px',
+              padding: '0 24px 0 60px',
+              fontSize: '16px',
+              fontWeight: 400,
+              color: '#1d1d1f',
+              outline: 'none',
+              transition: 'all 0.3s cubic-bezier(0.25,0.46,0.45,0.94)',
+              boxShadow: isSearchFocused
+                ? '0 8px 32px 0 rgba(66,133,244,0.18), 0 0 0 3px rgba(66,133,244,0.18)'
+                : '0 8px 32px rgba(0,0,0,0.1)',
+              borderColor: isSearchFocused ? '#4285F4' : 'rgba(255,255,255,0.2)',
+            }}
+          />
+          <svg
+            className="search-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            style={{
+              position: 'absolute',
+              left: 20,
+              top: '50%',
+              transform: `translateY(-50%) scale(${isSearchFocused ? 1.18 : 1})`,
+              width: 20,
+              height: 20,
+              opacity: 0.6,
+              pointerEvents: 'none',
+              transition: 'transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.2s',
+              color: isSearchFocused ? '#4285F4' : undefined,
+            }}
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          {/* Global Search Dropdown */}
+          {showGlobalDropdown && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
+              {dropdownMode === 'projects' && (
+                <>
+                  {allProjects
+                    .filter(project => project.name.toLowerCase().includes(globalSearch.toLowerCase()))
+                    .map((project, index) => (
+                      <button
+                        key={project.id}
+                        className={`dropdown-anim-item w-full px-4 py-3 text-left flex items-center gap-3 ${index === globalDropdownIndex ? 'bg-gray-100' : ''} ${index === 0 ? 'rounded-t-xl' : ''} ${index === allProjects.length - 1 ? 'rounded-b-xl' : ''}`}
+                        style={{
+                          // Only set the CSS variable for border color
+                          ['--dropdown-border-color' as any]: colorCodedProjectsEnabled ? generateProjectColor(project.name) : '#222',
+                        }}
+                        onClick={() => {
+                          setDropdownMode('subprojects');
+                          setSelectedDropdownProject(project);
+                        }}
+                      >
+                        <div
+                          className="w-2 h-2 rounded-full"
+                          style={{ background: colorCodedProjectsEnabled ? generateProjectColor(project.name) : '#222' }}
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900">{project.name}</div>
+                        </div>
+                        <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">Project</div>
+                      </button>
+                    ))}
+                  {allProjects.filter(project => project.name.toLowerCase().includes(globalSearch.toLowerCase())).length === 0 && (
+                    <div className="px-4 py-6 text-gray-500 text-sm text-center">No projects found</div>
+                  )}
+                </>
+              )}
+              {dropdownMode === 'subprojects' && selectedDropdownProject && (
+                <>
+                  <div className="flex items-center px-4 py-2 border-b border-gray-100 bg-gray-50 rounded-t-xl">
+                    <button
+                      className="mr-2 p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      onClick={() => { setDropdownMode('projects'); setSelectedDropdownProject(null); }}
+                    >
+                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <span className="font-medium text-gray-700">{selectedDropdownProject.name}</span>
+                  </div>
+                  {selectedDropdownProject.subprojects
+                    .filter(sub => sub.name.toLowerCase().includes(globalSearch.toLowerCase()))
+                    .map((subproject, index) => (
+                      <button
+                        key={subproject.id}
+                        className={`dropdown-anim-item w-full px-4 py-3 text-left flex items-center gap-3 ${index === 0 ? 'rounded-t-none' : ''} ${index === selectedDropdownProject.subprojects.length - 1 ? 'rounded-b-xl' : ''}`}
+                        style={{
+                          ['--dropdown-border-color' as any]: colorCodedProjectsEnabled ? generateProjectColor(selectedDropdownProject.name) : '#222',
+                        }}
+                        onClick={() => {
+                          onSubprojectSelect(subproject.id);
+                          setShowGlobalDropdown(false);
+                          setIsSearchFocused(false);
+                          setDropdownMode('projects');
+                          setSelectedDropdownProject(null);
+                        }}
+                      >
+                        <div
+                          className="w-2 h-2 rounded-full"
+                          style={{ background: colorCodedProjectsEnabled ? generateProjectColor(selectedDropdownProject.name) : '#222' }}
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900">{subproject.name}</div>
+                        </div>
+                        <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">Subproject</div>
+                      </button>
+                    ))}
+                  {selectedDropdownProject.subprojects.filter(sub => sub.name.toLowerCase().includes(globalSearch.toLowerCase())).length === 0 && (
+                    <div className="px-4 py-6 text-gray-500 text-sm text-center">No subprojects found</div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       
-      {/* Global Search Dropdown */}
-      {showGlobalDropdown && globalSearchResults.length > 0 && (
-        <div className="absolute top-full left-4 right-4 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
-          {globalSearchResults.map((result, index) => (
-            <button
-              key={result.id}
-              className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                index === globalDropdownIndex ? 'bg-gray-100' : ''
-              } ${index === 0 ? 'rounded-t-xl' : ''} ${index === globalSearchResults.length - 1 ? 'rounded-b-xl' : ''}`}
-              onClick={() => handleGlobalSearchResultClick(result)}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${
-                  result.type === 'project' ? 'bg-blue-500' : 'bg-green-500'
-                }`} />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">
-                    {result.type === 'project' ? result.project.name : result.subproject?.name}
-                  </div>
-                  {result.type === 'subproject' && (
-                    <div className="text-sm text-gray-500">
-                      {result.project.name}
-                    </div>
-                  )}
-                </div>
-                <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">
-                  {result.type === 'project' ? 'Project' : 'Subproject'}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Unified Tab + Grid Panel */}
       <div className="w-full max-w-full mx-auto rounded-2xl shadow-xl bg-white/95 border border-gray-200 flex flex-col flex-1 min-h-0 h-full">
         {/* Tab Navigation */}

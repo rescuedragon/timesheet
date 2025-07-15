@@ -638,3 +638,47 @@ All colors MUST be HSL.
   background-size: cover;
   transition: background 0.5s;
 }
+
+/* Dropdown animated item styles (hover/active/selected only) */
+.dropdown-anim-item {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  background: transparent;
+  --dropdown-border-color: #222;
+}
+.dropdown-anim-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--dropdown-border-color, #222);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 3px 0 0 3px;
+}
+.dropdown-anim-item:hover,
+.dropdown-anim-item.selected {
+  border-left-color: var(--dropdown-border-color);
+}
+.dropdown-anim-item:hover {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(88, 86, 214, 0.06) 100%);
+  transform: translateX(8px) scale(1.02);
+  box-shadow: 0 4px 20px rgba(0, 122, 255, 0.15);
+  border-radius: 12px;
+  margin: 2px 4px;
+}
+.dropdown-anim-item:hover::before {
+  width: 3px;
+}
+.dropdown-anim-item:active {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.12) 0%, rgba(88, 86, 214, 0.08) 100%);
+  transform: translateX(8px) scale(0.98);
+}
+.dropdown-anim-item.selected {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 500;
+}
+.dropdown-anim-item.selected::before {
+  width: 3px;
+}
