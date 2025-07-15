@@ -633,6 +633,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     }
   }, [showGlobalDropdown, hoveredProjectId, globalSearch, allProjects]);
 
+  // Add flip animation CSS
   return (
     <div className="flex-1 min-h-0 flex flex-col w-full h-full">
       {/* Global Search Bar */}
@@ -876,199 +877,73 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         </div>
         {/* Content Area (Button Grid) */}
         <div className="flex-1 w-full px-4 pb-4 pt-0">
-          {leftTab === 'projects' && (
-            <div className="w-full h-full bg-white rounded-b-2xl border-0 shadow-none overflow-hidden relative">
-              {/* Header with back button when showing subprojects - positioned as overlay */}
-              {currentView === 'subprojects' && selectedProject && (
-                <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-                  <div className="flex items-center gap-3 p-3">
-                    <button
-                      onClick={() => setCurrentView('projects')}
-                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-sm truncate">{selectedProject.name}</h3>
-                      <p className="text-xs text-gray-500">Subprojects</p>
+          <div className={`flip-container w-full h-full ${leftTab === 'quickstart' ? 'flipped' : ''}`}> 
+            <div className="flip-inner w-full h-full">
+              {/* Frequently Used Projects (front) */}
+              <div className="flip-front w-full h-full">
+                {leftTab === 'projects' && (
+                  <div className="w-full h-full bg-white rounded-b-2xl border-0 shadow-none overflow-hidden relative">
+                    {/* Header with back button when showing subprojects - positioned as overlay */}
+                    {currentView === 'subprojects' && selectedProject && (
+                      <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+                        <div className="flex items-center gap-3 p-3">
+                          <button
+                            onClick={() => setCurrentView('projects')}
+                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <ChevronLeft size={16} />
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-gray-900 text-sm truncate">{selectedProject.name}</h3>
+                            <p className="text-xs text-gray-500">Subprojects</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div className={`grid grid-cols-2 gap-3 p-4 h-full overflow-y-auto ${currentView === 'subprojects' ? '' : 'rounded-2xl'}`}>{currentView === 'projects' ? (<>{topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{topGridItems.map((item, index) => (<button key={item.id} ref={el => projectButtonRefs.current[index] = el} onClick={() => {onProjectSelect(item.id);setCurrentView('subprojects');setHoveredProjectId(null);}} className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl shadow-md transition-all duration-200 hover:from-gray-100 hover:to-gray-200 hover:shadow-lg active:shadow-inner active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40" style={{background: colorCodedProjectsEnabled? (() => {const base = item.name? generateProjectColor(item.name): '#4285F4';return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;})(): 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}><div className="h-full w-full flex items-center justify-center px-3"><span className="font-semibold text-lg text-center leading-tight" style={{color: colorCodedProjectsEnabled? (() => {const base = item.name? generateProjectColor(item.name): '#4285F4';return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';})(): '#1e293b'}}>{item.name}</span></div></button>))}</>):(<>{selectedProject?.subprojects.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{selectedProject?.subprojects.slice(0, 6).map((subproject) => (<button key={subproject.id} onClick={() => onSubprojectSelect(subproject.id)} className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40" style={{background: colorCodedProjectsEnabled? (() => {const base = selectedProject.name? generateProjectColor(selectedProject.name): '#4285F4';return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;})(): 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}><div className="h-full flex items-center justify-center px-3"><span className="font-semibold text-lg text-center leading-tight" style={{color: colorCodedProjectsEnabled? (() => {const base = selectedProject.name? generateProjectColor(selectedProject.name): '#4285F4';return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';})(): '#1e293b'}}>{subproject.name}</span></div></button>))}</>)}
                     </div>
                   </div>
-                </div>
-              )}
-              
-              <div className={`grid grid-cols-2 gap-3 p-4 h-full overflow-y-auto ${currentView === 'subprojects' ? '' : 'rounded-2xl'}`}>
-                {currentView === 'projects' ? (
-                  // Show projects
-                  <>
-                    {topGridItems.length === 0 && 
-                      Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />
-                      ))
-                    }
-                    {topGridItems.map((item, index) => (
-  <button
-    key={item.id}
-    ref={el => projectButtonRefs.current[index] = el}
-    onClick={() => {
-      onProjectSelect(item.id);
-      setCurrentView('subprojects');
-      setHoveredProjectId(null);
-    }}
-    className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl shadow-md transition-all duration-200 hover:from-gray-100 hover:to-gray-200 hover:shadow-lg active:shadow-inner active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40"
-    style={{
-      background: colorCodedProjectsEnabled
-        ? (() => {
-            const base = item.name
-              ? generateProjectColor(item.name)
-              : '#4285F4';
-            return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
-          })()
-        : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-    }}
-  >
-    <div className="h-full w-full flex items-center justify-center px-3">
-      <span
-        className="font-semibold text-lg text-center leading-tight"
-        style={{
-          color: colorCodedProjectsEnabled
-            ? (() => {
-                const base = item.name
-                  ? generateProjectColor(item.name)
-                  : '#4285F4';
-                return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
-              })()
-            : '#1e293b'
-        }}
-      >
-        {item.name}
-      </span>
-    </div>
-  </button>
-))}
-                  </>
-                ) : (
-                  // Show subprojects
-                  <>
-                    {selectedProject?.subprojects.length === 0 && 
-                      Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />
-                      ))
-                    }
-                    {selectedProject?.subprojects.slice(0, 6).map((subproject) => (
-                      <button
-                        key={subproject.id}
-                        onClick={() => onSubprojectSelect(subproject.id)}
-                        className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
-                        style={{
-                          background: colorCodedProjectsEnabled
-                            ? (() => {
-                                const base = selectedProject.name
-                                  ? generateProjectColor(selectedProject.name)
-                                : '#4285F4';
-                              return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
-                            })()
-                          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                      }}
-                    >
-                      <div className="h-full flex items-center justify-center px-3">
-                        <span 
-                          className="font-semibold text-lg text-center leading-tight"
-                          style={{
-                            color: colorCodedProjectsEnabled
-                              ? (() => {
-                                  const base = selectedProject.name
-                                    ? generateProjectColor(selectedProject.name)
-                                    : '#4285F4';
-                                  return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
-                                })()
-                              : '#1e293b'
-                          }}
-                        >
-                          {subproject.name}
-          </span>
-            </div>
-                    </button>
-                  ))}
-                  </>
+                )}
+              </div>
+              {/* Quick Start (back) */}
+              <div className="flip-back w-full h-full">
+                {leftTab === 'quickstart' && (
+                  <div className="w-full h-full bg-white rounded-b-2xl border-0 shadow-none overflow-hidden">
+                    <div className="grid grid-cols-2 gap-3 p-4 h-full">{bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{bottomGridItems.map((item) => {const isRunning = isTimerRunning && selectedProjectId === item.project.id && selectedSubprojectId === item.subproject.id;const key = `${item.project.id}-${item.subproject.id}`;return (<button key={key} onClick={() => handleQuickStartClick(item.project, item.subproject)} className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40" style={{background: isRunning? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)': colorCodedProjectsEnabled? (() => {const base = item.project && item.project.name? generateProjectColor(item.project.name): '#4285F4';return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;})(): 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}><div className="h-full flex flex-col items-center justify-center px-2"><span className="font-semibold text-xs text-center leading-tight mb-1" style={{color: isRunning? '#ffffff': colorCodedProjectsEnabled? (() => {const base = item.project && item.project.name? generateProjectColor(item.project.name): '#4285F4';return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';})(): '#1e293b'}}>{item.project.name}</span><span className="text-xs text-center leading-tight opacity-80" style={{color: isRunning? '#e2e8f0': colorCodedProjectsEnabled? (() => {const base = item.project && item.project.name? generateProjectColor(item.project.name): '#4285F4';return tinycolor2(base).isLight() ? '#475569' : '#e2e8f0';})(): '#64748b'}}>{item.subproject.name}</span></div></button>);})}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
-          )}
-
-          {leftTab === 'quickstart' && (
-            <div className="w-full h-full bg-white rounded-b-2xl border-0 shadow-none overflow-hidden">
-              <div className="grid grid-cols-2 gap-3 p-4 h-full">
-                {bottomGridItems.length === 0 && 
-                  Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />
-                  ))
-                }
-                {bottomGridItems.map((item) => {
-            const isRunning = isTimerRunning && selectedProjectId === item.project.id && selectedSubprojectId === item.subproject.id;
-            const key = `${item.project.id}-${item.subproject.id}`;
-                  
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => handleQuickStartClick(item.project, item.subproject)}
-                      className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      style={{
-                        background: isRunning
-                          ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
-              : colorCodedProjectsEnabled
-                ? (() => {
-                    const base = item.project && item.project.name
-                      ? generateProjectColor(item.project.name)
-                                : '#4285F4';
-                              return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
-                            })()
-                          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                    }}
-                  >
-                    <div className="h-full flex flex-col items-center justify-center px-2">
-                      <span 
-                        className="font-semibold text-xs text-center leading-tight mb-1"
-                        style={{
-                          color: isRunning
-                            ? '#ffffff'
-              : colorCodedProjectsEnabled
-                ? (() => {
-                    const base = item.project && item.project.name
-                      ? generateProjectColor(item.project.name)
-                                    : '#4285F4';
-                                  return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';
-                                })()
-                              : '#1e293b'
-                        }}
-                      >
-                        {item.project.name}
-                      </span>
-                      <span 
-                        className="text-xs text-center leading-tight opacity-80"
-                    style={{
-                          color: isRunning
-                            ? '#e2e8f0'
-                            : colorCodedProjectsEnabled
-                              ? (() => {
-                                  const base = item.project && item.project.name
-                                    ? generateProjectColor(item.project.name)
-                                    : '#4285F4';
-                                  return tinycolor2(base).isLight() ? '#475569' : '#e2e8f0';
-                                })()
-                              : '#64748b'
-                        }}
-                      >
-                        {item.subproject.name}
-                    </span>
-                </div>
-                  </button>
-                );
-              })}
-            </div>
           </div>
-        )}
-            </div>
-          </div>
+        </div>
+      </div>
+      <style>{`
+        .flip-container {
+          perspective: 1200px;
+        }
+        .flip-inner {
+          transition: transform 0.3s cubic-bezier(0.4,0.2,0.2,1);
+          transform-style: preserve-3d;
+          position: relative;
+          width: 100%;
+          height: 100%;
+        }
+        .flip-front, .flip-back {
+          backface-visibility: hidden;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+        }
+        .flip-back {
+          transform: rotateY(180deg);
+        }
+        .flipped .flip-inner {
+          transform: rotateY(180deg);
+        }
+      `}</style>
     </div>
   );
 });
