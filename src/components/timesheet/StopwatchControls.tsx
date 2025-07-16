@@ -34,7 +34,7 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
         <button
           onClick={onStart}
           disabled={!canStart}
-          className={`${buttonBaseStyle} bg-black text-white shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:bg-neutral-900 active:bg-neutral-950 border border-neutral-800`} // Matte black
+          className={`${buttonBaseStyle} bg-blue-600 text-white shadow-[0_4px_20px_rgba(79,70,229,0.3)] hover:bg-blue-700 active:bg-blue-800 border border-blue-500`}
           style={minWidth}
         >
           <span className="relative z-10 flex items-center justify-center">
@@ -46,7 +46,7 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
         <button
           onClick={onStop}
           disabled={!canPauseOrStop}
-          className={`${buttonBaseStyle} bg-black text-white shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:bg-neutral-900 active:bg-neutral-950 border border-neutral-800`} // Matte black
+          className={`${buttonBaseStyle} bg-red-600 text-white shadow-[0_4px_20px_rgba(220,38,38,0.3)] hover:bg-red-700 active:bg-red-800 border border-red-500`}
           style={minWidth}
         >
           <span className="relative z-10 flex items-center justify-center">
@@ -59,7 +59,7 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
       <button
         onClick={onPause}
         disabled={!canPauseOrStop}
-        className={`${buttonBaseStyle} bg-white/90 text-black border border-border shadow-[0_4px_20px_rgba(0,0,0,0.10)] hover:bg-white active:bg-gray-100 backdrop-blur-xl`} // Glassmorphism, matches header
+        className={`${buttonBaseStyle} bg-white/90 text-blue-700 border border-blue-200 shadow-[0_4px_20px_rgba(79,70,229,0.15)] hover:bg-white active:bg-blue-50 backdrop-blur-xl`}
         style={minWidth}
       >
         <span className="relative z-10 flex items-center justify-center">

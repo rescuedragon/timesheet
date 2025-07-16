@@ -27,10 +27,10 @@ const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
   return (
-    <div className="relative w-64 h-64 flex items-center justify-center overflow-hidden rounded-full" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(180,200,255,0.25) 100%)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: '0 4px 32px 0 rgba(80,100,180,0.10)' }}>
+    <div className="relative w-64 h-64 flex items-center justify-center overflow-hidden rounded-full" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(79,70,229,0.15) 100%)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: '0 4px 32px 0 rgba(79,70,229,0.2)' }}>
       {/* Pulsing Glow */}
       {isRunning && (
-        <div className="absolute inset-0 z-0 rounded-full bg-white opacity-30 blur-2xl animate-pulse" style={{ filter: 'blur(32px)' }} />
+        <div className="absolute inset-0 z-0 rounded-full bg-blue-400 opacity-40 blur-2xl animate-pulse" style={{ filter: 'blur(32px)' }} />
       )}
       {/* SVG Progress Ring and Border */}
       <svg

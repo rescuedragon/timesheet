@@ -78,26 +78,13 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
                 {/* Main Content Row: fills all available space */}
                 <div className="flex-1 min-h-0 flex flex-row gap-4">
                     {/* Left Glass Subcontainer: ProjectSelector */}
-                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md bg-white/20 border border-white/40 rounded-2xl shadow-md">
+                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md bg-white/20 border border-white/40 rounded-2xl shadow-md relative">
                         <div className="flex-1 min-h-0 flex flex-col">
                             <ProjectSelector
                                 ref={projectSelectorRef}
                                 projects={projects}
-                                selectedProjectId={selectedProjectId}
-                                selectedSubprojectId={selectedSubprojectId}
                                 onProjectSelect={onProjectSelect}
                                 onSubprojectSelect={onSubprojectSelect}
-                                onAddProject={onAddProject}
-                                onAddSubproject={onAddSubproject}
-                                currentFocus={currentFocus}
-                                onFocusChange={onFocusChange}
-                                stopwatchRef={stopwatchRef}
-                                handleStartNewTimerForProject={handleStartNewTimerForProject}
-                                isTimerRunning={isTimerRunning}
-                                queuedProjects={queuedProjects}
-                                onResumeProject={onResumeProject}
-                                onStopProject={onStopProject}
-                                onLogTime={onLogTime}
                             />
                         </div>
                     </div>

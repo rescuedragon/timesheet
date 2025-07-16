@@ -10,14 +10,14 @@ All colors MUST be HSL.
   :root {
     /* Google Colors Theme */
     --background: 210 20% 98%; /* Light blue-gray */
-    --foreground: 222 47% 11%; /* Google dark blue */
+    --foreground: 227 100% 66%; /* Blue #4773F9 */
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 227 100% 66%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 0 0% 0%; /* Matte Black */
-    --primary-foreground: 0 0% 98%;
-    --primary-hover: 0 0% 20%;
+    --popover-foreground: 227 100% 66%;
+    --primary: 227 100% 66%; /* Blue #4773F9 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 227 100% 56%;
     --secondary: 142 71% 45%; /* Google Green #34A853 */
     --secondary-foreground: 0 0% 100%;
     --secondary-hover: 142 71% 35%;
@@ -27,7 +27,7 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%; /* Google Red #EA4335 */
     --destructive-foreground: 0 0% 100%;
     --muted: 210 16% 93%;
-    --muted-foreground: 222 20% 40%;
+    --muted-foreground: 227 100% 66%; /* Blue #4773F9 */
     --accent: 220 60% 50%; /* Matte Cobalt Blue */
     --accent-foreground: 0 0% 100%;
     --accent-hover: 220 60% 40%;
