@@ -28,16 +28,15 @@ const TimerSection: React.FC<TimerSectionProps> = ({
   selectedSubproject
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center space-y-12 px-6 z-10 w-full">
-      <div className="animate-scale-in" style={{ animationDelay: '100ms' }}>
+    <div className="flex flex-col items-center justify-center w-full h-full min-h-0 min-w-0 flex-1">
+      <div className="flex items-center justify-center">
         <StopwatchDisplay
           isRunning={isRunning}
           elapsedTime={elapsedTime}
           displayTime={displayTime}
         />
       </div>
-      
-      <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+      <div className="mt-8 flex items-center justify-center">
         <StopwatchControls
           isRunning={isRunning}
           canStart={canStart}

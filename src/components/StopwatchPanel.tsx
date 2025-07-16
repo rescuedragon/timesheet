@@ -47,22 +47,17 @@ const StopwatchPanel = forwardRef<StopwatchPanelRef, StopwatchPanelProps>(({
   }), []);
 
   return (
-    <div 
-      ref={containerRef}
-      className="w-full h-full flex flex-col items-center justify-center"
-    >
-      <StopwatchContainer
-        selectedProject={selectedProject}
-        selectedSubproject={selectedSubproject}
-        onLogTime={onLogTime}
-        onPauseProject={onPauseProject}
-        resumedProject={resumedProject}
-        onResumedProjectHandled={onResumedProjectHandled}
-        startFnRef={startFnRef}
-        onTimerStopped={onTimerStopped}
-        onAddTimeLog={onAddTimeLog}
-      />
-    </div>
+    <StopwatchContainer
+      selectedProject={selectedProject}
+      selectedSubproject={selectedSubproject}
+      onLogTime={onLogTime}
+      onPauseProject={onPauseProject}
+      resumedProject={resumedProject}
+      onResumedProjectHandled={onResumedProjectHandled}
+      startFnRef={startFnRef}
+      onTimerStopped={onTimerStopped}
+      onAddTimeLog={onAddTimeLog}
+    />
   );
 });
 

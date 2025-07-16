@@ -698,7 +698,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               {allProjects
                 .filter(project => project.name.toLowerCase().includes(globalSearch.toLowerCase()))
                 .map((project, index) => (
-                  <button
+              <button
                     key={project.id}
                     ref={el => dropdownProjectButtonRefs.current[index] = el}
                     className={`dropdown-anim-item w-full px-4 py-3 text-left flex items-center gap-3 ${index === globalDropdownIndex ? 'bg-gray-100' : ''} ${index === 0 ? 'rounded-t-xl' : ''} ${index === allProjects.length - 1 ? 'rounded-b-xl' : ''}`}
@@ -727,12 +727,12 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       <div className="font-medium text-gray-900">{project.name}</div>
           </div>
                     <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">Project</div>
-                  </button>
+              </button>
                 ))}
               {allProjects.filter(project => project.name.toLowerCase().includes(globalSearch.toLowerCase())).length === 0 && (
                 <div className="px-4 py-6 text-gray-500 text-sm text-center">No projects found</div>
-              )}
-            </div>
+                )}
+              </div>
           )}
           {/* For the subproject list dropdown (when dropdownMode === 'subprojects'): */}
           {showGlobalDropdown && dropdownMode === 'subprojects' && selectedDropdownProject && (
@@ -745,17 +745,17 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
               </button>
                 <span className="font-medium text-gray-700">{selectedDropdownProject.name}</span>
-              </div>
+        </div>
               {selectedDropdownProject.subprojects
                 .filter(sub => sub.name.toLowerCase().includes(globalSearch.toLowerCase()))
                 .map((subproject, index) => (
-                  <button
+            <button
                     key={subproject.id}
                     className={`dropdown-anim-item w-full px-4 py-3 text-left flex items-center gap-3 ${index === 0 ? 'rounded-t-none' : ''} ${index === selectedDropdownProject.subprojects.length - 1 ? 'rounded-b-xl' : ''}`}
                     style={{
                       ['--dropdown-border-color' as any]: colorCodedProjectsEnabled ? getDropdownColor(generateProjectColor(selectedDropdownProject.name)) : '#222',
                     }}
-                    onClick={() => {
+              onClick={() => {
                       onSubprojectSelect(subproject.id);
                       setShowGlobalDropdown(false);
                       setIsSearchFocused(false);
@@ -820,12 +820,12 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       <div className="font-medium text-gray-900">{subproject.name}</div>
                     </div>
                     <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">Subproject</div>
-                  </button>
-                ))}
-              </div>
+            </button>
+          ))}
+        </div>
             );
           })(), document.body)}
-        </div>
+      </div>
       </div>
       
       {/* Unified Tab + Grid Panel */}
@@ -835,46 +835,32 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
           <button
             className={`flex-1 py-3 px-4 font-semibold text-sm transition-all duration-200 border-0 outline-none
               ${leftTab === 'projects'
-                ? 'bg-gradient-to-b from-white via-blue-50 to-blue-100 text-gray-900 shadow-lg rounded-t-2xl rounded-b-none z-20 -mb-1 border-b-0 font-bold'
+                ? 'bg-[#5b97f6] text-white shadow-lg rounded-t-2xl rounded-b-none z-20 -mb-1 border-b-0 font-bold'
                 : 'bg-gray-100 text-gray-600 hover:text-gray-900 shadow-sm rounded-2xl z-0'}
             `}
-            style={leftTab === 'projects' ? {
-              boxShadow: '0 4px 16px 0 rgba(66,133,244,0.08)',
-              marginBottom: '-6px', // overlap content
-              borderBottomLeftRadius: 0,
-              borderBottomRightRadius: 0,
-              borderBottom: 'none',
-              position: 'relative',
-              zIndex: 20,
-            } : {
-              borderBottom: '2px solid #e5e7eb',
-            }}
+            style={leftTab === 'projects' ? { boxShadow: '0 2px 8px 0 rgba(91,151,246,0.08)' } : {}}
             onClick={() => setLeftTab('projects')}
+            tabIndex={0}
+            aria-selected={leftTab === 'projects'}
+            aria-controls="frequent-projects-panel"
           >
             Frequently Used Projects
           </button>
           <button
             className={`flex-1 py-3 px-4 font-semibold text-sm transition-all duration-200 border-0 outline-none
               ${leftTab === 'quickstart'
-                ? 'bg-gradient-to-b from-white via-blue-50 to-blue-100 text-gray-900 shadow-lg rounded-t-2xl rounded-b-none z-20 -mb-1 border-b-0 font-bold'
+                ? 'bg-[#5b97f6] text-white shadow-lg rounded-t-2xl rounded-b-none z-20 -mb-1 border-b-0 font-bold'
                 : 'bg-gray-100 text-gray-600 hover:text-gray-900 shadow-sm rounded-2xl z-0'}
             `}
-            style={leftTab === 'quickstart' ? {
-              boxShadow: '0 4px 16px 0 rgba(66,133,244,0.08)',
-              marginBottom: '-6px', // overlap content
-              borderBottomLeftRadius: 0,
-              borderBottomRightRadius: 0,
-              borderBottom: 'none',
-              position: 'relative',
-              zIndex: 20,
-            } : {
-              borderBottom: '2px solid #e5e7eb',
-            }}
+            style={leftTab === 'quickstart' ? { boxShadow: '0 2px 8px 0 rgba(91,151,246,0.08)' } : {}}
             onClick={() => setLeftTab('quickstart')}
+            tabIndex={0}
+            aria-selected={leftTab === 'quickstart'}
+            aria-controls="quickstart-panel"
           >
             Quick Start
           </button>
-        </div>
+            </div>
         {/* Content Area (Button Grid) */}
         <div className="flex-1 w-full px-4 pb-4 pt-0">
           <div className={`flip-container w-full h-full ${leftTab === 'quickstart' ? 'flipped' : ''}`}> 
@@ -887,30 +873,58 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                     {currentView === 'subprojects' && selectedProject && (
                       <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100">
                         <div className="flex items-center gap-3 p-3">
-                          <button
+                    <button
                             onClick={() => setCurrentView('projects')}
                             className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                           >
                             <ChevronLeft size={16} />
-                          </button>
+                    </button>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-gray-900 text-sm truncate">{selectedProject.name}</h3>
                             <p className="text-xs text-gray-500">Subprojects</p>
-                          </div>
-                        </div>
+              </div>
+            </div>
                       </div>
                     )}
-                    <div className={`grid grid-cols-2 gap-3 p-4 h-full overflow-y-auto ${currentView === 'subprojects' ? '' : 'rounded-2xl'}`}>{currentView === 'projects' ? (<>{topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{topGridItems.map((item, index) => (<button key={item.id} ref={el => projectButtonRefs.current[index] = el} onClick={() => {onProjectSelect(item.id);setCurrentView('subprojects');setHoveredProjectId(null);}} className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl shadow-md transition-all duration-200 hover:from-gray-100 hover:to-gray-200 hover:shadow-lg active:shadow-inner active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40" style={{background: colorCodedProjectsEnabled? (() => {const base = item.name? generateProjectColor(item.name): '#4285F4';return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;})(): 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}><div className="h-full w-full flex items-center justify-center px-3"><span className="font-semibold text-lg text-center leading-tight" style={{color: colorCodedProjectsEnabled? (() => {const base = item.name? generateProjectColor(item.name): '#4285F4';return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';})(): '#1e293b'}}>{item.name}</span></div></button>))}</>):(<>{selectedProject?.subprojects.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{selectedProject?.subprojects.slice(0, 6).map((subproject) => (<button key={subproject.id} onClick={() => onSubprojectSelect(subproject.id)} className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40" style={{background: colorCodedProjectsEnabled? (() => {const base = selectedProject.name? generateProjectColor(selectedProject.name): '#4285F4';return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;})(): 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}><div className="h-full flex items-center justify-center px-3"><span className="font-semibold text-lg text-center leading-tight" style={{color: colorCodedProjectsEnabled? (() => {const base = selectedProject.name? generateProjectColor(selectedProject.name): '#4285F4';return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';})(): '#1e293b'}}>{subproject.name}</span></div></button>))}</>)}
-                    </div>
-                  </div>
-                )}
+                    <div className={`grid grid-cols-2 gap-3 p-4 h-full overflow-y-auto ${currentView === 'subprojects' ? '' : 'rounded-2xl'}`}>{currentView === 'projects' ? (<>{topGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{topGridItems.map((item, index) => (
+  <button
+    key={item.id}
+    ref={el => projectButtonRefs.current[index] = el}
+    onClick={() => {
+      onProjectSelect(item.id);
+      setCurrentView('subprojects');
+      setHoveredProjectId(null);
+    }}
+    className="w-full h-full block border border-gray-200 rounded-xl shadow-md transition-all duration-200 hover:from-blue-100 hover:to-blue-200 hover:shadow-lg active:shadow-inner active:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-primary/40"
+    style={{
+      background: leftTab === 'projects' && !colorCodedProjectsEnabled
+        ? 'linear-gradient(135deg, #e3f0fd 0%, #c6dbfc 100%)'
+              : colorCodedProjectsEnabled
+                ? (() => {
+              const base = item.name
+                ? generateProjectColor(item.name)
+                : '#4285F4';
+              return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;
+            })()
+          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+    }}
+  >
+    <div className="h-full w-full flex items-center justify-center px-3">
+      <span className="font-semibold text-lg text-center leading-tight" style={{ color: colorCodedProjectsEnabled ? (() => { const base = item.name ? generateProjectColor(item.name) : '#4285F4'; return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff'; })() : '#1e293b' }}>{item.name}</span>
+    </div>
+                  </button>
+))}
+</>):(<>{selectedProject?.subprojects.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{selectedProject?.subprojects.slice(0, 6).map((subproject) => (<button key={subproject.id} onClick={() => onSubprojectSelect(subproject.id)} className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40" style={{background: colorCodedProjectsEnabled? (() => {const base = selectedProject.name? generateProjectColor(selectedProject.name): '#4285F4';return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;})(): 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}><div className="h-full flex items-center justify-center px-3"><span className="font-semibold text-lg text-center leading-tight" style={{color: colorCodedProjectsEnabled? (() => {const base = selectedProject.name? generateProjectColor(selectedProject.name): '#4285F4';return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';})(): '#1e293b'}}>{subproject.name}</span></div></button>))}</>)}
+                </div>
               </div>
+                )}
+            </div>
               {/* Quick Start (back) */}
               <div className="flip-back w-full h-full">
                 {leftTab === 'quickstart' && (
                   <div className="w-full h-full bg-white rounded-b-2xl border-0 shadow-none overflow-hidden">
                     <div className="grid grid-cols-2 gap-3 p-4 h-full">{bottomGridItems.length === 0 && Array.from({ length: 6 }).map((_, i) => (<div key={i} className="w-full h-full bg-gray-50 rounded-xl border border-gray-100 min-h-[64px]" />))}{bottomGridItems.map((item) => {const isRunning = isTimerRunning && selectedProjectId === item.project.id && selectedSubprojectId === item.subproject.id;const key = `${item.project.id}-${item.subproject.id}`;return (<button key={key} onClick={() => handleQuickStartClick(item.project, item.subproject)} className="w-full h-full block bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-200 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/40" style={{background: isRunning? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)': colorCodedProjectsEnabled? (() => {const base = item.project && item.project.name? generateProjectColor(item.project.name): '#4285F4';return `linear-gradient(135deg, ${base} 0%, ${tinycolor2(base).darken(10).toString()} 100%)`;})(): 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}><div className="h-full flex flex-col items-center justify-center px-2"><span className="font-semibold text-xs text-center leading-tight mb-1" style={{color: isRunning? '#ffffff': colorCodedProjectsEnabled? (() => {const base = item.project && item.project.name? generateProjectColor(item.project.name): '#4285F4';return tinycolor2(base).isLight() ? '#1e293b' : '#ffffff';})(): '#1e293b'}}>{item.project.name}</span><span className="text-xs text-center leading-tight opacity-80" style={{color: isRunning? '#e2e8f0': colorCodedProjectsEnabled? (() => {const base = item.project && item.project.name? generateProjectColor(item.project.name): '#4285F4';return tinycolor2(base).isLight() ? '#475569' : '#e2e8f0';})(): '#64748b'}}>{item.subproject.name}</span></div></button>);})}
-                    </div>
+          </div>
                   </div>
                 )}
               </div>

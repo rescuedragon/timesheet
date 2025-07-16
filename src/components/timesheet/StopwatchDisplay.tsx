@@ -27,25 +27,25 @@ const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
   return (
-    <div className="relative w-64 h-64 flex items-center justify-center overflow-hidden rounded-full">
+    <div className="relative w-64 h-64 flex items-center justify-center overflow-hidden rounded-full" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(180,200,255,0.25) 100%)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: '0 4px 32px 0 rgba(80,100,180,0.10)' }}>
       {/* Pulsing Glow */}
       {isRunning && (
         <div className="absolute inset-0 z-0 rounded-full bg-white opacity-30 blur-2xl animate-pulse" style={{ filter: 'blur(32px)' }} />
       )}
-      {/* SVG Progress Ring */}
+      {/* SVG Progress Ring and Border */}
       <svg
         width={CIRCLE_SIZE}
         height={CIRCLE_SIZE}
-        className="absolute top-0 left-0 z-10"
+        className="absolute top-0 left-0 z-10 pointer-events-none"
       >
-        {/* Background ring */}
+        {/* Gradient Border */}
         <circle
           cx={CIRCLE_SIZE / 2}
           cy={CIRCLE_SIZE / 2}
           r={RADIUS}
-          stroke="#222"
-          strokeWidth={STROKE_WIDTH}
-          fill="black"
+          stroke="url(#borderGradient)"
+          strokeWidth={16}
+          fill="url(#glassGradient)"
         />
         {/* Progress ring */}
         <circle
@@ -63,6 +63,16 @@ const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
             filter: isRunning ? 'drop-shadow(0 0 8px #fff)' : undefined
           }}
         />
+        <defs>
+          <linearGradient id="glassGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#f8fafc" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#b4c8ff" stopOpacity="0.4" />
+          </linearGradient>
+          <linearGradient id="borderGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#b4c8ff" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#e0e7ff" stopOpacity="0.8" />
+          </linearGradient>
+        </defs>
       </svg>
       {/* Timer Text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20">

@@ -38,7 +38,7 @@ const CurrentTrackingDisplay: React.FC<CurrentTrackingDisplayProps> = ({
     };
 
     return (
-        <div className="bg-black rounded-xl shadow-lg border border-gray-800 w-full max-w-full overflow-hidden">
+        <div className="bg-[#4285F4] rounded-xl shadow-lg border border-blue-700 w-full max-w-full overflow-hidden">
             <div className="flex items-center justify-between w-full p-4">
                 {/* Currently Tracking Indicator */}
                 <div className="flex items-center space-x-6 min-w-0">
