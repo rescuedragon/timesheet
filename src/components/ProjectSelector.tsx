@@ -633,28 +633,34 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center bg-gray-100/95 dark:bg-gray-800/95 p-1 rounded-xl backdrop-blur-sm border border-gray-200/40 dark:border-gray-700/40 shadow-sm">
               <motion.button
-                className={`px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative ${
                   activeTab === 'frequent' 
-                    ? 'bg-indigo-500 text-white shadow-md' 
-                    : 'text-gray-600 hover:bg-white/50'
+                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' 
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white/40 dark:hover:bg-gray-700/40'
                 }`}
                 onClick={() => setActiveTab('frequent')}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                style={{
+                  boxShadow: activeTab === 'frequent' ? '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)' : 'none'
+                }}
               >
                 Frequently Used
               </motion.button>
               <motion.button
-                className={`px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative ${
                   activeTab === 'quick-start' 
-                    ? 'bg-indigo-500 text-white shadow-md' 
-                    : 'text-gray-600 hover:bg-white/50'
+                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' 
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white/40 dark:hover:bg-gray-700/40'
                 }`}
                 onClick={() => setActiveTab('quick-start')}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                style={{
+                  boxShadow: activeTab === 'quick-start' ? '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)' : 'none'
+                }}
               >
                 Quick Start
               </motion.button>

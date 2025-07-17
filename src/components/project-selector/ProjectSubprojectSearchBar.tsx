@@ -202,8 +202,8 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
             <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
               {projectSearch === '' && <ShinyText text="Search for main project" className="text-lg" />}
             </div>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
-              <Search size={24} strokeWidth={2} />
+            <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-opacity duration-200 ${projectSearch === '' ? 'opacity-100' : 'opacity-0'}`}>
+              <Search size={24} strokeWidth={2} className="text-gray-400" />
             </div>
             {/* Apple-style Elite dropdown for project */}
             <div className={showProjectDropdown ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0 }}>
@@ -283,8 +283,8 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
             <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
               {subprojectSearch === '' && <ShinyText text="Search for subproject" className="text-lg" />}
             </div>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
-              <Search size={24} strokeWidth={2} />
+            <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-opacity duration-200 ${subprojectSearch === '' ? 'opacity-100' : 'opacity-0'}`}>
+              <Search size={24} strokeWidth={2} className="text-gray-400" />
             </div>
             {/* Apple-style Elite dropdown for subproject */}
             <div className={showSubprojectDropdown && selectedProject ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0, zIndex: 1000 }}>

@@ -84,17 +84,6 @@ const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
         </defs>
       </svg>
       
-      {/* Pulsing Center Dot */}
-      {isRunning && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" 
-               style={{ 
-                 boxShadow: '0 0 20px rgba(126, 46, 255, 0.6)',
-                 animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-               }}></div>
-        </div>
-      )}
-      
       {/* Timer Text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
         <div className={`text-5xl font-medium tracking-tighter font-mono px-4 select-none transition-all duration-300 ${
@@ -107,13 +96,6 @@ const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
         }}>
           {formatTime(displayTime)}
         </div>
-        
-        {/* Status Indicator */}
-        {isRunning && (
-          <div className="mt-2 text-xs font-medium text-purple-600 uppercase tracking-wider animate-pulse">
-            Recording
-          </div>
-        )}
       </div>
     </div>
   );
