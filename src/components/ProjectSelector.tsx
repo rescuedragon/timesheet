@@ -77,8 +77,8 @@ const Card = React.memo<CardProps>(({ title, subtitle, color, onClick, isColorCo
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             whileHover={{ 
-                scale: 1.05, 
-                y: -8,
+                scale: 1.03, 
+                y: -4,
                 boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
             }}
             whileTap={{ scale: 0.98 }}
@@ -90,7 +90,8 @@ const Card = React.memo<CardProps>(({ title, subtitle, color, onClick, isColorCo
                 backdropFilter: 'blur(10px)',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                margin: '8px 0'
             }}
             onClick={onClick}
             onMouseEnter={(e) => {
@@ -114,8 +115,14 @@ const Card = React.memo<CardProps>(({ title, subtitle, color, onClick, isColorCo
                 className="flex flex-col items-center justify-center h-full"
                 whileHover={{ scale: 1.02 }}
             >
-                <h4 className="text-lg font-semibold text-center mb-2" style={{ color: '#1d1d1f' }}>{title}</h4>
-                {subtitle && <p className="text-sm text-center" style={{ color: '#6b7280', lineHeight: '1.4' }}>{subtitle}</p>}
+                <h4 className="text-lg font-semibold text-center mb-2" style={{ color: '#1d1d1f' }}>
+                  {title}
+                </h4>
+                {subtitle && (
+                  <p className="text-sm text-center" style={{ color: '#6b7280', lineHeight: '1.4' }}>
+                    {subtitle}
+                  </p>
+                )}
             </motion.div>
         </motion.div>
     );
@@ -141,8 +148,8 @@ const TimerCard = React.memo<TimerCardProps>(({ title, subtitle, color, onClick,
         exit={{ opacity: 0, scale: 0.95, y: -20 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         whileHover={{ 
-            scale: isRunning ? 1.02 : 1.05, 
-            y: isRunning ? -4 : -8,
+            scale: isRunning ? 1.02 : 1.03, 
+            y: isRunning ? -2 : -4,
             boxShadow: isRunning ? "0 15px 35px rgba(99, 102, 241, 0.4)" : "0 20px 40px rgba(0, 0, 0, 0.15)"
         }}
         whileTap={{ scale: 0.98 }}
@@ -154,7 +161,8 @@ const TimerCard = React.memo<TimerCardProps>(({ title, subtitle, color, onClick,
         backdropFilter: 'blur(10px)',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: isRunning ? '0 8px 32px rgba(99, 102, 241, 0.3)' : '0 4px 20px rgba(0, 0, 0, 0.08)'
+        boxShadow: isRunning ? '0 8px 32px rgba(99, 102, 241, 0.3)' : '0 4px 20px rgba(0, 0, 0, 0.08)',
+        margin: '8px 0'
         }}
         onClick={onClick}
       onMouseEnter={(e) => {
@@ -567,7 +575,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
 
   return (
     <motion.div 
-      className="p-4 rounded-lg flex flex-col h-full overflow-hidden" 
+      className="p-6 rounded-lg flex flex-col h-full overflow-hidden" 
       style={{ 
         background: 'rgba(255, 255, 255, 0.9)',
         backdropFilter: 'blur(10px)',
@@ -591,8 +599,8 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         <div ref={searchContainerRef} className="search-container-ps">
           <div className="search-input-wrapper-ps flex items-center">
             <div className="flex-grow relative">
-            <input
-            type="text"
+            <motion.input
+              type="text"
                 className={`search-input-ps ${isTimerRunning ? 'cursor-not-allowed' : 'cursor-text'}`}
                 placeholder={isTimerRunning ? "Timer is running..." : "Search projects..."}
           value={searchValue}
@@ -603,6 +611,11 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   setDropdownView('projects');
               }
                 }}
+                onFocus={() => {
+                    if (!isTimerRunning) {
+                  setDropdownOpen(true);
+              }
+          }}
                 onClick={handleSearchBarClick}
                 disabled={isTimerRunning}
                 style={{
@@ -623,7 +636,6 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   })
                 }}
               />
-              <Search className={`search-icon-ps ${isTimerRunning || searchValue ? 'text-indigo-500 opacity-60' : ''} ${isDropdownOpen ? 'icon-pop-disappear' : 'icon-reappear'}`} />
             </div>
             <motion.div 
               className="flex items-center ml-2 mr-2"
@@ -631,6 +643,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
+              <div className="flex items-center space-x-2">
               <motion.button
                 className={`px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === 'frequent' 
@@ -655,6 +668,23 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               >
                 Quick Start
               </motion.button>
+              </div>
+              <div className="w-10 flex justify-center">
+              {activeTab === 'quick-start' && (
+                <motion.button 
+                  onClick={() => setIsEditDialogOpen(true)} 
+                  className="text-indigo-500 hover:text-indigo-700 p-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileTap={{ scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Edit3 className="h-4 w-4" />
+                </motion.button>
+              )}
+              </div>
             </motion.div>
         </div>
           
@@ -698,9 +728,11 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                    whileHover={{ x: 5 }}
                 >
                   <div className="item-content-ps">
-                    <div className="item-text-ps">{project.name}</div>
+                    <div className="item-text-ps">
+                      {project.name}
+                    </div>
                           <div className="item-description-ps">
-                            {project.subprojects.length} subprojects
+                            {`${project.subprojects.length} subprojects`}
                           </div>
                   </div>
           </motion.div>
@@ -719,11 +751,13 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                        whileHover={{ x: 5 }}
                 >
                         <div className="item-content-ps">
-                          <div className="item-text-ps">{subproject.name}</div>
+                          <div className="item-text-ps">
+                            {subproject.name}
+                          </div>
                           <div className="item-description-ps">
                             {activeProject.name}
                           </div>
-        </div>
+                        </div>
                       </motion.div>
               ))}
                     </div>
@@ -802,7 +836,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: 0.2 }}
                     >
-                      {selectedProjectForSubprojects?.name}
+                      {selectedProjectForSubprojects?.name || ''}
                     </motion.h3>
                   </motion.div>
                   <motion.div 
@@ -841,22 +875,6 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <motion.div 
-                className="flex justify-between items-center mb-4"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div></div>
-                <motion.button 
-                  onClick={() => setIsEditDialogOpen(true)} 
-                  className="text-indigo-500 hover:text-indigo-700"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  Edit
-                </motion.button>
-              </motion.div>
               <motion.div
                 className="grid gap-4"
                 style={{ gridTemplateColumns: `repeat(auto-fill, minmax(180px, 1fr))` }}
@@ -930,7 +948,9 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                    whileHover={{ x: 5 }}
                 >
                         <div className="item-content-ps">
-                      <div className="item-text-ps">{subproject.name}</div>
+                      <div className="item-text-ps">
+                        {subproject.name}
+                      </div>
                       <div className="item-description-ps">
                         {hoveredProject.name}
                       </div>
