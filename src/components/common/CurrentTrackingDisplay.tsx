@@ -22,6 +22,7 @@ interface CurrentTrackingDisplayProps {
     selectedSubproject: Subproject | undefined;
     isTimerRunning: boolean;
     currentTime: Date;
+    elapsedTime: number;
 }
 
 // Custom Location Icon Component
@@ -114,7 +115,8 @@ const CurrentTrackingDisplay: React.FC<CurrentTrackingDisplayProps> = ({
     selectedProject,
     selectedSubproject,
     isTimerRunning,
-    currentTime
+    currentTime,
+    elapsedTime
 }) => {
     // Format time functions
     const formatTime = (date: Date, timezone: string) => {
@@ -149,15 +151,15 @@ const CurrentTrackingDisplay: React.FC<CurrentTrackingDisplayProps> = ({
                                     <div className="absolute inset-0 w-4 h-4 rounded-full bg-white animate-ping opacity-75"></div>
                                 )}
                             </div>
-                            <div className="text-xs font-bold uppercase tracking-[0.15em] leading-relaxed text-gray-300">
-                                Currently<br />Tracking
+                            <div className="text-xs font-bold uppercase tracking-[0.15em] leading-relaxed text-gray-300 w-32">
+                                <ShinyText text={isTimerRunning ? 'Currently\nTracking' : 'Currently\nSelected'} />
                             </div>
                         </div>
 
                         {/* Centered Project and Subproject Section */}
-                        <div className="flex items-center justify-center flex-1">
+                        <div className="grid grid-cols-2 flex-1 items-center gap-x-4">
                             {/* Project Section */}
-                            <div className="px-12 min-w-0">
+                            <div className="text-right pr-4">
                                 <div className="text-xs font-bold uppercase tracking-[0.15em] mb-3 text-gray-300">
                                     Project
                                 </div>
@@ -166,14 +168,48 @@ const CurrentTrackingDisplay: React.FC<CurrentTrackingDisplayProps> = ({
                                 </div>
                             </div>
 
-                            {/* Subproject Section */}
-                            <div className="px-12 min-w-0">
-                                <div className="text-xs font-bold uppercase tracking-[0.15em] mb-3 text-gray-300">
-                                    Subproject
+                            {/* Subproject & Hours Section */}
+                            <div className="text-left flex items-center">
+                                <div className="min-w-0">
+                                    <div className="text-xs font-bold uppercase tracking-[0.15em] mb-3 text-gray-300">
+                                        Subproject
+                                    </div>
+                                    <div className="text-2xl font-semibold tracking-tight truncate text-white">
+                                        {selectedSubproject.name}
+                                    </div>
                                 </div>
-                                <div className="text-2xl font-semibold tracking-tight truncate text-white">
-                                    {selectedSubproject.name}
-                                </div>
+                                {isTimerRunning && (
+                                    <div className="min-w-0 pl-16">
+                                        <div className="text-xs font-bold uppercase tracking-[0.15em] mb-3 text-gray-300">
+                                            Hours
+                                        </div>
+                                        <div className="text-2xl font-semibold tracking-tight text-white">
+                                            {(elapsedTime / 3600).toFixed(2)}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Time zones - Vertically stacked on the right */}
+                        <div className="flex flex-col space-y-1 select-none">
+                            <div className="flex items-center space-x-3">
+                                <img src="/flags/india.png" alt="India Flag" className="w-5 h-4 rounded-sm object-cover" />
+                                <span className="text-base font-semibold text-white" style={{ fontSize: '1.10rem' }}>
+                                    {formatTime(currentTime, 'Asia/Kolkata')}
+                                </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <img src="/flags/uk.png" alt="UK Flag" className="w-5 h-4 rounded-sm object-cover" />
+                                <span className="text-base font-semibold text-white" style={{ fontSize: '1.10rem' }}>
+                                    {formatTime(currentTime, 'Europe/London')}
+                                </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <img src="/flags/usa.png" alt="USA Flag" className="w-5 h-4 rounded-sm object-cover" />
+                                <span className="text-base font-semibold text-white" style={{ fontSize: '1.10rem' }}>
+                                    {formatTime(currentTime, 'America/New_York')}
+                                </span>
                             </div>
                         </div>
                     </>
@@ -233,30 +269,6 @@ const CurrentTrackingDisplay: React.FC<CurrentTrackingDisplayProps> = ({
                             </div>
                         </div>
                     </>
-                )}
-
-                {/* Time zones - Vertically stacked on the right (only when project is selected) */}
-                {selectedProject && selectedSubproject && (
-                    <div className="flex flex-col space-y-1 select-none">
-                        <div className="flex items-center space-x-3">
-                            <img src="/flags/india.png" alt="India Flag" className="w-5 h-4 rounded-sm object-cover" />
-                            <span className="text-base font-semibold text-white" style={{ fontSize: '1.10rem' }}>
-                                {formatTime(currentTime, 'Asia/Kolkata')}
-                            </span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <img src="/flags/uk.png" alt="UK Flag" className="w-5 h-4 rounded-sm object-cover" />
-                            <span className="text-base font-semibold text-white" style={{ fontSize: '1.10rem' }}>
-                                {formatTime(currentTime, 'Europe/London')}
-                            </span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <img src="/flags/usa.png" alt="USA Flag" className="w-5 h-4 rounded-sm object-cover" />
-                            <span className="text-base font-semibold text-white" style={{ fontSize: '1.10rem' }}>
-                                {formatTime(currentTime, 'America/New_York')}
-                            </span>
-                        </div>
-                    </div>
                 )}
             </div>
         </div>

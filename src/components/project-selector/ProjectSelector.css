@@ -48,9 +48,52 @@
     transform: translateY(-50%);
     width: 24px;
     height: 24px;
-    color: #9ca3af;
+    color: #6366f1;
     pointer-events: none;
     z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-icon-ps.icon-pop-disappear {
+    animation: iconPopDisappear 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.search-icon-ps.icon-reappear {
+    animation: iconReappear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+@keyframes iconPopDisappear {
+    0% {
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-50%) scale(1.3);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-50%) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes iconReappear {
+    0% {
+        transform: translateY(-50%) scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-50%) scale(1.2) rotate(-90deg);
+        opacity: 0.6;
+    }
+    75% {
+        transform: translateY(-50%) scale(0.9) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
 }
 
 .search-input-ps {
@@ -59,12 +102,12 @@
     border: 2px solid transparent;
     border-radius: 16px;
     background: transparent; /* Make input background transparent */
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 400;
-    color: #1d1d1f !important; /* Make text dark */
+    color: #1f2937 !important; /* Match HTML project-name color */
     outline: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     box-shadow: none; /* Remove original shadow */
     letter-spacing: -0.011em;
     will-change: transform, box-shadow;
@@ -99,7 +142,7 @@
     pointer-events: none;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    height: calc(100vh - 200px);
+    height: calc(100vh - 40px);
     width: 100%;
 }
 

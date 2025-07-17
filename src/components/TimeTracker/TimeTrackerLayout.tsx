@@ -32,6 +32,7 @@ interface TimeTrackerLayoutProps {
     onTimerStopped: () => void;
     isTimerRunning: boolean;
     onAddTimeLog: (newLog: any) => void;
+    elapsedTime: number;
 }
 
 const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any[]; onResumeProject: any; onStopProject: any; }> = ({
@@ -58,7 +59,8 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
     onAddTimeLog,
     queuedProjects,
     onResumeProject,
-    onStopProject
+    onStopProject,
+    elapsedTime
 }) => {
     // Responsive layout: top, search row, main row, bottom
     const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
@@ -73,6 +75,7 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
                         selectedSubproject={selectedSubproject}
                         isTimerRunning={isTimerRunning}
                         currentTime={new Date()}
+                        elapsedTime={elapsedTime}
                     />
                 </div>
                 {/* Main Content Row: fills all available space */}

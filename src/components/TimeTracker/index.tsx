@@ -60,7 +60,7 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
     console.log('TimeTracker - selectedProjectId:', selectedProjectId);
 
     // Use custom hooks
-    const { isTimerRunning } = useTimerStatus();
+    const { isTimerRunning, elapsedTime } = useTimerStatus();
     const { queuedProjects, handlePauseProject: pauseProject, handleResumeProject: resumeProject, handleStopQueuedProject } = useQueuedProjects();
 
     // Reference to the stopwatch panel for keyboard actions
@@ -246,6 +246,7 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
                 queuedProjects={queuedProjects}
                 onResumeProject={handleResumeProject}
                 onStopProject={handleStopQueuedProject}
+                elapsedTime={elapsedTime}
             />
 
                 {/* Queued Projects - removed, now handled by TimeTrackerLayout */}
