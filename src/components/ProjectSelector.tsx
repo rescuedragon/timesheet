@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef, CSSProperties, useLayoutEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Search, ChevronLeft, Edit3, Pin, PinOff } from 'lucide-react';
-import { toast } from '@/hooks/use-toast'; // Added for toast notifications
+import { Search, ChevronLeft, Edit3, Pin, PinOff, Check } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePinnedProjects } from '@/hooks/usePinnedProjects';
 import { useSettings } from '@/hooks/useSettings';
@@ -16,6 +16,7 @@ interface Subproject {
   name: string;
   totalTime: number;
 }
+
 interface Project {
   id: string;
   name: string;
@@ -29,6 +30,7 @@ interface CardProps {
   color: string;
   onClick: () => void;
   isColorCoded: boolean;
+  onComplete?: () => void;
 }
 
 interface ProjectSelectorProps {
@@ -43,83 +45,108 @@ export interface ProjectSelectorRef {
 }
 
 // ========== Reusable Card Component ==========
-const Card = React.memo<CardProps>(({ title, subtitle, color, onClick, isColorCoded }) => {
-    // Generate project category and color
-    const getProjectCategory = (projectTitle: string) => {
-        const lowerTitle = projectTitle.toLowerCase();
-        if (lowerTitle.includes('website') || lowerTitle.includes('web') || lowerTitle.includes('development') || lowerTitle.includes('dev')) {
-            return { name: 'Development', color: '#3B82F6', bgColor: '#DBEAFE' };
-        }
-        if (lowerTitle.includes('marketing') || lowerTitle.includes('campaign')) {
-            return { name: 'Marketing', color: '#10B981', bgColor: '#D1FAE5' };
-        }
-        if (lowerTitle.includes('data') || lowerTitle.includes('analytics')) {
-            return { name: 'Analytics', color: '#8B5CF6', bgColor: '#EDE9FE' };
-        }
-        if (lowerTitle.includes('e-commerce') || lowerTitle.includes('store')) {
-            return { name: 'E-commerce', color: '#F59E0B', bgColor: '#FEF3C7' };
-        }
-        if (lowerTitle.includes('hr') || lowerTitle.includes('onboarding')) {
-            return { name: 'HR', color: '#EF4444', bgColor: '#FEE2E2' };
-        }
-        if (lowerTitle.includes('design') || lowerTitle.includes('ui')) {
-            return { name: 'Design', color: '#EC4899', bgColor: '#FCE7F3' };
-        }
-        return { name: 'General', color: '#6B7280', bgColor: '#F3F4F6' };
-    };
+const Card = React.memo<CardProps>(({ title, subtitle, color, onClick, isColorCoded, onComplete }) => {
+  const getProjectCategory = (projectTitle: string) => {
+    const lowerTitle = projectTitle.toLowerCase();
+    if (lowerTitle.includes('website') || lowerTitle.includes('web') || lowerTitle.includes('development') || lowerTitle.includes('dev')) {
+      return { name: 'Development', color: '#7E2EFF', bgColor: '#F3F0FF' };
+    }
+    if (lowerTitle.includes('marketing') || lowerTitle.includes('campaign')) {
+      return { name: 'Marketing', color: '#6366f1', bgColor: '#EEF2FF' };
+    }
+    if (lowerTitle.includes('data') || lowerTitle.includes('analytics')) {
+      return { name: 'Analytics', color: '#8b5cf6', bgColor: '#F5F3FF' };
+    }
+    if (lowerTitle.includes('e-commerce') || lowerTitle.includes('store')) {
+      return { name: 'E-commerce', color: '#a855f7', bgColor: '#FAF5FF' };
+    }
+    if (lowerTitle.includes('hr') || lowerTitle.includes('onboarding')) {
+      return { name: 'HR', color: '#9333ea', bgColor: '#F3E8FF' };
+    }
+    if (lowerTitle.includes('design') || lowerTitle.includes('ui')) {
+      return { name: 'Design', color: '#7c3aed', bgColor: '#EDE9FE' };
+    }
+    return { name: 'General', color: '#6366f1', bgColor: '#F1F5F9' };
+  };
 
-    const category = getProjectCategory(title);
+  const category = getProjectCategory(title);
 
-    return (
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      whileHover={{ 
+        scale: 1.02, 
+        y: -2,
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1)'
+      }}
+      whileTap={{ scale: 0.98 }}
+      className="relative group rounded-2xl p-4 cursor-pointer transition-all duration-300 ease-in-out w-full h-full flex flex-col overflow-hidden"
+      style={{ 
+        background: 'rgba(255, 255, 255, 0.95)',
+        border: '1px solid rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        position: 'relative',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+        margin: '0'
+      }}
+      onClick={onClick}
+      onMouseEnter={(e) => {
+        const line = e.currentTarget.querySelector('.category-line') as HTMLElement;
+        if (line) line.style.transform = 'scaleX(1)';
+      }}
+      onMouseLeave={(e) => {
+        const line = e.currentTarget.querySelector('.category-line') as HTMLElement;
+        if (line) line.style.transform = 'scaleX(0)';
+      }}
+    >
+      {/* Enhanced glassmorphic layers */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-white/10 rounded-2xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-white/5 rounded-2xl" />
+      
+      {/* Subtle border glow */}
+      <div className="absolute inset-0 rounded-2xl border border-white/60 shadow-inner" />
+      
+      <motion.div 
+        className="category-line absolute top-0 left-0 right-0 h-1 transition-transform duration-300 ease-in-out rounded-t-2xl"
+        style={{
+          background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6))',
+          transform: 'scaleX(0)',
+          transformOrigin: 'left'
+        }}
+      />
+      
+      <motion.div 
+        className="flex flex-col items-center justify-center h-full pt-2 px-2 relative z-10"
+        whileHover={{ scale: 1.02 }}
+      >
+        <h4 className="text-lg font-bold text-center mb-3 leading-tight drop-shadow-sm" style={{ color: '#1d1d1f' }}>{title}</h4>
+        {subtitle && <p className="text-sm text-center font-medium drop-shadow-sm" style={{ color: '#6b7280', lineHeight: '1.4' }}>{subtitle}</p>}
+      </motion.div>
+      {onComplete && (
         <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            whileHover={{ 
-                scale: 1.03, 
-                y: -4,
-                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-            }}
-            whileTap={{ scale: 0.98 }}
-            className="relative group rounded-2xl p-6 cursor-pointer transition-all duration-300 ease-in-out shadow-sm w-full"
-            style={{ 
-                background: 'rgba(255, 255, 255, 0.9)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                minHeight: '120px',
-                backdropFilter: 'blur(10px)',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                margin: '8px 0'
-            }}
-            onClick={onClick}
-            onMouseEnter={(e) => {
-                const line = e.currentTarget.querySelector('.purple-line') as HTMLElement;
-                if (line) line.style.transform = 'scaleX(1)';
-            }}
-            onMouseLeave={(e) => {
-                const line = e.currentTarget.querySelector('.purple-line') as HTMLElement;
-                if (line) line.style.transform = 'scaleX(0)';
-            }}
+          className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          initial={{ y: 5, scale: 0.9 }}
+          animate={{ y: 0, scale: 1 }}
+          exit={{ y: 5, scale: 0.9 }}
         >
-            <motion.div 
-                className="purple-line absolute top-0 left-0 right-0 h-1 transition-transform duration-300 ease-in-out"
-                style={{
-                    background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
-                    transform: 'scaleX(0)',
-                    transformOrigin: 'left'
-                }}
-            />
-            <motion.div 
-                className="flex flex-col items-center justify-center h-full"
-                whileHover={{ scale: 1.02 }}
-            >
-                <h4 className="text-lg font-semibold text-center mb-2" style={{ color: '#1d1d1f' }}>{title}</h4>
-                {subtitle && <p className="text-sm text-center" style={{ color: '#6b7280', lineHeight: '1.4' }}>{subtitle}</p>}
-            </motion.div>
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onComplete) onComplete();
+            }}
+            className="flex items-center justify-center w-8 h-8 bg-white/50 rounded-full shadow-md hover:bg-white/80 transition-colors"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Check className="w-4 h-4 text-gray-700" />
+          </motion.button>
         </motion.div>
-    );
+      )}
+    </motion.div>
+  );
 });
 
 // ========== Timer-Aware Card Component ==========
@@ -137,28 +164,29 @@ interface TimerCardProps {
 const TimerCard = React.memo<TimerCardProps>(({ title, subtitle, color, onClick, isColorCoded, isRunning, projectId, subprojectId }) => {
   return (
     <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        whileHover={{ 
-            scale: isRunning ? 1.02 : 1.03, 
-            y: isRunning ? -2 : -4,
-            boxShadow: isRunning ? "0 15px 35px rgba(99, 102, 241, 0.4)" : "0 20px 40px rgba(0, 0, 0, 0.15)"
-        }}
-        whileTap={{ scale: 0.98 }}
-      className="relative group rounded-2xl p-6 cursor-pointer transition-all duration-300 ease-in-out shadow-sm w-full"
-        style={{ 
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      whileHover={{ 
+        scale: isRunning ? 1.02 : 1.03, 
+        y: isRunning ? -2 : -4,
+        boxShadow: isRunning ? "0 15px 35px rgba(99, 102, 241, 0.4)" : "0 20px 40px rgba(0, 0, 0, 0.15)"
+      }}
+      whileTap={{ scale: 0.98 }}
+      className="relative group rounded-2xl p-4 cursor-pointer transition-all duration-300 ease-in-out shadow-sm w-full h-full flex flex-col"
+      style={{ 
         background: isRunning ? '#6366f1' : 'rgba(255, 255, 255, 0.9)',
         border: '1px solid rgba(255, 255, 255, 0.2)',
         minHeight: '120px',
+        height: '120px',
         backdropFilter: 'blur(10px)',
         position: 'relative',
         overflow: 'hidden',
         boxShadow: isRunning ? '0 8px 32px rgba(99, 102, 241, 0.3)' : '0 4px 20px rgba(0, 0, 0, 0.08)',
-        margin: '8px 0'
-        }}
-        onClick={onClick}
+        margin: '0'
+      }}
+      onClick={onClick}
       onMouseEnter={(e) => {
         if (!isRunning) {
           const line = e.currentTarget.querySelector('.purple-line') as HTMLElement;
@@ -253,7 +281,7 @@ const TimerCard = React.memo<TimerCardProps>(({ title, subtitle, color, onClick,
             {subtitle}
           </p>
         )}
-        </motion.div>
+      </motion.div>
     </motion.div>
   );
 });
@@ -381,6 +409,23 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
     }
   };
 
+  const handleCompleteProject = (projectId: string, subprojectId?: string) => {
+    if (subprojectId) {
+      toast({
+        title: "Subproject Completed",
+        description: `Subproject from project ${projectId} is marked as complete.`,
+      });
+      console.log(`Subproject ${subprojectId} of project ${projectId} completed!`);
+    } else {
+      toast({
+        title: "Project Completed",
+        description: `Project ${projectId} is marked as complete.`,
+      });
+      console.log(`Project ${projectId} completed!`);
+    }
+    // You can add logic here to update project status, e.g., via a service call
+  };
+
   const handleProjectClick = (project) => {
     setSelectedProjectForSubprojects(project);
     setView('subprojects');
@@ -417,41 +462,41 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
 
   useEffect(() => {
     if (hoveredProject && dropdownRef.current) {
-        const hoveredItem = dropdownRef.current.querySelector(`[data-project-id='${hoveredProject.id}']`);
-        if (hoveredItem) {
-            const itemRect = hoveredItem.getBoundingClientRect();
-            const dropdownRect = dropdownRef.current.getBoundingClientRect();
+      const hoveredItem = dropdownRef.current.querySelector(`[data-project-id='${hoveredProject.id}']`);
+      if (hoveredItem) {
+        const itemRect = hoveredItem.getBoundingClientRect();
+        const dropdownRect = dropdownRef.current.getBoundingClientRect();
 
-            setFlyoutStyle({
-                position: 'fixed',
-                top: `${itemRect.top}px`,
-                left: `${dropdownRect.right + 8}px`,
-                width: `${dropdownRect.width}px`, // Set width to match dropdown
-                opacity: 1,
-                pointerEvents: 'auto',
-                transition: 'opacity 0.2s ease-out',
-                zIndex: 9999,
-            });
-          }
-        } else {
-        setFlyoutStyle({ opacity: 0, pointerEvents: 'none' });
+        setFlyoutStyle({
+          position: 'fixed',
+          top: `${itemRect.top}px`,
+          left: `${dropdownRect.right + 8}px`,
+          width: `${dropdownRect.width}px`, // Set width to match dropdown
+          opacity: 1,
+          pointerEvents: 'auto',
+          transition: 'opacity 0.2s ease-out',
+          zIndex: 9999,
+        });
+      }
+    } else {
+      setFlyoutStyle({ opacity: 0, pointerEvents: 'none' });
     }
   }, [hoveredProject]);
 
   useLayoutEffect(() => {
     if (hoveredProject && flyoutRef.current && dropdownRef.current) {
-        const flyoutHeight = flyoutRef.current.offsetHeight;
-        const windowHeight = window.innerHeight;
-        
-        const currentTop = parseFloat(flyoutStyle.top as string);
+      const flyoutHeight = flyoutRef.current.offsetHeight;
+      const windowHeight = window.innerHeight;
+      
+      const currentTop = parseFloat(flyoutStyle.top as string);
 
-        if (currentTop + flyoutHeight > windowHeight) {
-            const newTop = Math.max(8, windowHeight - flyoutHeight - 8);
-            setFlyoutStyle(prevStyle => ({
-                ...prevStyle,
-                top: `${newTop}px`,
-            }));
-        }
+      if (currentTop + flyoutHeight > windowHeight) {
+        const newTop = Math.max(8, windowHeight - flyoutHeight - 8);
+        setFlyoutStyle(prevStyle => ({
+          ...prevStyle,
+          top: `${newTop}px`,
+        }));
+      }
     }
   }, [hoveredProject, flyoutStyle.top]);
 
@@ -470,13 +515,13 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
 
   const startHideTimer = () => {
     hoverTimeoutRef.current = setTimeout(() => {
-        setHoveredProject(null);
+      setHoveredProject(null);
     }, 300);
   };
 
   const cancelHideTimer = () => {
     if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
+      clearTimeout(hoverTimeoutRef.current);
     }
   };
 
@@ -547,19 +592,15 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
   const shouldShowDropdown = isDropdownOpen && (filteredProjects.length > 0 || dropdownView === 'subprojects');
 
   const pinnedCombinations = pinned.map(({ projectId, subprojectId }) => {
-      const project = allProjects.find(p => p.id === projectId);
-      const subproject = project?.subprojects.find(s => s.id === subprojectId);
-      return { project, subproject };
+    const project = allProjects.find(p => p.id === projectId);
+    const subproject = project?.subprojects.find(s => s.id === subprojectId);
+    return { project, subproject };
   }).filter(item => item.project && item.subproject);
 
   // Calculate optimal columns based on number of items
   const getOptimalColumns = (itemCount: number) => {
-    if (itemCount <= 2) return itemCount;
-    if (itemCount <= 4) return 2;
-    if (itemCount <= 6) return 3;
-    if (itemCount <= 9) return 3;
-    if (itemCount <= 12) return 4;
-    return Math.min(5, Math.ceil(itemCount / 3));
+    if (itemCount <= 0) return 1;
+    return 3; // Always use 3 columns for consistent layout
   };
 
   const handleSaveQuickStart = (combinations: Array<{projectId: string, subprojectId: string}>) => {
@@ -569,7 +610,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
 
   return (
     <motion.div 
-      className="p-6 rounded-lg flex flex-col h-full overflow-hidden" 
+      className="p-4 rounded-lg flex flex-col h-full overflow-hidden" 
       style={{ 
         background: 'rgba(255, 255, 255, 0.9)',
         backdropFilter: 'blur(10px)',
@@ -577,7 +618,9 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         border: '1px solid rgba(255, 255, 255, 0.2)',
         maxWidth: '100%',
-        height: '100vh'
+        width: '100%',
+        height: '100vh',
+        boxSizing: 'border-box'
       }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -593,17 +636,17 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         <div ref={searchContainerRef} className="search-container-ps">
           <div className="search-input-wrapper-ps flex items-center">
             <div className="flex-grow relative">
-          <input
-            type="text"
+              <input
+                type="text"
                 className={`search-input-ps ${isTimerRunning ? 'cursor-not-allowed' : 'cursor-text'}`}
                 placeholder={isTimerRunning ? "Timer is running..." : "Search projects..."}
-          value={searchValue}
-          onChange={(e) => {
-                    if (!isTimerRunning) {
-              setSearchValue(e.target.value);
-                        setDropdownOpen(true);
-                  setDropdownView('projects');
-              }
+                value={searchValue}
+                onChange={(e) => {
+                  if (!isTimerRunning) {
+                    setSearchValue(e.target.value);
+                    setDropdownOpen(true);
+                    setDropdownView('projects');
+                  }
                 }}
                 onClick={handleSearchBarClick}
                 disabled={isTimerRunning}
@@ -633,56 +676,58 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <div className="flex items-center bg-gray-100/95 dark:bg-gray-800/95 p-1 rounded-xl backdrop-blur-sm border border-gray-200/40 dark:border-gray-700/40 shadow-sm">
-              <motion.button
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative ${
-                  activeTab === 'frequent' 
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white/40 dark:hover:bg-gray-700/40'
-                }`}
-                onClick={() => setActiveTab('frequent')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{
-                  boxShadow: activeTab === 'frequent' ? '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)' : 'none'
-                }}
-              >
-                Frequently Used
-              </motion.button>
-              <motion.button
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative ${
-                  activeTab === 'quick-start' 
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white/40 dark:hover:bg-gray-700/40'
-                }`}
-                onClick={() => setActiveTab('quick-start')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{
-                  boxShadow: activeTab === 'quick-start' ? '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)' : 'none'
-                }}
-              >
-                Quick Start
-              </motion.button>
+              <div className="flex items-center bg-gradient-to-r from-gray-100/95 via-blue-50/80 to-purple-50/80 dark:from-gray-800/95 dark:via-blue-900/20 dark:to-purple-900/20 p-1 rounded-2xl backdrop-blur-sm border border-blue-200/30 dark:border-blue-700/30 shadow-lg">
+                <motion.button
+                  className={`px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 relative ${
+                    activeTab === 'frequent' 
+                      ? 'text-white shadow-lg' 
+                      : 'text-gray-600 dark:text-gray-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50/60 dark:hover:bg-blue-900/30'
+                  }`}
+                  onClick={() => setActiveTab('frequent')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    background: activeTab === 'frequent' ? 'linear-gradient(135deg, #7E2EFF 0%, #6366f1 100%)' : 'transparent',
+                    boxShadow: activeTab === 'frequent' ? '0 4px 16px rgba(126, 46, 255, 0.4), 0 2px 8px rgba(99, 102, 241, 0.3)' : 'none'
+                  }}
+                >
+                  Frequently Used
+                </motion.button>
+                <motion.button
+                  className={`px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 relative ${
+                    activeTab === 'quick-start' 
+                      ? 'text-white shadow-lg' 
+                      : 'text-gray-600 dark:text-gray-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50/60 dark:hover:bg-purple-900/30'
+                  }`}
+                  onClick={() => setActiveTab('quick-start')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    background: activeTab === 'quick-start' ? 'linear-gradient(135deg, #7E2EFF 0%, #8b5cf6 100%)' : 'transparent',
+                    boxShadow: activeTab === 'quick-start' ? '0 4px 16px rgba(126, 46, 255, 0.4), 0 2px 8px rgba(139, 92, 246, 0.3)' : 'none'
+                  }}
+                >
+                  Quick Start
+                </motion.button>
               </div>
               <div className="w-10 flex justify-center">
-              {activeTab === 'quick-start' && (
-                <motion.button 
-                  onClick={() => setIsEditDialogOpen(true)} 
-                  className="text-indigo-500 hover:text-indigo-700 p-2 rounded-lg hover:bg-indigo-50 transition-colors"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.9 }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Edit3 className="h-4 w-4" />
-                </motion.button>
-              )}
+                {activeTab === 'quick-start' && (
+                  <motion.button 
+                    onClick={() => setIsEditDialogOpen(true)} 
+                    className="text-indigo-500 hover:text-indigo-700 p-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileTap={{ scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Edit3 className="h-4 w-4" />
+                  </motion.button>
+                )}
               </div>
             </motion.div>
-        </div>
+          </div>
           
           {/* Dropdown - Within Container */}
           <AnimatePresence>
@@ -704,65 +749,70 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   width: '100%'
                 }}
               >
-          {dropdownView === 'projects' ? (
-            <div className="dropdown-ps-scroll">
-              {filteredProjects.map((project, index) => (
-                <motion.div
-                    key={project.id}
+                {dropdownView === 'projects' ? (
+                  <div className="dropdown-ps-scroll">
+                    {filteredProjects.map((project, index) => (
+                      <motion.div
+                        key={project.id}
                         className={`dropdown-ps-item ${selectedIndex === index ? 'selected' : ''}`}
-                    onClick={() => {
-                    setActiveProject(project);
-                    setDropdownView('subprojects');
-                    setSelectedIndex(0);
-                  }}
-                  onMouseEnter={() => handleProjectHover(project)}
+                        onClick={() => {
+                          setActiveProject(project);
+                          setDropdownView('subprojects');
+                          setSelectedIndex(0);
+                        }}
+                        onMouseEnter={() => handleProjectHover(project)}
                         onMouseLeave={handleProjectLeave}
                         data-project-id={project.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2, delay: index * 0.05 }}
-                   whileHover={{ x: 5 }}
-                >
-                  <div className="item-content-ps">
-                    <div className="item-text-ps">{project.name}</div>
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                        whileHover={{ x: 5 }}
+                      >
+                        <div className="item-content-ps">
+                          <div className="item-text-ps">{project.name}</div>
                           <div className="item-description-ps">
                             {project.subprojects.length} subprojects
                           </div>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
-          </motion.div>
-                ))}
-              </div>
                 ) : (
-            <div className="dropdown-ps-scroll">
+                  <div className="dropdown-ps-scroll">
                     {activeProject?.subprojects.map((subproject, index) => (
-                <motion.div 
+                      <motion.div 
                         key={subproject.id}
                         className={`dropdown-ps-item ${selectedIndex === index ? 'selected' : ''}`}
                         onClick={() => handleSelection(activeProject, subproject)}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.2, delay: index * 0.05 }}
-                       whileHover={{ x: 5 }}
-                >
+                        whileHover={{ x: 5 }}
+                      >
                         <div className="item-content-ps">
                           <div className="item-text-ps">{subproject.name}</div>
                           <div className="item-description-ps">
                             {activeProject.name}
                           </div>
-        </div>
+                        </div>
                       </motion.div>
-              ))}
-                    </div>
+                    ))}
+                  </div>
                 )}
               </motion.div>
             )}
           </AnimatePresence>
-              </div>
+        </div>
       </motion.div>
 
       {/* Content Area */}
       <motion.div 
-        className="flex-grow overflow-y-auto"
+        className="flex-grow overflow-y-auto px-4"
+        style={{ 
+          maxWidth: '100%',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.3 }}
@@ -777,29 +827,43 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               transition={{ duration: 0.3 }}
             >
               {view === 'projects' ? (
-                <motion.div 
-                  className="grid gap-4" 
-                  style={{ gridTemplateColumns: `repeat(auto-fill, minmax(180px, 1fr))` }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
+                <div className="grid grid-cols-3 gap-3 w-full">
                   {frequentProjects.map((project, index) => (
                     <motion.div
                       key={project.id}
                       initial={{ opacity: 0, y: 30, scale: 0.9 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="w-full h-full"
                     >
                       <Card
                         title={project.name}
                         onClick={() => handleProjectClick(project)}
                         isColorCoded={colorCodedProjectsEnabled}
                         color={generateProjectColor(project.name)}
+                        onComplete={() => handleCompleteProject(project.id)}
                       />
                     </motion.div>
                   ))}
-                </motion.div>
+                </div>
+                  {frequentProjects.map((project, index) => (
+                    <motion.div
+                      key={project.id}
+                      initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="w-full h-full"
+                    >
+                      <Card
+                        title={project.name}
+                        onClick={() => handleProjectClick(project)}
+                        isColorCoded={colorCodedProjectsEnabled}
+                        color={generateProjectColor(project.name)}
+                        onComplete={() => handleCompleteProject(project.id)}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
               ) : (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -832,8 +896,11 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                     </motion.h3>
                   </motion.div>
                   <motion.div 
-                    className="grid gap-4" 
-                    style={{ gridTemplateColumns: `repeat(auto-fill, minmax(180px, 1fr))` }}
+                    className="grid gap-3" 
+                    style={{ 
+                      gridTemplateColumns: `repeat(${getOptimalColumns(selectedProjectForSubprojects?.subprojects.length || 0)}, 1fr)`,
+                      gridAutoRows: '140px'
+                    }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.3 }}
@@ -844,12 +911,15 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                         initial={{ opacity: 0, y: 30, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ duration: 0.4, delay: index * 0.1 }}
+                        className="w-full h-full"
                       >
                         <Card
-                          title={subproject.name}
+                          title={selectedProjectForSubprojects.name}
+                          subtitle={subproject.name}
                           onClick={() => handleSelection(selectedProjectForSubprojects, subproject)}
                           isColorCoded={colorCodedProjectsEnabled}
                           color={generateProjectColor(selectedProjectForSubprojects.id)}
+                          onComplete={() => handleCompleteProject(selectedProjectForSubprojects.id, subproject.id)}
                         />
                       </motion.div>
                     ))}
@@ -867,12 +937,12 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <motion.div
-                className="grid gap-4"
-                style={{ gridTemplateColumns: `repeat(auto-fill, minmax(180px, 1fr))` }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+              <div
+                className="grid gap-3 w-full"
+                style={{
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gridAutoRows: '120px'
+                }}
               >
                 {pinnedCombinations.map(({ project, subproject }, index) => {
                   const isCurrentlyRunning = runningProject && 
@@ -885,6 +955,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       initial={{ opacity: 0, y: 30, scale: 0.9 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="w-full h-full"
                     >
                       <TimerCard
                         title={project.name}
@@ -899,7 +970,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                     </motion.div>
                   );
                 })}
-              </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -918,43 +989,43 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         <AnimatePresence>
           {hoveredProject && dropdownView === 'projects' && (
             <motion.div
-                ref={flyoutRef}
-                className="flyout-ps"
-                style={flyoutStyle}
-                onMouseEnter={cancelHideTimer}
-                onMouseLeave={startHideTimer}
-                initial={{ opacity: 0, x: -10, scale: 0.95 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -10, scale: 0.95 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
+              ref={flyoutRef}
+              className="flyout-ps"
+              style={flyoutStyle}
+              onMouseEnter={cancelHideTimer}
+              onMouseLeave={startHideTimer}
+              initial={{ opacity: 0, x: -10, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -10, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
               <div className="dropdown-ps-scroll">
                 {hoveredProject.subprojects.map((subproject, index) => (
-                    <motion.div
+                  <motion.div
                     key={subproject.id}
-                        className="dropdown-ps-item"
+                    className="dropdown-ps-item"
                     onClick={() => handleSelection(hoveredProject, subproject)}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.2, delay: index * 0.05 }}
-                   whileHover={{ x: 5 }}
-                    >
-                        <div className="item-content-ps">
+                    whileHover={{ x: 5 }}
+                  >
+                    <div className="item-content-ps">
                       <div className="item-text-ps">{subproject.name}</div>
                       <div className="item-description-ps">
                         {hoveredProject.name}
                       </div>
-        </div>
-                    </motion.div>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
-                  </motion.div>
-                )}
+            </motion.div>
+          )}
         </AnimatePresence>,
         document.body
-                )}
-        </motion.div>
+      )}
+    </motion.div>
   );
 });
 
-export default ProjectSelector;
+export default ProjectSelector; 
