@@ -6,12 +6,16 @@ interface StopwatchManagerProps {
   resumedProject?: QueuedProject;
   onResumedProjectHandled: () => void;
   children: (state: any, actions: any) => React.ReactNode;
+  selectedProject?: any;
+  selectedSubproject?: any;
 }
 
 const StopwatchManager: React.FC<StopwatchManagerProps> = ({
   resumedProject,
   onResumedProjectHandled,
   children,
+  selectedProject,
+  selectedSubproject,
 }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
@@ -64,15 +68,30 @@ const StopwatchManager: React.FC<StopwatchManagerProps> = ({
     };
   }, [isRunning, startTime, elapsedTime]);
 
-  // Save state when it changes
+  // Save state when it changes and dispatch events
   useEffect(() => {
     const state = {
       isRunning,
       startTime: startTime?.toISOString(),
-      elapsedTime
+      elapsedTime,
+      projectId: selectedProject?.id,
+      subprojectId: selectedSubproject?.id
     };
     storageService.saveStopwatchState(state);
-  }, [isRunning, startTime, elapsedTime]);
+  }, [isRunning, startTime, elapsedTime, selectedProject?.id, selectedSubproject?.id]);
+
+  // Separate effect for event dispatching to avoid excessive events
+  useEffect(() => {
+    // Dispatch timer state change event
+    window.dispatchEvent(new CustomEvent('timer-state-changed'));
+    
+    // Dispatch specific start/stop events
+    if (isRunning) {
+      window.dispatchEvent(new CustomEvent('timer-started'));
+    } else {
+      window.dispatchEvent(new CustomEvent('timer-stopped'));
+    }
+  }, [isRunning]); // Only dispatch when isRunning changes, not on every timer tick
 
   const handleStart = () => {
     const now = new Date();

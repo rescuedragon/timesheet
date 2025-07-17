@@ -78,18 +78,19 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
                 {/* Main Content Row: fills all available space */}
                 <div className="flex-1 min-h-0 flex flex-row gap-4">
                     {/* Left Glass Subcontainer: ProjectSelector */}
-                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md bg-white/20 border border-white/40 rounded-2xl shadow-md relative">
+                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md border border-white/40 rounded-2xl shadow-md relative" style={{ background: 'rgba(255, 255, 255, 0.9)' }}>
                         <div className="flex-1 min-h-0 flex flex-col">
                             <ProjectSelector
                                 ref={projectSelectorRef}
                                 projects={projects}
                                 onProjectSelect={onProjectSelect}
                                 onSubprojectSelect={onSubprojectSelect}
+                                onStartTimer={handleStartNewTimerForProject}
                             />
                         </div>
                     </div>
                     {/* Right Glass Subcontainer: StopwatchPanel */}
-                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md bg-white/20 border border-white/40 rounded-2xl shadow-md">
+                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md border border-white/40 rounded-2xl shadow-md" style={{ background: 'rgba(255, 255, 255, 0.9)' }}>
                         <div className="flex-1 min-h-0 flex flex-col">
                             <StopwatchPanel
                                 ref={stopwatchRef}

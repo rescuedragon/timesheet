@@ -36,13 +36,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   return (
     <Card className="border-l-4 border-l-primary">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Folder className="h-5 w-5 text-foreground" />
+        <CardTitle className="flex items-center justify-between text-white">
+          <div className="flex items-center gap-2 text-white">
+            <Folder className="h-5 w-5 text-white" />
             {project.name}
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-white">
+            <Clock className="h-4 w-4 text-white" />
             <Badge variant="secondary">{formatTime(project.totalTime)}</Badge>
           </div>
         </CardTitle>
@@ -52,7 +52,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         <div className="space-y-2">
           {project.subprojects.map(subproject => (
             <div key={subproject.id} className="flex items-center justify-between p-2 bg-primary/10 rounded">
-              <span className="text-sm font-medium text-foreground">{subproject.name}</span>
+              <span className="text-sm font-medium text-white">{subproject.name}</span>
               <Badge variant="outline">{formatTime(subproject.totalTime)}</Badge>
             </div>
           ))}

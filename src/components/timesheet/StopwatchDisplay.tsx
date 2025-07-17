@@ -27,56 +27,15 @@ const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
   return (
-    <div className="relative w-64 h-64 flex items-center justify-center overflow-hidden rounded-full" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(79,70,229,0.15) 100%)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: '0 4px 32px 0 rgba(79,70,229,0.2)' }}>
-      {/* Pulsing Glow */}
-      {isRunning && (
-        <div className="absolute inset-0 z-0 rounded-full bg-blue-400 opacity-40 blur-2xl animate-pulse" style={{ filter: 'blur(32px)' }} />
-      )}
-      {/* SVG Progress Ring and Border */}
-      <svg
-        width={CIRCLE_SIZE}
-        height={CIRCLE_SIZE}
-        className="absolute top-0 left-0 z-10 pointer-events-none"
-      >
-        {/* Gradient Border */}
-        <circle
-          cx={CIRCLE_SIZE / 2}
-          cy={CIRCLE_SIZE / 2}
-          r={RADIUS}
-          stroke="url(#borderGradient)"
-          strokeWidth={16}
-          fill="url(#glassGradient)"
-        />
-        {/* Progress ring */}
-        <circle
-          cx={CIRCLE_SIZE / 2}
-          cy={CIRCLE_SIZE / 2}
-          r={RADIUS}
-          stroke="#fff"
-          strokeWidth={STROKE_WIDTH}
-          fill="none"
-          strokeDasharray={CIRCUMFERENCE}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          style={{
-            transition: 'stroke-dashoffset 0.3s linear',
-            filter: isRunning ? 'drop-shadow(0 0 8px #fff)' : undefined
-          }}
-        />
-        <defs>
-          <linearGradient id="glassGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#f8fafc" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#b4c8ff" stopOpacity="0.4" />
-          </linearGradient>
-          <linearGradient id="borderGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#b4c8ff" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#e0e7ff" stopOpacity="0.8" />
-          </linearGradient>
-        </defs>
-      </svg>
+          <div className="relative w-64 h-64 flex items-center justify-center overflow-hidden rounded-full" style={{ background: 'rgba(255, 255, 255, 0.9)', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
+      {/* SVG Progress Ring and Border - Removed */}
       {/* Timer Text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-        <div className="text-5xl font-medium text-white tracking-tighter font-mono px-4 select-none" style={{ fontWeight: 400, textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>
+        <div className="text-5xl font-medium tracking-tighter font-mono px-4 select-none" style={{ 
+          fontWeight: 300, 
+          color: '#6366f1',
+          fontVariantNumeric: 'tabular-nums'
+        }}>
           {formatTime(displayTime)}
         </div>
       </div>

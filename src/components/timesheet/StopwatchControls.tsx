@@ -34,8 +34,20 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
         <button
           onClick={onStart}
           disabled={!canStart}
-          className={`${buttonBaseStyle} bg-blue-600 text-white shadow-[0_4px_20px_rgba(79,70,229,0.3)] hover:bg-blue-700 active:bg-blue-800 border border-blue-500`}
-          style={minWidth}
+          className={`${buttonBaseStyle} text-white shadow-[0_4px_16px_rgba(99,102,241,0.3)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.4)] border border-transparent`}
+          style={{
+            ...minWidth,
+            background: '#6366f1',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#5856eb';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#6366f1';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
         >
           <span className="relative z-10 flex items-center justify-center">
             <Play className="h-5 w-5 mr-3" strokeWidth={2} />
@@ -46,8 +58,20 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
         <button
           onClick={onStop}
           disabled={!canPauseOrStop}
-          className={`${buttonBaseStyle} bg-red-600 text-white shadow-[0_4px_20px_rgba(220,38,38,0.3)] hover:bg-red-700 active:bg-red-800 border border-red-500`}
-          style={minWidth}
+          className={`${buttonBaseStyle} text-white shadow-[0_4px_16px_rgba(99,102,241,0.3)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.4)] border border-transparent`}
+          style={{
+            ...minWidth,
+            background: '#6366f1',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#5856eb';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#6366f1';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
         >
           <span className="relative z-10 flex items-center justify-center">
             <Square className="h-5 w-5 mr-3" strokeWidth={2} />
@@ -59,8 +83,20 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
       <button
         onClick={onPause}
         disabled={!canPauseOrStop}
-        className={`${buttonBaseStyle} bg-white/90 text-blue-700 border border-blue-200 shadow-[0_4px_20px_rgba(79,70,229,0.15)] hover:bg-white active:bg-blue-50 backdrop-blur-xl`}
-        style={minWidth}
+        className={`${buttonBaseStyle} text-gray-600 border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] backdrop-blur-xl`}
+        style={{
+          ...minWidth,
+          background: 'rgba(255, 255, 255, 0.8)',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
+          e.currentTarget.style.transform = 'translateY(-1px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
       >
         <span className="relative z-10 flex items-center justify-center">
           <Pause className="h-5 w-5 mr-3" strokeWidth={2} />

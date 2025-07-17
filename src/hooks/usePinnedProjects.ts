@@ -8,12 +8,12 @@ export interface PinnedCombination {
 const MAX_PINS = 12;
 
 export const usePinnedProjects = () => {
-  const [pinned, setPinned] = useLocalStorage<PinnedCombination[]>('pinnedProjects', []);
+  const [pinned, setPinned] = useLocalStorage<PinnedCombination[]>('pinnedCombinations', []);
+  const [pinnedProjects, setPinnedProjects] = useLocalStorage<string[]>('pinnedProjects', []);
 
   const addPin = (projectId: string, subprojectId: string) => {
     if (!isPinned(projectId, subprojectId)) {
         if (pinned.length >= MAX_PINS) {
-            // To keep the list at a maximum of 12, remove the oldest item.
             const newPinned = [...pinned.slice(1), { projectId, subprojectId }];
             setPinned(newPinned);
         } else {
@@ -38,5 +38,39 @@ export const usePinnedProjects = () => {
       }
   }
 
-  return { pinned, togglePin, isPinned };
+  const addProjectPin = (projectId: string) => {
+    if (!isProjectPinned(projectId)) {
+      if (pinnedProjects.length >= MAX_PINS) {
+        setPinnedProjects([...pinnedProjects.slice(1), projectId]);
+      } else {
+        setPinnedProjects([...pinnedProjects, projectId]);
+      }
+    }
+  };
+
+  const removeProjectPin = (projectId: string) => {
+    setPinnedProjects(pinnedProjects.filter(id => id !== projectId));
+  };
+
+  const isProjectPinned = (projectId: string) => {
+    return pinnedProjects.includes(projectId);
+  };
+
+  const toggleProjectPin = (projectId: string) => {
+    if (isProjectPinned(projectId)) {
+      removeProjectPin(projectId);
+    } else {
+      addProjectPin(projectId);
+    }
+  };
+
+  const setAllPinnedProjects = (projectIds: string[]) => {
+    setPinnedProjects(projectIds.slice(0, MAX_PINS));
+  };
+
+  const setAllPinnedCombinations = (combinations: PinnedCombination[]) => {
+    setPinned(combinations.slice(0, MAX_PINS));
+  };
+
+  return { pinned, togglePin, isPinned, pinnedProjects, toggleProjectPin, isProjectPinned, setAllPinnedProjects, setAllPinnedCombinations };
 }; 

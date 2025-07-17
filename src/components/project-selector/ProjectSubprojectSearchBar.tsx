@@ -158,11 +158,10 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
       {/* Main Project Search */}
       {showProjectSearch && (
         <div className={bothShown ? "w-1/2 m-0 p-0 h-full" : "w-full m-0 p-0 h-full"}>
-          <div className="w-full h-full min-h-16 flex items-center relative">
+          <div className="w-full h-full min-h-16 flex items-center relative" style={{ background: '#e8f0fe', borderRadius: '1rem' }}>
             <input
               ref={projectInputRef}
               type="text"
-              placeholder={undefined}
               value={projectSearch}
               onChange={(e) => {
                 setProjectSearch(e.target.value);
@@ -180,8 +179,25 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
                 setProjectDropdownIndex(-1);
               }}
               onBlur={() => setTimeout(() => setShowProjectDropdown(false), 150)}
-              className="w-full h-16 px-5 py-4 pr-12 text-white bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
-              style={{ fontSize: '1.125rem' }}
+              className="w-full h-16 px-5 py-4 pr-12 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-base font-medium text-lg border"
+              style={{
+                fontSize: '1.125rem',
+                background: '#e8f0fe',
+                color: '#6b7280',
+                borderColor: '#cbd5e1',
+                boxShadow: 'none',
+                backgroundImage: 'none',
+                backgroundClip: 'padding-box',
+                backgroundOrigin: 'padding-box',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                outline: 'none',
+                transition: 'all 0.2s',
+                fontWeight: 500,
+                zIndex: 1,
+              }}
+              placeholder="Search for main project"
             />
             <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
               {projectSearch === '' && <ShinyText text="Search for main project" className="text-lg" />}
@@ -223,7 +239,6 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
             <input
               ref={subprojectInputRef}
               type="text"
-              placeholder={undefined}
               value={subprojectSearch}
               onChange={(e) => {
                 setSubprojectSearch(e.target.value);
@@ -241,8 +256,29 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
                 setSubprojectDropdownIndex(-1);
               }}
               onBlur={() => setTimeout(() => setShowSubprojectDropdown(false), 150)}
-              className="w-full h-16 px-5 py-4 pr-12 text-white bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
-              style={{ fontSize: '1.125rem' }}
+              className="w-full h-16 px-5 py-4 pr-12 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-base font-medium text-lg border"
+              style={{
+                fontSize: '1.125rem',
+                background: '#e8f0fe',
+                color: '#6b7280',
+                borderColor: '#cbd5e1',
+                boxShadow: 'none',
+                backgroundImage: 'none',
+                backgroundClip: 'padding-box',
+                backgroundOrigin: 'padding-box',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                outline: 'none',
+                transition: 'all 0.2s',
+                fontWeight: 500,
+                zIndex: 1,
+                // Add !important to key properties
+                ...(typeof window !== 'undefined' ? {
+                  setProperty: (prop, value) => document.documentElement.style.setProperty(prop, value, 'important')
+                } : {}),
+              }}
+              placeholder="Search for subproject"
             />
             <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
               {subprojectSearch === '' && <ShinyText text="Search for subproject" className="text-lg" />}

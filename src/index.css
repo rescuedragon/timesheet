@@ -10,24 +10,24 @@ All colors MUST be HSL.
   :root {
     /* Google Colors Theme */
     --background: 210 20% 98%; /* Light blue-gray */
-    --foreground: 227 100% 66%; /* Blue #4773F9 */
+    --foreground: 260 100% 60%; /* Purple #7E2EFF */
     --card: 0 0% 100%;
-    --card-foreground: 227 100% 66%;
+    --card-foreground: 260 100% 60%; /* Purple #7E2EFF */
     --popover: 0 0% 100%;
-    --popover-foreground: 227 100% 66%;
-    --primary: 227 100% 66%; /* Blue #4773F9 */
+    --popover-foreground: 260 100% 60%; /* Purple #7E2EFF */
+      --primary: 260 100% 60%; /* Purple #7E2EFF */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 227 100% 56%;
+  --primary-hover: 260 100% 50%;
     --secondary: 142 71% 45%; /* Google Green #34A853 */
     --secondary-foreground: 0 0% 100%;
     --secondary-hover: 142 71% 35%;
     --success: 142 71% 45%; /* Google Green */
     --warning: 45 100% 51%; /* Google Yellow #FBBC04 */
-    --info: 217 89% 61%; /* Google Blue */
+    --info: 260 89% 61%; /* Purple */
     --destructive: 0 84% 60%; /* Google Red #EA4335 */
     --destructive-foreground: 0 0% 100%;
     --muted: 210 16% 93%;
-    --muted-foreground: 227 100% 66%; /* Blue #4773F9 */
+    --muted-foreground: 260 100% 60%; /* Purple #7E2EFF */
     --accent: 220 60% 50%; /* Matte Cobalt Blue */
     --accent-foreground: 0 0% 100%;
     --accent-hover: 220 60% 40%;
@@ -36,9 +36,9 @@ All colors MUST be HSL.
     --ring: 0 0% 0%; /* Matte Black */
     --radius: 12px;
     /* Google Colors Gradients */
-    --gradient-primary: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+    --gradient-primary: linear-gradient(135deg, #7E2EFF 0%, #34A853 100%);
     --gradient-secondary: linear-gradient(135deg, #EA4335 0%, #FBBC04 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(220, 60%, 50%) 0%, #4285F4 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(220, 60%, 50%) 0%, #7E2EFF 100%);
     /* Material Shadows */
     --shadow-sm: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 1px 2px 0 rgba(60, 64, 67, 0.06);
     --shadow-md: 0 4px 6px -1px rgba(60, 64, 67, 0.10), 0 2px 4px -1px rgba(60, 64, 67, 0.08);
@@ -116,7 +116,7 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-lg);
   }
   .currently-tracking-material {
-    /* background: linear-gradient(90deg, #4285F4 0%, #34A853 100%); */
+    /* background: linear-gradient(90deg, #7E2EFF 0%, #34A853 100%); */
     color: #fff;
     box-shadow: 0 4px 24px 0 rgba(60,64,67,0.10);
     border-radius: 1.25rem;
@@ -545,7 +545,7 @@ All colors MUST be HSL.
   height: 100vh;
   z-index: 0;
   pointer-events: none;
-  background: rgba(255, 255, 255, 0.245);
+  background: rgba(251,240,217, 0.1);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
   /* Remove blur for clear background image */
   /* backdrop-filter: blur(18px); */
@@ -561,8 +561,7 @@ All colors MUST be HSL.
   width: 100vw;
   height: 100vh;
   z-index: -1;
-  background: url('https://images.unsplash.com/photo-1615715035646-e92d1a56395b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
-  background-size: cover;
+  background: #f8f9fa !important;
   transition: background 0.5s;
 }
 

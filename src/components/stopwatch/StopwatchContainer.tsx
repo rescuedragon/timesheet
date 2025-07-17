@@ -71,6 +71,8 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
       <StopwatchManager
         resumedProject={resumedProject}
         onResumedProjectHandled={onResumedProjectHandled}
+        selectedProject={selectedProject}
+        selectedSubproject={selectedSubproject}
       >
         {(state, actions) => {
           // Expose handleStart to parent via ref
