@@ -7,7 +7,6 @@ import { ProjectSelectorRef } from '../ProjectSelector';
 import { StopwatchPanelRef } from '../StopwatchPanel';
 import ProjectSubprojectSearchBar from '../project-selector/ProjectSubprojectSearchBar';
 import CurrentTrackingDisplay from '../common/CurrentTrackingDisplay';
-import QueuedProjects from '../QueuedProjects';
 import { useState } from 'react';
 
 interface TimeTrackerLayoutProps {
@@ -35,7 +34,7 @@ interface TimeTrackerLayoutProps {
     elapsedTime: number;
 }
 
-const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any[]; onResumeProject: any; onStopProject: any; }> = ({
+const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
     projects,
     selectedProjectId,
     selectedSubprojectId,
@@ -57,9 +56,6 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps & { queuedProjects: any
     onTimerStopped,
     isTimerRunning,
     onAddTimeLog,
-    queuedProjects,
-    onResumeProject,
-    onStopProject,
     elapsedTime
 }) => {
     // Responsive layout: top, search row, main row, bottom

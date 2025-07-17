@@ -243,13 +243,16 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
                 onTimerStopped={handleTimerStopped}
                 isTimerRunning={isTimerRunning}
                 onAddTimeLog={onAddTimeLog}
-                queuedProjects={queuedProjects}
-                onResumeProject={handleResumeProject}
-                onStopProject={handleStopQueuedProject}
                 elapsedTime={elapsedTime}
             />
 
-                {/* Queued Projects - removed, now handled by TimeTrackerLayout */}
+            <div className="w-[95%] mx-auto flex flex-col min-h-0 p-6">
+                <QueuedProjects
+                    queuedProjects={queuedProjects}
+                    onResumeProject={handleResumeProject}
+                    onStopProject={handleStopQueuedProject}
+                />
+            </div>
         </div>
     );
 };

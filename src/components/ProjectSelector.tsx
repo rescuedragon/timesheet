@@ -115,14 +115,8 @@ const Card = React.memo<CardProps>(({ title, subtitle, color, onClick, isColorCo
                 className="flex flex-col items-center justify-center h-full"
                 whileHover={{ scale: 1.02 }}
             >
-                <h4 className="text-lg font-semibold text-center mb-2" style={{ color: '#1d1d1f' }}>
-                  {title}
-                </h4>
-                {subtitle && (
-                  <p className="text-sm text-center" style={{ color: '#6b7280', lineHeight: '1.4' }}>
-                    {subtitle}
-                  </p>
-                )}
+                <h4 className="text-lg font-semibold text-center mb-2" style={{ color: '#1d1d1f' }}>{title}</h4>
+                {subtitle && <p className="text-sm text-center" style={{ color: '#6b7280', lineHeight: '1.4' }}>{subtitle}</p>}
             </motion.div>
         </motion.div>
     );
@@ -599,8 +593,8 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         <div ref={searchContainerRef} className="search-container-ps">
           <div className="search-input-wrapper-ps flex items-center">
             <div className="flex-grow relative">
-            <motion.input
-              type="text"
+          <input
+            type="text"
                 className={`search-input-ps ${isTimerRunning ? 'cursor-not-allowed' : 'cursor-text'}`}
                 placeholder={isTimerRunning ? "Timer is running..." : "Search projects..."}
           value={searchValue}
@@ -611,11 +605,6 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   setDropdownView('projects');
               }
                 }}
-                onFocus={() => {
-                    if (!isTimerRunning) {
-                  setDropdownOpen(true);
-              }
-          }}
                 onClick={handleSearchBarClick}
                 disabled={isTimerRunning}
                 style={{
@@ -636,6 +625,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   })
                 }}
               />
+              <Search className={`search-icon-ps ${isTimerRunning || searchValue ? 'text-indigo-500 opacity-60' : ''} ${isDropdownOpen ? 'icon-pop-disappear' : 'icon-reappear'}`} />
             </div>
             <motion.div 
               className="flex items-center ml-2 mr-2"
@@ -728,11 +718,9 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                    whileHover={{ x: 5 }}
                 >
                   <div className="item-content-ps">
-                    <div className="item-text-ps">
-                      {project.name}
-                    </div>
+                    <div className="item-text-ps">{project.name}</div>
                           <div className="item-description-ps">
-                            {`${project.subprojects.length} subprojects`}
+                            {project.subprojects.length} subprojects
                           </div>
                   </div>
           </motion.div>
@@ -751,13 +739,11 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                        whileHover={{ x: 5 }}
                 >
                         <div className="item-content-ps">
-                          <div className="item-text-ps">
-                            {subproject.name}
-                          </div>
+                          <div className="item-text-ps">{subproject.name}</div>
                           <div className="item-description-ps">
                             {activeProject.name}
                           </div>
-                        </div>
+        </div>
                       </motion.div>
               ))}
                     </div>
@@ -836,7 +822,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: 0.2 }}
                     >
-                      {selectedProjectForSubprojects?.name || ''}
+                      {selectedProjectForSubprojects?.name}
                     </motion.h3>
                   </motion.div>
                   <motion.div 
@@ -946,11 +932,9 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.2, delay: index * 0.05 }}
                    whileHover={{ x: 5 }}
-                >
+                    >
                         <div className="item-content-ps">
-                      <div className="item-text-ps">
-                        {subproject.name}
-                      </div>
+                      <div className="item-text-ps">{subproject.name}</div>
                       <div className="item-description-ps">
                         {hoveredProject.name}
                       </div>
