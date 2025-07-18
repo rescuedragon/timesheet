@@ -47,6 +47,47 @@ const TimesheetView: React.FC = () => {
   };
 
   const currentDayTotal = getCurrentDayTotal();
+  
+  // Handle adding a new time log
+  const handleAddTimeLog = (newLog: TimeLog) => {
+    // Generate a unique ID for the new log
+    const logWithId = {
+      ...newLog,
+      id: `log_${Date.now()}`
+    };
+    
+    // Add to state and storage
+    const updatedLogs = [...timeLogs, logWithId];
+    setTimeLogs(updatedLogs);
+    storageService.saveTimeLogs(updatedLogs);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('time-logs-updated'));
+  };
+  
+  // Handle updating an existing time log
+  const handleUpdateTimeLog = (updatedLog: TimeLog) => {
+    const updatedLogs = timeLogs.map(log => 
+      log.id === updatedLog.id ? updatedLog : log
+    );
+    
+    setTimeLogs(updatedLogs);
+    storageService.saveTimeLogs(updatedLogs);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('time-logs-updated'));
+  };
+  
+  // Handle deleting a time log
+  const handleDeleteTimeLog = (logToDelete: TimeLog) => {
+    const updatedLogs = timeLogs.filter(log => log.id !== logToDelete.id);
+    
+    setTimeLogs(updatedLogs);
+    storageService.saveTimeLogs(updatedLogs);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('time-logs-updated'));
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 p-4">
@@ -58,12 +99,15 @@ const TimesheetView: React.FC = () => {
         enabled={true}
       />
       
-      {/* Apple-style Weekly Calendar View */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+      {/* Apple-style Weekly/Daily Calendar View */}
+      <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] shadow-sm p-6">
         <WeeklyCalendarView 
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           timeLogs={timeLogs}
+          onAddTimeLog={handleAddTimeLog}
+          onUpdateTimeLog={handleUpdateTimeLog}
+          onDeleteTimeLog={handleDeleteTimeLog}
         />
       </div>
     </div>

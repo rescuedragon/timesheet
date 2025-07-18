@@ -251,6 +251,8 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
                     queuedProjects={queuedProjects}
                     onResumeProject={handleResumeProject}
                     onStopProject={handleStopQueuedProject}
+                    onLogTime={handleLogTime}
+                    isTimerRunning={isTimerRunning}
                 />
             </div>
         </div>

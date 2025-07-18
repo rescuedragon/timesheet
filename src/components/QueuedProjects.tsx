@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Play, Square, Save } from 'lucide-react';
+import { Play, Square, Save, AlertCircle } from 'lucide-react';
 import { generateProjectColor, isColorCodedProjectsEnabled } from '@/lib/projectColors';
 import { motion, Variants, Transition } from 'framer-motion';
 
@@ -23,17 +23,20 @@ interface QueuedProjectsProps {
   onResumeProject: (queuedProject: QueuedProject) => void;
   onStopProject: (queuedProjectId: string) => void;
   onLogTime?: (duration: number, description: string, startTime: Date, endTime: Date, projectId: string, subprojectId: string) => void;
+  isTimerRunning?: boolean;
 }
 
 const QueuedProjects: React.FC<QueuedProjectsProps> = ({
   queuedProjects,
   onResumeProject,
   onStopProject,
-  onLogTime
+  onLogTime,
+  isTimerRunning = false
 }) => {
   const [stoppingProject, setStoppingProject] = useState<QueuedProject | null>(null);
   const [description, setDescription] = useState('');
   const [colorCodedEnabled, setColorCodedEnabled] = useState(false);
+  const [showTimerError, setShowTimerError] = useState(false);
 
   useEffect(() => {
     const checkColorCodedStatus = () => {
@@ -99,6 +102,16 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
   const handleCancelStop = () => {
     setStoppingProject(null);
     setDescription('');
+  };
+
+  const handleResumeClick = (project: QueuedProject) => {
+    if (isTimerRunning) {
+      setShowTimerError(true);
+      // Auto-hide the error after 3 seconds
+      setTimeout(() => setShowTimerError(false), 3000);
+      return;
+    }
+    onResumeProject(project);
   };
 
   if (queuedProjects.length === 0) {
@@ -207,8 +220,13 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => onResumeProject(project)}
-                          className="group/btn bg-white/80 dark:bg-gray-800/80 border-gray-200/50 dark:border-gray-600/50 hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-300 dark:hover:border-green-600 text-gray-700 dark:text-gray-200 hover:text-green-700 dark:hover:text-green-300 transition-all duration-200 px-3 py-1.5 rounded-lg font-medium shadow-sm"
+                          onClick={() => handleResumeClick(project)}
+                          disabled={isTimerRunning}
+                          className={`group/btn bg-white/80 dark:bg-gray-800/80 border-gray-200/50 dark:border-gray-600/50 hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-300 dark:hover:border-green-600 text-gray-700 dark:text-gray-200 hover:text-green-700 dark:hover:text-green-300 transition-all duration-200 px-3 py-1.5 rounded-lg font-medium shadow-sm ${
+                            isTimerRunning 
+                              ? 'opacity-50 cursor-not-allowed hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-gray-200/50 dark:hover:border-gray-600/50 hover:text-gray-700 dark:hover:text-gray-200' 
+                              : ''
+                          }`}
                         >
                           <Play className="h-4 w-4 mr-1.5 group-hover/btn:scale-110 transition-transform duration-200" />
                           Resume
@@ -231,6 +249,34 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
           </div>
         </div>
       </motion.div>
+
+      {/* Timer Running Error Dialog */}
+      <Dialog open={showTimerError} onOpenChange={setShowTimerError}>
+        <DialogContent className="max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+          <DialogHeader className="text-center pb-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+            </div>
+            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Timer is running
+            </DialogTitle>
+          </DialogHeader>
+          <div className="text-center space-y-4">
+            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              Timer is currently active for another project.<br />
+              Please stop or pause the current timer first, then try resuming your paused project.
+            </p>
+            <Button
+              onClick={() => setShowTimerError(false)}
+              className="bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg py-2.5 px-6 transition-all duration-200"
+            >
+              Got it
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Stop Confirmation Dialog */}
       <Dialog open={!!stoppingProject} onOpenChange={(open) => !open && handleCancelStop()}>
