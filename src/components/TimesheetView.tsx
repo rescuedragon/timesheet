@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { TimeLog } from '@/types';
 import { storageService } from '@/services/storageService';
 import ProgressBar from './ProgressBar';
+import WeeklyCalendarView from './timesheet/WeeklyCalendarView';
 
 const TimesheetView: React.FC = () => {
   const [timeLogs, setTimeLogs] = useState<TimeLog[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   
   // Load initial time logs
   useEffect(() => {
@@ -55,6 +57,15 @@ const TimesheetView: React.FC = () => {
         color="#006994"
         enabled={true}
       />
+      
+      {/* Apple-style Weekly Calendar View */}
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+        <WeeklyCalendarView 
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          timeLogs={timeLogs}
+        />
+      </div>
     </div>
   );
 };
