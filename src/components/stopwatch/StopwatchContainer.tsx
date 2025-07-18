@@ -32,32 +32,41 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
   const [showDescriptionDialog, setShowDescriptionDialog] = React.useState(false);
   const [description, setDescription] = React.useState('');
   const [pendingLogData, setPendingLogData] = React.useState<{duration: number, startTime: Date, endTime: Date} | null>(null);
+  const [currentDuration, setCurrentDuration] = React.useState(0);
 
   const handleConfirmLog = () => {
     if (pendingLogData && selectedProject && selectedSubproject) {
+      // Calculate new start time based on edited duration
+      const newStartTime = new Date(pendingLogData.endTime.getTime() - (currentDuration * 1000));
+      
       const newLog = {
         id: Date.now().toString(),
         projectId: selectedProject.id,
         subprojectId: selectedSubproject.id,
         projectName: selectedProject.name,
         subprojectName: selectedSubproject.name,
-        duration: pendingLogData.duration,
+        duration: currentDuration,
         description,
         date: new Date().toISOString().split('T')[0],
-        startTime: pendingLogData.startTime.toLocaleTimeString(),
+        startTime: newStartTime.toLocaleTimeString(),
         endTime: pendingLogData.endTime.toLocaleTimeString()
       };
+      console.log('StopwatchContainer - created new log:', newLog);
       onAddTimeLog(newLog);
     }
     setShowDescriptionDialog(false);
     setDescription('');
     setPendingLogData(null);
+    setCurrentDuration(0);
   };
 
   const handleCancelLog = () => {
     setShowDescriptionDialog(false);
     setDescription('');
     setPendingLogData(null);
+    setCurrentDuration(0);
+    // Clear project selection when user cancels the dialog
+    if (onTimerStopped) onTimerStopped();
   };
 
   return (
@@ -112,6 +121,7 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
                 startTime: state.startTime,
                 endTime
               });
+              setCurrentDuration(finalDuration);
               setShowDescriptionDialog(true);
             }
             
@@ -139,11 +149,14 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
                 open={showDescriptionDialog}
                 selectedProject={selectedProject}
                 selectedSubproject={selectedSubproject}
-                duration={pendingLogData?.duration || 0}
+                duration={currentDuration}
                 description={description}
                 onDescriptionChange={setDescription}
                 onConfirm={handleConfirmLog}
                 onCancel={handleCancelLog}
+                startTime={pendingLogData?.startTime}
+                endTime={pendingLogData?.endTime}
+                onDurationChange={setCurrentDuration}
               />
             </>
           );

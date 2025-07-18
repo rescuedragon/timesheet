@@ -12,7 +12,6 @@ import { useState } from 'react';
 
 const Settings: React.FC = () => {
   const {
-    progressBarEnabled,
     progressBarColor,
     colorCodedProjectsEnabled,
     frequentSubprojectsEnabled,
@@ -20,14 +19,12 @@ const Settings: React.FC = () => {
     setProjects,
     holidays,
     setHolidays,
-    handleProgressBarToggle,
     handleProgressBarColorChange,
     handleColorCodedProjectsToggle,
     handleFrequentSubprojectsToggle
   } = useSettings();
 
   // Local state for pending changes
-  const [pendingProgressBarEnabled, setPendingProgressBarEnabled] = useState(progressBarEnabled);
   const [pendingProgressBarColor, setPendingProgressBarColor] = useState(progressBarColor);
   const [pendingColorCodedProjectsEnabled, setPendingColorCodedProjectsEnabled] = useState(colorCodedProjectsEnabled);
   const [pendingFrequentSubprojectsEnabled, setPendingFrequentSubprojectsEnabled] = useState(frequentSubprojectsEnabled);
@@ -37,7 +34,6 @@ const Settings: React.FC = () => {
 
   // Save handler
   const handleSave = () => {
-    handleProgressBarToggle(pendingProgressBarEnabled);
     handleProgressBarColorChange(pendingProgressBarColor);
     handleColorCodedProjectsToggle(pendingColorCodedProjectsEnabled);
     handleFrequentSubprojectsToggle(pendingFrequentSubprojectsEnabled);
@@ -77,11 +73,9 @@ const Settings: React.FC = () => {
           
           <TabsContent value="user" className="space-y-4">
             <SettingsUserAccess
-              progressBarEnabled={pendingProgressBarEnabled}
               progressBarColor={pendingProgressBarColor}
               colorCodedProjectsEnabled={pendingColorCodedProjectsEnabled}
               frequentSubprojectsEnabled={pendingFrequentSubprojectsEnabled}
-              onProgressBarToggle={setPendingProgressBarEnabled}
               onProgressBarColorChange={setPendingProgressBarColor}
               onColorCodedProjectsToggle={setPendingColorCodedProjectsEnabled}
               onFrequentSubprojectsToggle={setPendingFrequentSubprojectsEnabled}

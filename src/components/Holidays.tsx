@@ -97,8 +97,8 @@ const PersonalJournal: React.FC = React.memo(() => {
   const [notifications, setNotifications] = useState<Entry[]>([]);
 
   // Progress bar settings using useLocalStorage hook
-  const [isAnimationEnabled, setIsAnimationEnabled] = useLocalStorage('progressbar-enabled', false);
-  const [progressBarColor, setProgressBarColor] = useLocalStorage('progressbar-color', '#000000');
+  const [isAnimationEnabled, setIsAnimationEnabled] = useLocalStorage('progressbar-enabled', true); // Changed default to true
+  const [progressBarColor, setProgressBarColor] = useLocalStorage('progressbar-color', '#006994'); // Changed to ocean blue
 
   // Memoized color functions
   const createSofterColor = useCallback((hex: string, softenFactor = 0.5) => {
@@ -139,7 +139,7 @@ const PersonalJournal: React.FC = React.memo(() => {
       const savedColor = localStorage.getItem('progressbar-color');
       if (savedColor) setProgressBarColor(savedColor);
       const savedEnabled = localStorage.getItem('progressbar-enabled');
-      setIsAnimationEnabled(savedEnabled ? JSON.parse(savedEnabled) : false);
+      setIsAnimationEnabled(savedEnabled ? JSON.parse(savedEnabled) : true); // Changed default to true
     };
 
     window.addEventListener('storage', handleStorageChange);

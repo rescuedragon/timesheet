@@ -11,20 +11,12 @@ interface StopwatchDisplayProps {
   duration?: number; // total duration in seconds (optional, for progress ring)
 }
 
-const CIRCLE_SIZE = 256;
-const STROKE_WIDTH = 8;
-const RADIUS = (CIRCLE_SIZE / 2) - (STROKE_WIDTH / 2);
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-
 const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
   isRunning,
   elapsedTime,
   displayTime,
   duration = 3600 // default to 1 hour if not provided
 }) => {
-  // Calculate progress (0 to 1)
-  const progress = Math.min(elapsedTime / duration, 1);
-  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
   return (
     <div className="relative w-64 h-64 flex items-center justify-center overflow-hidden rounded-full" 
@@ -45,44 +37,7 @@ const StopwatchDisplay: React.FC<StopwatchDisplayProps> = ({
         </div>
       )}
       
-      {/* Progress Ring */}
-      <svg className="absolute inset-0 w-full h-full transform -rotate-90" style={{ filter: 'drop-shadow(0 2px 8px rgba(126, 46, 255, 0.2))' }}>
-        {/* Background Ring */}
-        <circle
-          cx={CIRCLE_SIZE / 2}
-          cy={CIRCLE_SIZE / 2}
-          r={RADIUS}
-          stroke="rgba(126, 46, 255, 0.1)"
-          strokeWidth={STROKE_WIDTH}
-          fill="none"
-        />
-        
-        {/* Progress Ring */}
-        <circle
-          cx={CIRCLE_SIZE / 2}
-          cy={CIRCLE_SIZE / 2}
-          r={RADIUS}
-          stroke="url(#progressGradient)"
-          strokeWidth={STROKE_WIDTH}
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={CIRCUMFERENCE}
-          strokeDashoffset={strokeDashoffset}
-          className="transition-all duration-1000 ease-out"
-          style={{
-            filter: isRunning ? 'drop-shadow(0 0 8px rgba(126, 46, 255, 0.4))' : 'none'
-          }}
-        />
-        
-        {/* Gradient Definition */}
-        <defs>
-          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#7E2EFF" />
-            <stop offset="50%" stopColor="#6366f1" />
-            <stop offset="100%" stopColor="#8b5cf6" />
-          </linearGradient>
-        </defs>
-      </svg>
+
       
       {/* Timer Text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20">

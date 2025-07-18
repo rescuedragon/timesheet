@@ -4,22 +4,18 @@ import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 
 interface SettingsUserAccessProps {
-  progressBarEnabled: boolean;
   progressBarColor: string;
   colorCodedProjectsEnabled: boolean;
   frequentSubprojectsEnabled: boolean;
-  onProgressBarToggle: (enabled: boolean) => void;
   onProgressBarColorChange: (color: string) => void;
   onColorCodedProjectsToggle: (enabled: boolean) => void;
   onFrequentSubprojectsToggle: (enabled: boolean) => void;
 }
 
 const SettingsUserAccess: React.FC<SettingsUserAccessProps> = ({
-  progressBarEnabled,
   progressBarColor,
   colorCodedProjectsEnabled,
   frequentSubprojectsEnabled,
-  onProgressBarToggle,
   onProgressBarColorChange,
   onColorCodedProjectsToggle,
   onFrequentSubprojectsToggle
@@ -30,23 +26,16 @@ const SettingsUserAccess: React.FC<SettingsUserAccessProps> = ({
         <h3 className="text-lg font-medium mb-4">Experimental Features</h3>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="space-y-1">
-              <Label className="text-base">Animated Progress Bar</Label>
+          <div className="p-4 border rounded-lg">
+            <div className="space-y-1 mb-3">
+              <Label className="text-base">Progress Bar Color</Label>
               <p className="text-sm text-muted-foreground">
-                Turn the "Total Time Today" panel into an animated progress bar with 8-hour target
+                Customize the color of the animated progress bar
               </p>
             </div>
-            <Switch
-              checked={progressBarEnabled}
-              onCheckedChange={onProgressBarToggle}
-            />
-          </div>
-          
-          {progressBarEnabled && (
-            <div className="ml-4 p-4 bg-muted rounded-lg space-y-3">
+            <div className="space-y-3">
               <div className="space-y-2">
-                <Label>Progress Bar Color</Label>
+                <Label>Color</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     type="color"
@@ -57,7 +46,7 @@ const SettingsUserAccess: React.FC<SettingsUserAccessProps> = ({
                   <Input
                     value={progressBarColor}
                     onChange={(e) => onProgressBarColorChange(e.target.value)}
-                    placeholder="#10b981"
+                    placeholder="#006994"
                     className="font-mono"
                   />
                 </div>
@@ -67,7 +56,7 @@ const SettingsUserAccess: React.FC<SettingsUserAccessProps> = ({
                 Preview: The progress bar will fill as you log time entries throughout the day.
               </div>
             </div>
-          )}
+          </div>
 
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="space-y-1">
@@ -92,9 +81,9 @@ const SettingsUserAccess: React.FC<SettingsUserAccessProps> = ({
 
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="space-y-1">
-              <Label className="text-base">Color-Coded Projects</Label>
+              <Label className="text-base">Color Coded Projects</Label>
               <p className="text-sm text-muted-foreground">
-                Highlight project names and rows with consistent colors to easily identify project groups
+                Assign unique colors to projects for better visual organization
               </p>
             </div>
             <Switch
@@ -106,7 +95,7 @@ const SettingsUserAccess: React.FC<SettingsUserAccessProps> = ({
           {colorCodedProjectsEnabled && (
             <div className="ml-4 p-4 bg-muted rounded-lg space-y-3">
               <div className="text-sm text-muted-foreground">
-                Preview: Each project and its subprojects will be highlighted with the same soft color across all views for easy identification.
+                Preview: Each project will have a unique color assigned automatically based on its name.
               </div>
             </div>
           )}

@@ -132,18 +132,18 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
 
         if (!project || !subproject) return;
 
-        // Compose the new log object
+                // Compose the new log object
         const newLog = {
-            id: Date.now().toString(),
-            projectId: targetProjectId,
-            subprojectId: targetSubprojectId,
-            projectName: project.name,
-            subprojectName: subproject.name,
-            duration,
-            description,
-            date: new Date().toISOString().split('T')[0],
-            startTime: startTime.toLocaleTimeString(),
-            endTime: endTime.toLocaleTimeString()
+          id: Date.now().toString(),
+          projectId: targetProjectId,
+          subprojectId: targetSubprojectId,
+          projectName: project.name,
+          subprojectName: subproject.name,
+          duration,
+          description,
+          date: new Date().toISOString().split('T')[0],
+          startTime: startTime.toLocaleTimeString(),
+          endTime: endTime.toLocaleTimeString()
         };
         onAddTimeLog(newLog);
     };
@@ -170,10 +170,10 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
         setSelectedSubprojectId('');
     };
 
-    // Deselect project/subproject when timer is stopped
+    // Don't deselect project/subproject when timer is stopped - keep them for the dialog
     const handleTimerStopped = () => {
-        setSelectedProjectId('');
-        setSelectedSubprojectId('');
+        // Keep the project and subproject selected for the time entry dialog
+        // Only clear if user explicitly cancels the dialog
         projectSelectorRef.current?.clearSelection();
     };
 

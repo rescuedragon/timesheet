@@ -19,9 +19,13 @@ const Index = React.memo(() => {
     return saved ? JSON.parse(saved) : [];
   });
   const addTimeLog = (newLog) => {
+    console.log('Index.tsx - addTimeLog called with:', newLog);
     setTimeLogs(prev => {
       const updated = newLog ? [newLog, ...prev] : prev;
       localStorage.setItem('timesheet-logs', JSON.stringify(updated));
+      console.log('Index.tsx - saved logs to localStorage:', updated);
+      // Dispatch event to notify TimesheetView
+      window.dispatchEvent(new CustomEvent('time-logs-updated'));
       return updated;
     });
   };

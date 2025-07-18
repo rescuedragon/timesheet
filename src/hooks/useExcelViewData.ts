@@ -7,15 +7,15 @@ export const useExcelViewData = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [colorCodedEnabled, setColorCodedEnabled] = useState(false);
 
-  // Progress bar settings
+  // Progress bar settings - always enabled
   const [progressBarEnabled, setProgressBarEnabled] = useState(() => {
     const saved = localStorage.getItem('progressbar-enabled');
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true; // Changed default to true
   });
   
   const [progressBarColor, setProgressBarColor] = useState(() => {
     const saved = localStorage.getItem('progressbar-color');
-    return saved || '#10b981';
+    return saved || '#006994'; // Changed to ocean blue
   });
 
   useEffect(() => {
@@ -28,8 +28,8 @@ export const useExcelViewData = () => {
       const savedEnabled = localStorage.getItem('progressbar-enabled');
       const savedColor = localStorage.getItem('progressbar-color');
       
-      setProgressBarEnabled(savedEnabled ? JSON.parse(savedEnabled) : false);
-      setProgressBarColor(savedColor || '#10b981');
+      setProgressBarEnabled(savedEnabled ? JSON.parse(savedEnabled) : true); // Changed default to true
+      setProgressBarColor(savedColor || '#006994'); // Changed to ocean blue
     };
     
     window.addEventListener('storage', handleStorageChange);

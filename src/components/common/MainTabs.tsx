@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import TimeTracker from '../TimeTracker';
-import ExcelView from '../ExcelView';
+import TimesheetView from '../TimesheetView';
 import Holidays from '../Holidays';
 
 interface MainTabsProps {
@@ -78,7 +78,7 @@ const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, a
       
       <div className="animate-fade-in transition-all duration-200 ease-out">
         {activeTab === 'tracker' && <TimeTracker onAddTimeLog={addTimeLog} />}
-        {activeTab === 'data' && <ExcelView timeLogs={timeLogs} addTimeLog={addTimeLog} setTimeLogs={setTimeLogs} replaceTimeLogs={replaceTimeLogs} />}
+        {activeTab === 'data' && <TimesheetView />}
         {activeTab === 'holidays' && <Holidays />}
       </div>
     </div>

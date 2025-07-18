@@ -154,8 +154,8 @@ class StorageService {
     try {
       const settings = {
         progressBar: {
-          enabled: this.getBooleanSetting('progressbar-enabled', false),
-          color: this.getStringSetting('progressbar-color', '#10b981'),
+          enabled: this.getBooleanSetting('progressbar-enabled', true), // Changed default to true
+          color: this.getStringSetting('progressbar-color', '#006994'), // Changed to ocean blue
           targetHours: 8
         },
         colorCodedProjects: this.getBooleanSetting('color-coded-projects-enabled', false),
@@ -268,8 +268,8 @@ class StorageService {
   private getDefaultSettings(): AppSettings {
     return {
       progressBar: {
-        enabled: false,
-        color: '#10b981',
+        enabled: true, // Changed default to true
+        color: '#006994', // Changed to ocean blue
         targetHours: 8
       },
       colorCodedProjects: false,

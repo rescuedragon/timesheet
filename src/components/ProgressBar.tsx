@@ -10,7 +10,7 @@ interface ProgressBarProps {
 const ProgressBar: React.FC<ProgressBarProps> = ({
   currentHours,
   targetHours = 8,
-  color = '#10b981',
+  color = '#006994', // Changed to ocean blue
   enabled = false
 }) => {
   const progressPercentage = Math.min(currentHours / 3600 / targetHours * 100, 100);

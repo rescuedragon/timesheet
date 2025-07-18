@@ -2,9 +2,8 @@ import React from 'react';
 import ProgressBar from './ProgressBar';
 
 const ExcelView: React.FC<{ timeLogs: any[]; addTimeLog: (newLog: any) => void; setTimeLogs: React.Dispatch<any>; replaceTimeLogs: (logs: any[]) => void }> = ({ timeLogs, addTimeLog, setTimeLogs, replaceTimeLogs }) => {
-  // Progress bar settings
-  const [progressBarEnabled, setProgressBarEnabled] = React.useState(true);
-  const [progressBarColor, setProgressBarColor] = React.useState('#10b981');
+  // Progress bar settings - always enabled
+  const [progressBarColor, setProgressBarColor] = React.useState('#006994'); // Ocean blue
 
   // Get current day's total time
   const getCurrentDayTotal = () => {
@@ -20,7 +19,7 @@ const ExcelView: React.FC<{ timeLogs: any[]; addTimeLog: (newLog: any) => void; 
         currentHours={getCurrentDayTotal()}
         targetHours={8}
         color={progressBarColor}
-        enabled={progressBarEnabled}
+        enabled={true}
       />
     </div>
   );
