@@ -47,8 +47,8 @@ const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, a
               style={{
                 isolation: 'isolate',
                 contain: 'layout style paint',
-                background: activeTab === 'data' ? 'linear-gradient(135deg, #7E2EFF 0%, #6366f1 100%)' : 'transparent',
-                boxShadow: activeTab === 'data' ? '0 4px 16px rgba(126, 46, 255, 0.3), 0 2px 8px rgba(99, 102, 241, 0.2)' : 'none'
+                background: activeTab === 'data' ? 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)' : 'transparent',
+                boxShadow: activeTab === 'data' ? '0 4px 16px rgba(66, 153, 225, 0.3), 0 2px 8px rgba(49, 130, 206, 0.2)' : 'none'
               }}
             >
               Timesheet

@@ -81,10 +81,34 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       const boatTypes = ['sailboat', 'motorboat', 'canoe', 'fish', 'whale', 'shark', 'mermaid', 'turtle', 'buoy', 'jellyfish'];
       const randomType = boatTypes[Math.floor(Math.random() * boatTypes.length)];
       
+      // Distribute across the entire height of the water with more variation
+      // Different types of creatures should appear at different depths
+      let top;
+      if (['fish', 'whale', 'shark', 'mermaid', 'jellyfish'].includes(randomType)) {
+        // Sea creatures appear deeper
+        top = Math.random() * 30 + 50; // 50-80% depth (deeper)
+      } else if (randomType === 'turtle') {
+        // Turtles appear in the middle
+        top = Math.random() * 20 + 40; // 40-60% depth (middle)
+      } else {
+        // Boats appear near the surface
+        top = Math.random() * 25 + 20; // 20-45% depth (surface)
+      }
+      
+      // Vary the speed based on the type
+      let speed;
+      if (['fish', 'shark'].includes(randomType)) {
+        speed = 15 + (Math.random() * 5); // Faster
+      } else if (['whale', 'turtle'].includes(randomType)) {
+        speed = 25 + (Math.random() * 10); // Slower
+      } else {
+        speed = 20 + (Math.random() * 8 - 4); // Medium
+      }
+      
       setBoats(prev => [...prev, { 
         id: Date.now(), 
-        top: Math.random() * 20 + 40,
-        speed: 20 + (Math.random() * 8 - 4),
+        top,
+        speed,
         type: randomType
       }]);
     }, 900000);
@@ -440,13 +464,38 @@ const renderBoat = (type: string) => {
           className="bg-gray-900/90 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-800/50 shadow-md hover:bg-gray-800/90 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={parseFloat(hours) < 5}
           onClick={() => {
-            if (parseFloat(hours) >= 5 && boats.length < 10) {
+            if (parseFloat(hours) >= 5) {
               const boatTypes = ['sailboat', 'motorboat', 'canoe', 'fish', 'whale', 'shark', 'mermaid', 'turtle', 'buoy', 'jellyfish'];
               const randomType = boatTypes[Math.floor(Math.random() * boatTypes.length)];
+              
+              // Distribute across the entire height of the water with more variation
+              // Different types of creatures should appear at different depths
+              let top;
+              if (['fish', 'whale', 'shark', 'mermaid', 'jellyfish'].includes(randomType)) {
+                // Sea creatures appear deeper
+                top = Math.random() * 30 + 50; // 50-80% depth (deeper)
+              } else if (randomType === 'turtle') {
+                // Turtles appear in the middle
+                top = Math.random() * 20 + 40; // 40-60% depth (middle)
+              } else {
+                // Boats appear near the surface
+                top = Math.random() * 25 + 20; // 20-45% depth (surface)
+              }
+              
+              // Vary the speed based on the type
+              let speed;
+              if (['fish', 'shark'].includes(randomType)) {
+                speed = 15 + (Math.random() * 5); // Faster
+              } else if (['whale', 'turtle'].includes(randomType)) {
+                speed = 25 + (Math.random() * 10); // Slower
+              } else {
+                speed = 20 + (Math.random() * 8 - 4); // Medium
+              }
+              
               setBoats(prev => [...prev, { 
                 id: Date.now(), 
-                top: Math.random() * 20 + 40,
-                speed: 20 + (Math.random() * 8 - 4),
+                top,
+                speed,
                 type: randomType
               }]);
             }
@@ -503,16 +552,43 @@ const renderBoat = (type: string) => {
           0% { 
             left: -5%;
             opacity: 0;
+            transform: translateY(0);
           }
           5% { 
             opacity: 1;
           }
+          15% {
+            transform: translateY(-10px);
+          }
+          25% {
+            transform: translateY(5px);
+          }
+          35% {
+            transform: translateY(-15px);
+          }
+          45% {
+            transform: translateY(10px);
+          }
+          55% {
+            transform: translateY(-8px);
+          }
+          65% {
+            transform: translateY(15px);
+          }
+          75% {
+            transform: translateY(-12px);
+          }
+          85% {
+            transform: translateY(8px);
+          }
           95% {
             opacity: 1;
+            transform: translateY(0);
           }
           100% { 
             left: 100%;
             opacity: 0;
+            transform: translateY(0);
           }
         }
         
@@ -525,14 +601,23 @@ const renderBoat = (type: string) => {
           5% { 
             opacity: 1;
           }
-          25% { 
-            transform: translateY(-5px) rotate(-3deg);
+          15% { 
+            transform: translateY(-15px) rotate(-5deg);
           }
-          50% { 
-            transform: translateY(0) rotate(0deg);
+          30% { 
+            transform: translateY(10px) rotate(3deg);
+          }
+          45% { 
+            transform: translateY(-20px) rotate(-8deg);
+          }
+          60% { 
+            transform: translateY(15px) rotate(5deg);
           }
           75% { 
-            transform: translateY(5px) rotate(3deg);
+            transform: translateY(-10px) rotate(-3deg);
+          }
+          90% {
+            transform: translateY(5px) rotate(2deg);
           }
           95% {
             opacity: 1;

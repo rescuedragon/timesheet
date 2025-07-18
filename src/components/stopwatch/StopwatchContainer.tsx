@@ -53,15 +53,25 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
         endTime: pendingLogData.endTime.toLocaleTimeString()
       };
       console.log('StopwatchContainer - created new log:', newLog);
+      
+      // Add the time log
       onAddTimeLog(newLog);
       
-      // Force switch to the Timesheet tab and daily view
-      window.dispatchEvent(new CustomEvent('switchToTimesheetTab', {
-        detail: { viewMode: 'daily' }
-      }));
+      // Save directly to storage to ensure it's available to other components
+      const existingLogs = JSON.parse(localStorage.getItem('timesheet-logs') || '[]');
+      const updatedLogs = [newLog, ...existingLogs];
+      localStorage.setItem('timesheet-logs', JSON.stringify(updatedLogs));
       
-      // Also dispatch the event that TimesheetView is listening for
-      window.dispatchEvent(new CustomEvent('switch-to-daily-view'));
+      // Dispatch time-logs-updated event first to ensure TimesheetView loads the updated logs
+      window.dispatchEvent(new CustomEvent('time-logs-updated'));
+      
+      // Force switch to the Timesheet tab
+      window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
+      
+      // Then dispatch the event that TimesheetView is listening for to switch to daily view
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('switch-to-daily-view'));
+      }, 100);
     }
     setShowDescriptionDialog(false);
     setDescription('');

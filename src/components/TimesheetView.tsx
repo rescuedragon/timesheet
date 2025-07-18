@@ -9,36 +9,48 @@ const TimesheetView: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'weekly' | 'daily'>('weekly');
   
+  // Function to load time logs from storage
+  const loadTimeLogs = () => {
+    // Clear cache to ensure we get fresh data
+    storageService.clearAllCache();
+    
+    // Get logs directly from localStorage to ensure we have the latest data
+    let logs;
+    try {
+      const saved = localStorage.getItem('timesheet-logs');
+      logs = saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error('Error loading time logs:', error);
+      logs = [];
+    }
+    
+    // If no logs exist, create a sample entry for today
+    if (!logs || logs.length === 0) {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const sampleEntry: TimeLog = {
+        id: `sample_${Date.now()}`,
+        projectId: 'project_123',
+        subprojectId: 'subproject_456',
+        projectName: 'Marketing Campaign',
+        subprojectName: 'Subproject 6',
+        startTime: '09:00',
+        endTime: '17:00',
+        duration: 28800, // 8 hours in seconds
+        description: 'Created sample marketing materials',
+        date: today
+      };
+      
+      logs = [sampleEntry];
+      storageService.saveTimeLogs(logs);
+    }
+    
+    console.log('TimesheetView - loaded time logs:', logs);
+    setTimeLogs(logs);
+  };
+  
   // Load initial time logs
   useEffect(() => {
-    const loadTimeLogs = () => {
-      // Get logs from storage
-      let logs = storageService.getTimeLogs();
-      
-      // If no logs exist, create a sample entry for today
-      if (!logs || logs.length === 0) {
-        const today = new Date().toISOString().split('T')[0];
-        
-        const sampleEntry: TimeLog = {
-          id: `sample_${Date.now()}`,
-          projectId: 'project_123',
-          subprojectId: 'subproject_456',
-          projectName: 'Marketing Campaign',
-          subprojectName: 'Subproject 6',
-          startTime: '09:00',
-          endTime: '17:00',
-          duration: 28800, // 8 hours in seconds
-          description: 'Created sample marketing materials',
-          date: today
-        };
-        
-        logs = [sampleEntry];
-        storageService.saveTimeLogs(logs);
-      }
-      
-      console.log('TimesheetView - loaded time logs:', logs);
-      setTimeLogs(logs);
-    };
     
     loadTimeLogs();
     
@@ -59,6 +71,11 @@ const TimesheetView: React.FC = () => {
     // Listen for switch to daily view event
     const handleSwitchToDailyView = () => {
       console.log('TimesheetView - switching to daily view');
+      // Clear the cache to force a fresh load of time logs
+      storageService.clearAllCache();
+      // Load the latest time logs
+      loadTimeLogs();
+      // Switch to daily view
       setViewMode('daily');
     };
     
