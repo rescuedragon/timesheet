@@ -46,16 +46,24 @@ const Index = React.memo(() => {
   const handleSwitchToDaily = useCallback(() => {
     setActiveTab('data');
   }, []);
+  
+  const handleSwitchToTimesheetTab = useCallback((event) => {
+    setActiveTab('data');
+    // Dispatch another event to notify TimesheetView to switch to daily view
+    window.dispatchEvent(new CustomEvent('switch-to-daily-view'));
+  }, []);
 
   useEffect(() => {
     window.addEventListener('switchToExcelView', handleSwitchToExcel);
     window.addEventListener('switchToDailyView', handleSwitchToDaily);
+    window.addEventListener('switchToTimesheetTab', handleSwitchToTimesheetTab);
     
     return () => {
       window.removeEventListener('switchToExcelView', handleSwitchToExcel);
       window.removeEventListener('switchToDailyView', handleSwitchToDaily);
+      window.removeEventListener('switchToTimesheetTab', handleSwitchToTimesheetTab);
     };
-  }, [handleSwitchToExcel, handleSwitchToDaily]);
+  }, [handleSwitchToExcel, handleSwitchToDaily, handleSwitchToTimesheetTab]);
 
   const handleClearStorage = useCallback(() => {
     localStorage.clear();

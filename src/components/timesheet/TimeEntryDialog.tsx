@@ -91,20 +91,24 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Format the date in yyyy-MM-dd format
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+    
     // Generate a complete TimeLog object
     const completeEntry: TimeLog = {
-      id: initialEntry?.id || '',
-      projectId: entry.projectId || '',
-      subprojectId: entry.subprojectId || '',
-      projectName: entry.projectName || '',
-      subprojectName: entry.subprojectName || '',
-      startTime: entry.startTime || '',
-      endTime: entry.endTime || '',
-      duration: entry.duration || 0,
+      id: initialEntry?.id || `log_${Date.now()}`,
+      projectId: entry.projectId || `project_${Date.now()}`,
+      subprojectId: entry.subprojectId || `subproject_${Date.now()}`,
+      projectName: entry.projectName || 'Default Project',
+      subprojectName: entry.subprojectName || 'Default Subproject',
+      startTime: entry.startTime || '09:00',
+      endTime: entry.endTime || '17:00',
+      duration: entry.duration || 28800, // Default to 8 hours (28800 seconds)
       description: entry.description || '',
-      date: entry.date || format(selectedDate, 'yyyy-MM-dd')
+      date: formattedDate
     };
     
+    console.log('Saving time entry:', completeEntry);
     onSave(completeEntry);
   };
   

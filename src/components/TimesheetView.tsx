@@ -7,11 +7,35 @@ import WeeklyCalendarView from './timesheet/WeeklyCalendarView';
 const TimesheetView: React.FC = () => {
   const [timeLogs, setTimeLogs] = useState<TimeLog[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [viewMode, setViewMode] = useState<'weekly' | 'daily'>('weekly');
   
   // Load initial time logs
   useEffect(() => {
     const loadTimeLogs = () => {
-      const logs = storageService.getTimeLogs();
+      // Get logs from storage
+      let logs = storageService.getTimeLogs();
+      
+      // If no logs exist, create a sample entry for today
+      if (!logs || logs.length === 0) {
+        const today = new Date().toISOString().split('T')[0];
+        
+        const sampleEntry: TimeLog = {
+          id: `sample_${Date.now()}`,
+          projectId: 'project_123',
+          subprojectId: 'subproject_456',
+          projectName: 'Marketing Campaign',
+          subprojectName: 'Subproject 6',
+          startTime: '09:00',
+          endTime: '17:00',
+          duration: 28800, // 8 hours in seconds
+          description: 'Created sample marketing materials',
+          date: today
+        };
+        
+        logs = [sampleEntry];
+        storageService.saveTimeLogs(logs);
+      }
+      
       console.log('TimesheetView - loaded time logs:', logs);
       setTimeLogs(logs);
     };
@@ -28,14 +52,24 @@ const TimesheetView: React.FC = () => {
     // Listen for custom events
     const handleTimeLogsUpdate = () => {
       loadTimeLogs();
+      // Switch to daily view when a time log is updated
+      setViewMode('daily');
+    };
+    
+    // Listen for switch to daily view event
+    const handleSwitchToDailyView = () => {
+      console.log('TimesheetView - switching to daily view');
+      setViewMode('daily');
     };
     
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('time-logs-updated', handleTimeLogsUpdate);
+    window.addEventListener('switch-to-daily-view', handleSwitchToDailyView);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('time-logs-updated', handleTimeLogsUpdate);
+      window.removeEventListener('switch-to-daily-view', handleSwitchToDailyView);
     };
   }, []);
 
@@ -50,11 +84,13 @@ const TimesheetView: React.FC = () => {
   
   // Handle adding a new time log
   const handleAddTimeLog = (newLog: TimeLog) => {
-    // Generate a unique ID for the new log
+    // Generate a unique ID for the new log if not already present
     const logWithId = {
       ...newLog,
-      id: `log_${Date.now()}`
+      id: newLog.id || `log_${Date.now()}`
     };
+    
+    console.log('Adding new time log:', logWithId);
     
     // Add to state and storage
     const updatedLogs = [...timeLogs, logWithId];
@@ -67,6 +103,8 @@ const TimesheetView: React.FC = () => {
   
   // Handle updating an existing time log
   const handleUpdateTimeLog = (updatedLog: TimeLog) => {
+    console.log('Updating time log:', updatedLog);
+    
     const updatedLogs = timeLogs.map(log => 
       log.id === updatedLog.id ? updatedLog : log
     );
@@ -80,6 +118,8 @@ const TimesheetView: React.FC = () => {
   
   // Handle deleting a time log
   const handleDeleteTimeLog = (logToDelete: TimeLog) => {
+    console.log('Deleting time log:', logToDelete);
+    
     const updatedLogs = timeLogs.filter(log => log.id !== logToDelete.id);
     
     setTimeLogs(updatedLogs);
@@ -108,6 +148,8 @@ const TimesheetView: React.FC = () => {
           onAddTimeLog={handleAddTimeLog}
           onUpdateTimeLog={handleUpdateTimeLog}
           onDeleteTimeLog={handleDeleteTimeLog}
+          initialViewMode={viewMode}
+          onViewModeChange={setViewMode}
         />
       </div>
     </div>

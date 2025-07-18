@@ -11,6 +11,8 @@ interface WeeklyCalendarViewProps {
   onAddTimeLog?: (log: TimeLog) => void;
   onUpdateTimeLog?: (log: TimeLog) => void;
   onDeleteTimeLog?: (log: TimeLog) => void;
+  initialViewMode?: 'weekly' | 'daily';
+  onViewModeChange?: (mode: 'weekly' | 'daily') => void;
 }
 
 const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
@@ -19,13 +21,20 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
   timeLogs = [],
   onAddTimeLog,
   onUpdateTimeLog,
-  onDeleteTimeLog
+  onDeleteTimeLog,
+  initialViewMode = 'weekly',
+  onViewModeChange
 }) => {
   const [currentDate, setCurrentDate] = useState<Date>(selectedDate);
   const [weekDays, setWeekDays] = useState<Date[]>([]);
-  const [viewMode, setViewMode] = useState<'weekly' | 'daily'>('weekly');
+  const [viewMode, setViewMode] = useState<'weekly' | 'daily'>(initialViewMode);
   const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
   const [currentEntry, setCurrentEntry] = useState<TimeLog | undefined>(undefined);
+  
+  // Update viewMode when initialViewMode changes
+  useEffect(() => {
+    setViewMode(initialViewMode);
+  }, [initialViewMode]);
   
   // Calculate week days whenever the current date changes
   useEffect(() => {
@@ -56,8 +65,13 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
   
   // Calculate hours for a specific day
   const getHoursForDay = (date: Date) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    
     const dayTotal = timeLogs
-      .filter(log => isSameDay(new Date(log.date), date))
+      .filter(log => {
+        // Compare the formatted date strings directly
+        return log.date === formattedDate;
+      })
       .reduce((total, log) => total + log.duration, 0);
     
     return (dayTotal / 3600).toFixed(1);
@@ -112,7 +126,28 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
         onAddTimeLog(entry);
       }
     }
+    
+    // Close the dialog
     setIsEntryDialogOpen(false);
+    
+    // Switch to daily view to show the entry
+    setViewMode('daily');
+    if (onViewModeChange) {
+      onViewModeChange('daily');
+    }
+    
+    // Make sure the current date matches the entry date
+    if (entry.date) {
+      try {
+        const entryDate = new Date(entry.date);
+        setCurrentDate(entryDate);
+        if (onDateChange) {
+          onDateChange(entryDate);
+        }
+      } catch (error) {
+        console.error('Error parsing entry date:', error);
+      }
+    }
   };
   
   return (
@@ -122,7 +157,10 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
         <div className="w-full flex justify-center">
           <div className="inline-flex rounded-xl bg-[#F2F2F7] dark:bg-[#1C1C1E] p-1 shadow-inner">
             <button 
-              onClick={() => setViewMode('weekly')}
+              onClick={() => {
+                setViewMode('weekly');
+                if (onViewModeChange) onViewModeChange('weekly');
+              }}
               className={`py-2 px-6 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${
                 viewMode === 'weekly' ? '' : 'bg-transparent'
               }`}
@@ -142,7 +180,10 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
               </span>
             </button>
             <button 
-              onClick={() => setViewMode('daily')}
+              onClick={() => {
+                setViewMode('daily');
+                if (onViewModeChange) onViewModeChange('daily');
+              }}
               className={`py-2 px-6 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${
                 viewMode === 'daily' ? '' : 'bg-transparent'
               }`}

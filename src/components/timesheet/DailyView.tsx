@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { format, isSameDay, parseISO } from 'date-fns';
 import { TimeLog } from '@/types';
 
@@ -18,9 +18,8 @@ const DailyView: React.FC<DailyViewProps> = ({
   onDeleteEntry
 }) => {
   // Filter logs for the selected date
-  const dailyLogs = timeLogs.filter(log => 
-    isSameDay(parseISO(log.date), selectedDate)
-  );
+  const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
+  const dailyLogs = timeLogs.filter(log => log.date === selectedDateStr);
   
   // Calculate total hours for the day
   const totalHours = dailyLogs.reduce((total, log) => total + log.duration, 0) / 3600;
