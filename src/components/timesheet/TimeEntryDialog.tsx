@@ -18,10 +18,12 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
   selectedDate
 }) => {
   const [entry, setEntry] = useState<Partial<TimeLog>>({
-    project: '',
-    subproject: '',
-    startTime: 0,
-    endTime: 0,
+    projectId: '',
+    subprojectId: '',
+    projectName: '',
+    subprojectName: '',
+    startTime: '',
+    endTime: '',
     duration: 0,
     description: '',
     date: format(selectedDate, 'yyyy-MM-dd')
@@ -35,10 +37,12 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
       });
     } else {
       setEntry({
-        project: '',
-        subproject: '',
-        startTime: 0,
-        endTime: 0,
+        projectId: '',
+        subprojectId: '',
+        projectName: '',
+        subprojectName: '',
+        startTime: '',
+        endTime: '',
         duration: 0,
         description: '',
         date: format(selectedDate, 'yyyy-MM-dd')
@@ -55,35 +59,53 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
   // Handle time input changes
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const [hours, minutes] = value.split(':').map(Number);
-    const timeInSeconds = (hours * 3600) + (minutes * 60);
     
     setEntry(prev => {
-      const newEntry = { ...prev, [name]: timeInSeconds };
+      const newEntry = { ...prev, [name]: value };
       
       // Calculate duration if both start and end times are set
-      if (name === 'startTime' && prev.endTime) {
-        newEntry.duration = prev.endTime - timeInSeconds;
-      } else if (name === 'endTime' && prev.startTime) {
-        newEntry.duration = timeInSeconds - prev.startTime;
+      if ((name === 'startTime' && prev.endTime) || (name === 'endTime' && prev.startTime)) {
+        const startParts = (name === 'startTime' ? value : prev.startTime).split(':').map(Number);
+        const endParts = (name === 'endTime' ? value : prev.endTime).split(':').map(Number);
+        
+        const startSeconds = (startParts[0] * 3600) + (startParts[1] * 60);
+        const endSeconds = (endParts[0] * 3600) + (endParts[1] * 60);
+        
+        if (endSeconds >= startSeconds) {
+          newEntry.duration = endSeconds - startSeconds;
+        }
       }
       
       return newEntry;
     });
   };
   
-  // Format seconds to HH:MM for input display
-  const formatTimeForInput = (seconds: number): string => {
-    if (!seconds) return '';
+  // Format duration in seconds to hours and minutes
+  const formatDuration = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return `${hours}h${minutes.toString().padStart(2, '0')}m`;
   };
   
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(entry as TimeLog);
+    
+    // Generate a complete TimeLog object
+    const completeEntry: TimeLog = {
+      id: initialEntry?.id || '',
+      projectId: entry.projectId || '',
+      subprojectId: entry.subprojectId || '',
+      projectName: entry.projectName || '',
+      subprojectName: entry.subprojectName || '',
+      startTime: entry.startTime || '',
+      endTime: entry.endTime || '',
+      duration: entry.duration || 0,
+      description: entry.description || '',
+      date: entry.date || format(selectedDate, 'yyyy-MM-dd')
+    };
+    
+    onSave(completeEntry);
   };
   
   if (!isOpen) return null;
@@ -104,7 +126,7 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
             <div className="w-32 h-32 rounded-full border-4 border-[#E5E5EA] dark:border-[#38383A] flex items-center justify-center">
               <div className="text-center">
                 <div className="text-3xl font-bold text-[#000000] dark:text-white">
-                  {Math.floor(entry.duration / 3600)}h{Math.floor((entry.duration % 3600) / 60)}m
+                  {formatDuration(entry.duration || 0)}
                 </div>
                 <div className="text-sm text-[#8E8E93] dark:text-[#8E8E93]">click to edit</div>
               </div>
@@ -125,7 +147,7 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
                   <input
                     type="time"
                     name="startTime"
-                    value={formatTimeForInput(entry.startTime || 0)}
+                    value={entry.startTime || ''}
                     onChange={handleTimeChange}
                     className="bg-transparent text-xl font-bold text-[#000000] dark:text-white focus:outline-none"
                   />
@@ -145,7 +167,7 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
                   <input
                     type="time"
                     name="endTime"
-                    value={formatTimeForInput(entry.endTime || 0)}
+                    value={entry.endTime || ''}
                     onChange={handleTimeChange}
                     className="bg-transparent text-xl font-bold text-[#000000] dark:text-white focus:outline-none"
                   />
@@ -170,24 +192,26 @@ const TimeEntryDialog: React.FC<TimeEntryDialogProps> = ({
                 <div className="text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">PROJECT</div>
                 <input
                   type="text"
-                  name="project"
-                  value={entry.project || ''}
+                  name="projectName"
+                  value={entry.projectName || ''}
                   onChange={handleChange}
                   placeholder="Marketing Campaign"
                   className="w-full bg-transparent text-xl font-bold text-[#000000] dark:text-white focus:outline-none"
                 />
+                <input type="hidden" name="projectId" value={entry.projectId || ''} />
               </div>
             </div>
             <div className="ml-12 mt-2">
               <div className="text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">SUBPROJECT</div>
               <input
                 type="text"
-                name="subproject"
-                value={entry.subproject || ''}
+                name="subprojectName"
+                value={entry.subprojectName || ''}
                 onChange={handleChange}
                 placeholder="Subproject 6"
                 className="w-full bg-transparent text-lg text-[#000000] dark:text-white focus:outline-none"
               />
+              <input type="hidden" name="subprojectId" value={entry.subprojectId || ''} />
             </div>
           </div>
           

@@ -36,13 +36,6 @@ const DailyView: React.FC<DailyViewProps> = ({
     groupedLogs[dateKey].push(log);
   });
   
-  // Format time (seconds to HH:MM)
-  const formatTime = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  };
-  
   return (
     <div className="w-full">
       {/* Header with date and add entry button */}
@@ -82,10 +75,10 @@ const DailyView: React.FC<DailyViewProps> = ({
               key={index} 
               className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F2F2F7] dark:hover:bg-[#2C2C2E] transition-colors"
             >
-              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.project || '-'}</div>
-              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.subproject || '-'}</div>
-              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.startTime ? formatTime(log.startTime) : '-'}</div>
-              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.endTime ? formatTime(log.endTime) : '-'}</div>
+              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.projectName || '-'}</div>
+              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.subprojectName || '-'}</div>
+              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.startTime || '-'}</div>
+              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.endTime || '-'}</div>
               <div className="col-span-2 text-sm font-medium text-[#000000] dark:text-white">
                 {(log.duration / 3600).toFixed(1)}
               </div>
