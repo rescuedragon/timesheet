@@ -1,9 +1,4 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Clock, Calendar, FolderOpen, FileText, X } from 'lucide-react';
 import { TimeLog } from '@/types';
 
@@ -67,167 +62,170 @@ const TimeLogEditDialog: React.FC<TimeLogEditDialogProps> = ({
       const diff = end.getTime() - start.getTime();
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return `${hours}h ${minutes}m`;
+      return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
     }
-    return '0h 0m';
+    return '0';
   };
 
-  if (!timeLog) return null;
+  if (!timeLog || !open) return null;
+
+  console.log('CUSTOM DIALOG RENDERING - NEW VERSION');
 
   return (
-    <Dialog open={open} onOpenChange={handleCancel}>
-      <DialogContent className="max-w-[480px] rounded-3xl bg-white/95 backdrop-blur-xl border-0 shadow-[0_32px_64px_rgba(0,0,0,0.12)] p-0 overflow-hidden animate-scale-in">
-        {/* Header with close button */}
-        <div className="relative px-8 pt-8 pb-4">
-          <button
-            onClick={handleCancel}
-            className="absolute right-6 top-6 w-8 h-8 rounded-full bg-gray-100/80 hover:bg-gray-200/80 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-          >
-            <X className="w-4 h-4 text-gray-600" />
-          </button>
-          
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-              <Clock className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <DialogTitle className="text-2xl font-semibold text-gray-900 tracking-tight">
-                Time Entry
-              </DialogTitle>
-              <p className="text-sm text-gray-500 mt-1">Edit your time log details</p>
-            </div>
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-red-500/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        onClick={handleCancel}
+      >
+        {/* Dialog */}
+        <div 
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100 border-4 border-red-500"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            <h2 className="text-xl font-semibold text-red-600">🔥 CUSTOM TIME ENTRY 🔥</h2>
+            <button
+              onClick={handleCancel}
+              className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            >
+              <X className="w-4 h-4 text-gray-600" />
+            </button>
           </div>
-        </div>
 
-        {/* Duration Display */}
-        <div className="px-8 mb-6">
-          <div className="bg-gray-50/80 rounded-2xl p-6 border border-gray-100">
-            <div className="text-center">
-              <div className="text-4xl font-light text-gray-900 mb-2 font-mono tracking-tight">
+          {/* Content */}
+          <div className="p-4 space-y-4">
+            {/* Duration Display */}
+            <div className="text-center bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                <Clock className="w-7 h-7 text-white" />
+              </div>
+              <div className="text-3xl font-light text-gray-900 font-mono mb-1">
                 {calculateDuration()}
               </div>
-              <p className="text-sm text-gray-500">Click to edit • Press Enter to save</p>
+              <p className="text-xs text-gray-500">Click to edit duration</p>
             </div>
-          </div>
-        </div>
 
-        {/* Form Content */}
-        <div className="px-8 space-y-6">
-          {/* Project Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-purple-600 mb-3">
-              <FolderOpen className="w-4 h-4" />
-              <span className="text-sm font-medium uppercase tracking-wide">Project</span>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <Input
+            {/* Project Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <FolderOpen className="w-4 h-4 text-purple-600" />
+                </div>
+                <span className="text-sm font-semibold text-purple-600 uppercase tracking-wide">Project</span>
+              </div>
+              
+              <div className="space-y-3">
+                <input
+                  type="text"
                   value={formData.projectName || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, projectName: e.target.value }))}
                   placeholder="Mobile App Launch"
-                  className="h-12 border-0 bg-gray-50/80 rounded-xl text-gray-900 placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg transition-all duration-300 text-lg font-medium"
+                  className="w-full h-12 px-4 bg-gray-50 border-0 rounded-xl text-gray-900 placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200 text-base font-medium"
                 />
-              </div>
-              
-              <div>
-                <Input
+                
+                <input
+                  type="text"
                   value={formData.subprojectName || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, subprojectName: e.target.value }))}
                   placeholder="Subproject 3"
-                  className="h-12 border-0 bg-gray-50/80 rounded-xl text-gray-700 placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:shadow-lg transition-all duration-300"
+                  className="w-full h-12 px-4 bg-gray-50 border-0 rounded-xl text-gray-700 placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200 text-base"
                 />
               </div>
             </div>
-          </div>
 
-          {/* Date & Time Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-purple-600 mb-3">
-              <Calendar className="w-4 h-4" />
-              <span className="text-sm font-medium uppercase tracking-wide">Date & Time</span>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 block">
-                  Start Time
-                </Label>
-                <Input
-                  type="time"
-                  value={formData.startTime || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                  className="h-12 border-0 bg-gray-50/80 rounded-xl text-gray-900 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg transition-all duration-300 text-lg font-mono"
-                />
+            {/* Date & Time Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-purple-600" />
+                </div>
+                <span className="text-sm font-semibold text-purple-600 uppercase tracking-wide">Date & Time</span>
               </div>
               
-              <div>
-                <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 block">
-                  End Time
-                </Label>
-                <Input
-                  type="time"
-                  value={formData.endTime || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-                  className="h-12 border-0 bg-gray-50/80 rounded-xl text-gray-900 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg transition-all duration-300 text-lg font-mono"
-                />
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                    Start Time
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.startTime || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                    className="w-full h-12 px-4 bg-gray-50 border-0 rounded-xl text-gray-900 focus:bg-white focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200 text-base font-mono"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                    End Time
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.endTime || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+                    className="w-full h-12 px-4 bg-gray-50 border-0 rounded-xl text-gray-900 focus:bg-white focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200 text-base font-mono"
+                  />
+                </div>
+              </div>
+              
+              <div className="text-center py-2">
+                <span className="text-sm text-gray-600 font-medium">
+                  {timeLog.date && formatDate(timeLog.date)}
+                </span>
               </div>
             </div>
-            
-            <div className="text-center py-2">
-              <span className="text-sm text-gray-500">
-                {timeLog.date && formatDate(timeLog.date)}
-              </span>
-            </div>
-          </div>
 
-          {/* Description Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-purple-600 mb-3">
-              <FileText className="w-4 h-4" />
-              <span className="text-sm font-medium uppercase tracking-wide">Description (Optional)</span>
-            </div>
-            
-            <Textarea
-              value={formData.description || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="What did you work on? Add any notes or details about this time entry..."
-              rows={4}
-              className="border-0 bg-gray-50/80 rounded-xl text-gray-900 placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg transition-all duration-300 resize-none"
-            />
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="px-8 py-8 bg-gray-50/50 mt-8">
-          <div className="flex gap-3">
-            <Button
-              onClick={handleCancel}
-              variant="outline"
-              className="flex-1 h-12 rounded-xl border-0 bg-white/80 text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200 font-medium"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={isAnimating}
-              className={`flex-1 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 font-medium ${
-                isAnimating ? 'scale-95 opacity-80' : 'hover:scale-[1.02] active:scale-[0.98]'
-              }`}
-            >
-              {isAnimating ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Saving...
+            {/* Description Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-purple-600" />
                 </div>
-              ) : (
-                'Save Entry'
-              )}
-            </Button>
+                <span className="text-sm font-semibold text-purple-600 uppercase tracking-wide">Description (Optional)</span>
+              </div>
+              
+              <textarea
+                value={formData.description || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="What did you work on? Add any notes or details about this time entry..."
+                rows={3}
+                className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-gray-900 placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200 resize-none text-sm leading-relaxed"
+              />
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 bg-gray-50/50 border-t border-gray-100 rounded-b-2xl">
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancel}
+                className="flex-1 h-12 rounded-xl bg-white text-gray-700 hover:bg-gray-50 hover:shadow-sm transition-all duration-200 font-semibold text-base border border-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isAnimating}
+                className={`flex-1 h-12 rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:from-purple-700 hover:to-purple-600 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold text-base ${
+                  isAnimating ? 'opacity-80 scale-95' : 'hover:scale-[1.02] active:scale-[0.98]'
+                }`}
+              >
+                {isAnimating ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </div>
+                ) : (
+                  'Save Entry'
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </>
   );
 };
 
