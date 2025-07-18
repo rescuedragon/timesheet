@@ -33,11 +33,12 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
   const [description, setDescription] = React.useState('');
   const [pendingLogData, setPendingLogData] = React.useState<{duration: number, startTime: Date, endTime: Date} | null>(null);
   const [currentDuration, setCurrentDuration] = React.useState(0);
+  const [currentStartTime, setCurrentStartTime] = React.useState<Date | undefined>(undefined);
 
   const handleConfirmLog = () => {
     if (pendingLogData && selectedProject && selectedSubproject) {
-      // Calculate new start time based on edited duration
-      const newStartTime = new Date(pendingLogData.endTime.getTime() - (currentDuration * 1000));
+      // Use the current start time (which may have been updated by duration changes)
+      const startTimeToUse = currentStartTime || pendingLogData.startTime;
       
       const newLog = {
         id: Date.now().toString(),
@@ -48,7 +49,7 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
         duration: currentDuration,
         description,
         date: new Date().toISOString().split('T')[0],
-        startTime: newStartTime.toLocaleTimeString(),
+        startTime: startTimeToUse.toLocaleTimeString(),
         endTime: pendingLogData.endTime.toLocaleTimeString()
       };
       console.log('StopwatchContainer - created new log:', newLog);
@@ -58,6 +59,7 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
     setDescription('');
     setPendingLogData(null);
     setCurrentDuration(0);
+    setCurrentStartTime(undefined);
   };
 
   const handleCancelLog = () => {
@@ -65,8 +67,13 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
     setDescription('');
     setPendingLogData(null);
     setCurrentDuration(0);
+    setCurrentStartTime(undefined);
     // Clear project selection when user cancels the dialog
     if (onTimerStopped) onTimerStopped();
+  };
+
+  const handleStartTimeChange = (newStartTime: Date) => {
+    setCurrentStartTime(newStartTime);
   };
 
   return (
@@ -154,9 +161,10 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
                 onDescriptionChange={setDescription}
                 onConfirm={handleConfirmLog}
                 onCancel={handleCancelLog}
-                startTime={pendingLogData?.startTime}
+                startTime={currentStartTime || pendingLogData?.startTime}
                 endTime={pendingLogData?.endTime}
                 onDurationChange={setCurrentDuration}
+                onStartTimeChange={handleStartTimeChange}
               />
             </>
           );
