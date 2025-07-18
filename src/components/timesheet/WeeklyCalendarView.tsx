@@ -151,7 +151,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
   };
   
   return (
-    <div className="w-full">
+    <div className="w-full h-full flex flex-col">
       {/* View Toggle - Apple Style Segmented Control */}
       <div className="flex mb-6">
         <div className="w-full flex justify-center">
@@ -210,18 +210,18 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
       {viewMode === 'weekly' ? (
         <>
           {/* Week Header - Apple Style Card */}
-          <div className="flex items-center justify-between mb-6 bg-[#1C1C1E] dark:bg-[#1C1C1E] text-white rounded-xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-6 bg-gradient-to-br from-[#0A84FF] to-[#0066CC] text-white rounded-xl p-5 shadow-sm">
             <div>
               <h2 className="text-lg font-semibold">
                 {format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'MMM d, yyyy')} - 
                 {format(endOfWeek(currentDate, { weekStartsOn: 1 }), ' MMM d, yyyy')}
               </h2>
-              <p className="text-sm text-[#A0A0A8]">{getWeekTotal()} hours this week</p>
+              <p className="text-sm text-white/80">{getWeekTotal()} hours this week</p>
             </div>
             <div className="flex gap-2">
               <button 
                 onClick={goToPreviousWeek}
-                className="p-2 rounded-lg bg-[#2C2C2E] hover:bg-[#3A3A3C] transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
                 aria-label="Previous week"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -230,13 +230,13 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
               </button>
               <button 
                 onClick={goToCurrentWeek}
-                className="px-4 py-2 rounded-lg bg-[#0A84FF] hover:bg-[#007AFF] transition-colors text-sm font-medium"
+                className="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors text-sm font-medium"
               >
                 This Week
               </button>
               <button 
                 onClick={goToNextWeek}
-                className="p-2 rounded-lg bg-[#2C2C2E] hover:bg-[#3A3A3C] transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
                 aria-label="Next week"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -247,7 +247,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
           </div>
           
           {/* Days Grid - Apple Style Cards */}
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid grid-cols-5 gap-4 flex-1">
             {weekDays.map((day, index) => {
               const dayHours = getHoursForDay(day);
               const isToday = isSameDay(day, new Date());
@@ -256,14 +256,17 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
               return (
                 <div 
                   key={index}
-                  className={`flex flex-col items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer ${
+                  className={`flex flex-col items-center p-4 rounded-xl transition-all duration-200 cursor-pointer ${
                     isToday 
-                      ? 'bg-[#F2F2F7] dark:bg-[#2C2C2E] border-[#E5E5EA] dark:border-[#38383A]' 
-                      : 'bg-white dark:bg-[#1C1C1E] border-[#E5E5EA] dark:border-[#2C2C2E]'
+                      ? 'bg-[#F2F2F7] dark:bg-[#2C2C2E]' 
+                      : 'bg-white dark:bg-[#1C1C1E]'
                   } hover:shadow-md`}
                   onClick={() => handleDaySelect(day)}
                   style={{
-                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)'
+                    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
+                    border: isToday 
+                      ? '1px solid rgba(10, 132, 255, 0.3)' // Apple blue border for today
+                      : '1px solid rgba(209, 209, 214, 0.5)' // Subtle border for other days
                   }}
                 >
                   <span className="text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">
@@ -278,11 +281,11 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
                   <div 
                     className={`mt-4 w-full py-2 px-4 rounded-lg text-center font-medium ${
                       hasHours
-                        ? 'bg-[#1C1C1E] dark:bg-[#2C2C2E] text-white' 
+                        ? 'bg-[#0A84FF] text-white' // Apple blue for hours
                         : 'bg-[#F2F2F7] dark:bg-[#2C2C2E] text-[#8E8E93] dark:text-[#8E8E93]'
                     }`}
                     style={{
-                      boxShadow: hasHours ? '0px 1px 2px rgba(0, 0, 0, 0.1)' : 'none'
+                      boxShadow: hasHours ? '0px 1px 3px rgba(10, 132, 255, 0.2)' : 'none'
                     }}
                   >
                     {dayHours} hours

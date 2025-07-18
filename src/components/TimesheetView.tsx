@@ -130,27 +130,31 @@ const TimesheetView: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 p-4">
+    <div className="w-full h-full flex flex-col">
       {/* Progress Bar */}
-      <ProgressBar
-        currentHours={currentDayTotal}
-        targetHours={8}
-        color="#006994"
-        enabled={true}
-      />
+      <div className="w-full max-w-7xl mx-auto px-4 pt-4">
+        <ProgressBar
+          currentHours={currentDayTotal}
+          targetHours={8}
+          color="#0A84FF" // Apple blue color
+          enabled={true}
+        />
+      </div>
       
       {/* Apple-style Weekly/Daily Calendar View */}
-      <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] shadow-sm p-6">
-        <WeeklyCalendarView 
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          timeLogs={timeLogs}
-          onAddTimeLog={handleAddTimeLog}
-          onUpdateTimeLog={handleUpdateTimeLog}
-          onDeleteTimeLog={handleDeleteTimeLog}
-          initialViewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
+      <div className="flex-1 w-full max-w-7xl mx-auto px-4 pb-4 mt-6 overflow-hidden">
+        <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] shadow-sm p-6 h-full">
+          <WeeklyCalendarView 
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+            timeLogs={timeLogs}
+            onAddTimeLog={handleAddTimeLog}
+            onUpdateTimeLog={handleUpdateTimeLog}
+            onDeleteTimeLog={handleDeleteTimeLog}
+            initialViewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        </div>
       </div>
     </div>
   );
