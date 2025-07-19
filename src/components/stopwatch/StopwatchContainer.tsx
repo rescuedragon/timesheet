@@ -65,10 +65,9 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
       // Dispatch time-logs-updated event first to ensure TimesheetView loads the updated logs
       window.dispatchEvent(new CustomEvent('time-logs-updated'));
       
-      // Force switch to the Timesheet tab
+      // Force switch to the Timesheet tab and daily view
       window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
-      
-      // Removed automatic switch to daily view
+      window.dispatchEvent(new CustomEvent('switchToDailyView'));
     }
     setShowDescriptionDialog(false);
     setDescription('');

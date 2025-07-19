@@ -89,6 +89,33 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
         stoppingProject.projectId,
         stoppingProject.subprojectId
       );
+      
+      // Create a new log entry directly to ensure it appears in Daily view
+      const newLog = {
+        id: Date.now().toString(),
+        projectId: stoppingProject.projectId,
+        subprojectId: stoppingProject.subprojectId,
+        projectName: stoppingProject.projectName,
+        subprojectName: stoppingProject.subprojectName,
+        duration: stoppingProject.elapsedTime,
+        description,
+        date: new Date().toISOString().split('T')[0],
+        startTime: stoppingProject.startTime.toLocaleTimeString(),
+        endTime: endTime.toLocaleTimeString()
+      };
+      
+      // Save directly to storage to ensure it's available to other components
+      const existingLogs = JSON.parse(localStorage.getItem('timesheet-logs') || '[]');
+      const updatedLogs = [newLog, ...existingLogs];
+      localStorage.setItem('timesheet-logs', JSON.stringify(updatedLogs));
+      
+      // Dispatch time-logs-updated event to ensure TimesheetView loads the updated logs
+      window.dispatchEvent(new CustomEvent('time-logs-updated'));
+      
+      // Force switch to the Timesheet tab and daily view
+      window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
+      window.dispatchEvent(new CustomEvent('switchToDailyView'));
+      
       onStopProject(stoppingProject.id);
     } else {
       if (stoppingProject) {

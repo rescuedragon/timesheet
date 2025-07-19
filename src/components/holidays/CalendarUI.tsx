@@ -75,7 +75,7 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
 
     // Add empty cells for days before the first day of month
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="w-12 h-12"></div>);
+      days.push(<div key={`empty-${i}`} className="h-12"></div>);
     }
 
     // Generate calendar days
@@ -88,25 +88,36 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
       const isSelected = selectedDate && selectedDate.toDateString() === date.toDateString();
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
-      // Build className based on date type
-      let className = "w-12 h-12 flex items-center justify-center rounded-lg font-semibold cursor-pointer transition-all duration-200 text-xl relative hover:scale-105";
-      if (isWeekend) className += " bg-gray-100 text-gray-500 hover:bg-gray-200";
-      else className += " hover:bg-gray-100 text-gray-700";
-      if (isToday) className += " bg-blue-500 text-white hover:bg-blue-600";
-      else if (isSelected) className += " bg-gray-700 text-white";
-      else if (isHoliday) className += " bg-red-500 text-white hover:bg-red-600";
-      else if (isLeave) className += " bg-green-500 text-white hover:bg-green-600";
+      // Build className based on date type with Apple-like styling
+      let className = "group h-12 flex items-center justify-center rounded-2xl font-semibold cursor-pointer transition-all duration-300 text-base relative hover:scale-110 active:scale-95 select-none";
 
-      const dotColor = isToday || isSelected || isHoliday || isLeave ? 'white' : 'black';
+      if (isToday) {
+        className += " bg-blue-500 text-white shadow-xl shadow-blue-500/40 hover:bg-blue-600 hover:shadow-2xl hover:shadow-blue-500/50 ring-2 ring-blue-300/50";
+      } else if (isSelected) {
+        className += " bg-white text-gray-900 shadow-xl shadow-white/20 hover:bg-gray-100 ring-2 ring-white/30";
+      } else if (isHoliday) {
+        className += " bg-red-500 text-white shadow-xl shadow-red-500/40 hover:bg-red-600 hover:shadow-2xl hover:shadow-red-500/50 ring-2 ring-red-300/50";
+      } else if (isLeave) {
+        className += " bg-green-500 text-white shadow-xl shadow-green-500/40 hover:bg-green-600 hover:shadow-2xl hover:shadow-green-500/50 ring-2 ring-green-300/50";
+      } else if (isWeekend) {
+        className += " bg-gray-800/60 text-gray-400 hover:bg-gray-700/60 hover:text-gray-300 border border-gray-700/60 hover:border-gray-600/80 hover:shadow-lg";
+      } else {
+        className += " bg-gray-800/40 text-white hover:bg-gray-700/60 hover:text-white border border-gray-700/40 hover:border-gray-600/60 hover:shadow-xl shadow-sm";
+      }
+
+      const dotColor = isToday || isHoliday || isLeave ? 'white' : isSelected ? 'red' : 'red';
 
       days.push(
         <div key={day} onClick={() => handleDateClick(day)} className={className}>
           {hasEntries && (
             <div
-              className={`w-2 h-2 rounded-full ${dotColor === 'white' ? 'bg-white' : 'bg-red-500'} absolute top-1 right-1 animate-pulse`}
+              className={`w-2 h-2 rounded-full ${dotColor === 'white' ? 'bg-white shadow-lg' : 'bg-red-500 shadow-lg shadow-red-500/60'
+                } absolute top-1 right-1 animate-pulse group-hover:scale-125 transition-all duration-300`}
             ></div>
           )}
-          {day}
+          <span className="group-hover:scale-110 transition-all duration-300 font-semibold">
+            {day}
+          </span>
         </div>
       );
     }
@@ -116,49 +127,55 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
 
   return (
     <div className="w-full">
-      <div className="bg-white/10 rounded-xl shadow-2xl border border-black/5 overflow-hidden backdrop-blur-md">
+      <div className="bg-gray-900 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-800/60 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:border-gray-700/80">
         {/* Calendar Header */}
-        <div className="p-6 shadow-inner" style={{ backgroundColor: containerBgColor, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.1)' }}>
-          <div className="flex items-center justify-between">
+        <div className="px-6 py-5 relative overflow-hidden bg-gray-800/50">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+          <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Calendar size={20} />
-              <span className="text-lg font-bold" style={{ color: containerTextColor }}>Calendar</span>
+              <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-md shadow-lg">
+                <Calendar size={20} className="drop-shadow-sm text-white" />
+              </div>
+              <span className="text-lg font-semibold tracking-tight text-white drop-shadow-sm">
+                Calendar
+              </span>
             </div>
             <div className="flex items-center gap-6">
               <button
                 onClick={prevMonth}
-                className="w-9 h-9 rounded-lg bg-white bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all font-bold text-lg hover:scale-110"
-                style={{ color: containerTextColor }}
+                className="group w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/20 transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl text-white"
               >
-                ‹
+                <span className="text-lg font-semibold group-hover:-translate-x-0.5 transition-transform duration-300">‹</span>
               </button>
-              <div className="text-xl font-bold min-w-48 text-center" style={{ color: containerTextColor }}>
+              <div className="text-xl font-semibold min-w-48 text-center tracking-tight text-white drop-shadow-sm">
                 {months[month.getMonth()]} {month.getFullYear()}
               </div>
               <button
                 onClick={nextMonth}
-                className="w-9 h-9 rounded-lg bg-white bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all font-bold text-lg hover:scale-110"
-                style={{ color: containerTextColor }}
+                className="group w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/20 transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl text-white"
               >
-                ›
+                <span className="text-lg font-semibold group-hover:translate-x-0.5 transition-transform duration-300">›</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Calendar Body */}
-        <div className="p-6">
-          {/* Day headers (Mon, Tue, etc.) */}
-          <div className="grid grid-cols-7 gap-2 mb-4">
+        <div className="px-6 py-5 bg-gray-900">
+          {/* Single unified grid for headers and days */}
+          <div className="grid grid-cols-7 gap-2">
+            {/* Day headers (Mon, Tue, etc.) */}
             {daysOfWeek.map((day, index) => (
-              <div key={day} className={`w-12 text-center font-bold py-2 text-lg ${index >= 5 ? 'text-gray-400' : 'text-gray-600'}`}>
+              <div
+                key={day}
+                className={`h-8 flex items-center justify-center text-center font-semibold text-xs tracking-wider uppercase mb-2 ${index >= 5 ? 'text-gray-500' : 'text-gray-400'
+                  }`}
+              >
                 {day}
               </div>
             ))}
-          </div>
 
-          {/* Calendar days grid */}
-          <div className="grid grid-cols-7 gap-2">
+            {/* Calendar days */}
             {renderCalendarDays()}
           </div>
         </div>

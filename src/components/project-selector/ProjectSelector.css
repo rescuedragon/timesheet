@@ -31,9 +31,8 @@
     border-radius: 16px;
     box-shadow: var(--shadow-secondary-ps);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding-right: 8px;
     width: 100%;
-    min-height: 60px;
+    height: 44px; /* Fixed height to match tabs */
 }
 
 .search-input-wrapper-ps:focus-within {
@@ -98,7 +97,7 @@
 
 .search-input-ps {
     width: 100%;
-    padding: 20px 24px 20px 56px; /* Increased left padding to accommodate icon */
+    padding: 0 24px 0 56px; /* Remove vertical padding, let height control it */
     border: 2px solid transparent;
     border-radius: 16px;
     background: transparent; /* Make input background transparent */
@@ -111,6 +110,9 @@
     box-shadow: none; /* Remove original shadow */
     letter-spacing: -0.011em;
     will-change: transform, box-shadow;
+    height: 100%; /* Take full height of wrapper */
+    display: flex;
+    align-items: center;
 }
 
 .search-input-ps:focus {
@@ -142,7 +144,7 @@
     pointer-events: none;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    height: calc(100vh - 40px);
+    max-height: calc(100vh - 200px);
     width: 100%;
 }
 
@@ -297,7 +299,7 @@
     transform-origin: left center;
     will-change: transform, opacity;
     overflow: hidden;
-    height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
 }
 
 /* Performance optimizations */
@@ -313,7 +315,7 @@
 
 /* Scrollable dropdown container */
 .dropdown-ps-scroll {
-    height: 100%;
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -339,10 +341,10 @@
 .dropdown-ps-item.selected {
     background: rgba(0, 122, 255, 0.1);
     font-weight: 500;
-    border-left: 3px solid var(--accent-blue-ps);
+    border-left: 3px solid rgba(139, 92, 246, 0.8);
     border-radius: 12px;
-    margin: 0px 4px;
-    padding: 18px 24px;
+    margin: 0px 2px;
+    padding: 20px 28px;
 }
 
 

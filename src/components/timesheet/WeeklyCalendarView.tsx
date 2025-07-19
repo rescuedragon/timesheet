@@ -153,8 +153,8 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
   return (
     <div className="w-full h-full flex flex-col">
       {/* View Toggle - Apple Style Segmented Control */}
-      <div className="flex mb-6">
-        <div className="w-full flex justify-center">
+      <div className="flex mb-4">
+        <div className="flex justify-start">
           <div className="inline-flex bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-2xl shadow-sm p-1.5 relative" 
                style={{ 
                  boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
@@ -238,7 +238,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
       {viewMode === 'weekly' ? (
         <>
           {/* Week Header - Apple Style Card */}
-          <div className="flex items-center justify-between mb-6 text-white rounded-2xl p-6 relative overflow-hidden group" 
+          <div className="flex items-center justify-between mb-4 text-white rounded-2xl p-4 relative overflow-hidden group" 
                style={{ 
                  background: 'linear-gradient(135deg, #0A84FF 0%, #0056CC 100%)',
                  boxShadow: '0 8px 32px rgba(10, 132, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1)',
@@ -254,12 +254,24 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
               }}
             />
             
+            {/* Matte Black Container for Date and Hours */}
             <div className="relative z-10">
-              <h2 className="text-lg font-semibold tracking-tight mb-1" style={{ letterSpacing: '-0.02em' }}>
-                {format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'MMM d, yyyy')} - 
-                {format(endOfWeek(currentDate, { weekStartsOn: 1 }), ' MMM d, yyyy')}
-              </h2>
-              <p className="text-sm text-white/85 font-medium">{getWeekTotal()} hours this week</p>
+              <div 
+                className="inline-block px-6 py-4 rounded-2xl"
+                style={{
+                  background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}
+              >
+                <h2 className="text-lg font-semibold tracking-tight mb-1 text-white drop-shadow-sm" style={{ letterSpacing: '-0.02em' }}>
+                  {format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'MMM d, yyyy')} - 
+                  {format(endOfWeek(currentDate, { weekStartsOn: 1 }), ' MMM d, yyyy')}
+                </h2>
+                <p className="text-sm text-white/90 font-medium">{getWeekTotal()} hours this week</p>
+              </div>
             </div>
             <div className="flex gap-2 relative z-10">
               <button 

@@ -592,192 +592,183 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
       >
-        {/* Search Bar */}
-        <div ref={searchContainerRef} className="search-container-ps mb-4">
-          <div className="search-input-wrapper-ps">
-            <div className="flex-grow relative">
-              <input
-                type="text"
-                className={`search-input-ps ${isTimerRunning ? 'cursor-not-allowed' : 'cursor-text'}`}
-                placeholder={isTimerRunning ? "Timer is running..." : "Search projects..."}
-                value={searchValue}
-                onChange={(e) => {
-                  if (!isTimerRunning) {
-                    setSearchValue(e.target.value);
-                    setDropdownOpen(true);
-                    setDropdownView('projects');
-                  }
-                }}
-                onClick={handleSearchBarClick}
-                disabled={isTimerRunning}
-                style={{
-                  ...(isTimerRunning && {
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    borderColor: '#6366f1',
-                    color: '#1f2937',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    fontWeight: '500',
-                    fontSize: '15px'
-                  }),
-                  ...(searchValue && !isTimerRunning && {
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    borderColor: '#6366f1',
-                    color: '#1f2937',
-                    fontWeight: '500',
-                    fontSize: '15px'
-                  })
-                }}
-              />
-              <Search className={`search-icon-ps ${isTimerRunning || searchValue ? 'text-indigo-500 opacity-60' : ''} ${isDropdownOpen ? 'icon-pop-disappear' : 'icon-reappear'}`} />
+        {/* Search and Tabs Container */}
+        <div className="flex items-stretch gap-3 mb-4">
+          {/* Search Bar */}
+          <div ref={searchContainerRef} className="search-container-ps flex-1">
+            <div className="search-input-wrapper-ps">
+              <div className="flex-grow relative">
+                <input
+                  type="text"
+                  className={`search-input-ps ${isTimerRunning ? 'cursor-not-allowed' : 'cursor-text'}`}
+                  placeholder={isTimerRunning ? "Timer is running..." : "Search projects..."}
+                  value={searchValue}
+                  onChange={(e) => {
+                    if (!isTimerRunning) {
+                      setSearchValue(e.target.value);
+                      setDropdownOpen(true);
+                      setDropdownView('projects');
+                    }
+                  }}
+                  onClick={handleSearchBarClick}
+                  disabled={isTimerRunning}
+                  style={{
+                    height: '44px', // Match tab height
+                    ...(isTimerRunning && {
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      borderColor: '#6366f1',
+                      color: '#1f2937',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                      fontWeight: '500',
+                      fontSize: '15px'
+                    }),
+                    ...(searchValue && !isTimerRunning && {
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      borderColor: '#6366f1',
+                      color: '#1f2937',
+                      fontWeight: '500',
+                      fontSize: '15px'
+                    })
+                  }}
+                />
+                <Search className={`search-icon-ps ${isTimerRunning || searchValue ? 'text-indigo-500 opacity-60' : ''} ${isDropdownOpen ? 'icon-pop-disappear' : 'icon-reappear'}`} />
+              </div>
             </div>
+            
+            {/* Dropdown - Within Container */}
+            <AnimatePresence>
+              {shouldShowDropdown && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className={`dropdown-ps ${shouldShowDropdown ? 'show' : ''}`}
+                  ref={dropdownRef}
+                  style={{ 
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    zIndex: 1000,
+                    overflowY: 'auto',
+                    width: '100%'
+                  }}
+                >
+                  {dropdownView === 'projects' ? (
+                    <div className="dropdown-ps-scroll">
+                      {filteredProjects.map((project, index) => (
+                        <motion.div
+                          key={project.id}
+                          className={`dropdown-ps-item ${selectedIndex === index ? 'selected' : ''}`}
+                          onClick={() => {
+                            setActiveProject(project);
+                            setDropdownView('subprojects');
+                            setSelectedIndex(0);
+                          }}
+                          onMouseEnter={() => handleProjectHover(project)}
+                          onMouseLeave={handleProjectLeave}
+                          data-project-id={project.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.2, delay: index * 0.05 }}
+                          whileHover={{ x: 5 }}
+                        >
+                          <div className="item-content-ps">
+                            <div className="item-text-ps">{project.name}</div>
+                            <div className="item-description-ps">
+                              {project.subprojects.length} subprojects
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="dropdown-ps-scroll">
+                      {activeProject?.subprojects.map((subproject, index) => (
+                        <motion.div 
+                          key={subproject.id}
+                          className={`dropdown-ps-item ${selectedIndex === index ? 'selected' : ''}`}
+                          onClick={() => handleSelection(activeProject, subproject)}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.2, delay: index * 0.05 }}
+                          whileHover={{ x: 5 }}
+                        >
+                          <div className="item-content-ps">
+                            <div className="item-text-ps">{subproject.name}</div>
+                            <div className="item-description-ps">
+                              {activeProject.name}
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           
-          {/* Dropdown - Within Container */}
-          <AnimatePresence>
-            {shouldShowDropdown && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className={`dropdown-ps ${shouldShowDropdown ? 'show' : ''}`}
-                ref={dropdownRef}
-                style={{ 
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  zIndex: 1000,
-                  overflowY: 'auto',
-                  width: '100%'
+          {/* Tabs outside search bar */}
+          <motion.div 
+            className="flex items-stretch"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="flex items-stretch p-1 rounded-xl gap-1" 
+                 style={{
+                   background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(167, 139, 250, 0.08) 100%)',
+                   backdropFilter: 'blur(10px)',
+                   border: '1px solid rgba(255, 255, 255, 0.2)',
+                   width: 'fit-content',
+                   height: '44px'
+                 }}>
+              <motion.button
+                className={`px-4 text-sm font-medium rounded-lg border transition-all duration-500 flex items-center justify-center ${
+                  activeTab === 'frequent' 
+                    ? 'bg-white/95 text-indigo-600 shadow-lg border-white/20' 
+                    : 'bg-white/70 text-gray-600 hover:text-gray-800 hover:bg-white/80 border-white/20'
+                }`}
+                onClick={() => setActiveTab('frequent')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  minWidth: '120px',
+                  height: '36px', // Slightly smaller to fit within container padding
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: activeTab === 'frequent' ? '0 4px 16px rgba(139, 92, 246, 0.2)' : 'none',
+                  transform: activeTab === 'frequent' ? 'translateY(-1px)' : 'translateY(0)',
+                  transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                 }}
               >
-                {dropdownView === 'projects' ? (
-                  <div className="dropdown-ps-scroll">
-                    {filteredProjects.map((project, index) => (
-                      <motion.div
-                        key={project.id}
-                        className={`dropdown-ps-item ${selectedIndex === index ? 'selected' : ''}`}
-                        onClick={() => {
-                          setActiveProject(project);
-                          setDropdownView('subprojects');
-                          setSelectedIndex(0);
-                        }}
-                        onMouseEnter={() => handleProjectHover(project)}
-                        onMouseLeave={handleProjectLeave}
-                        data-project-id={project.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
-                        whileHover={{ x: 5 }}
-                      >
-                        <div className="item-content-ps">
-                          <div className="item-text-ps">{project.name}</div>
-                          <div className="item-description-ps">
-                            {project.subprojects.length} subprojects
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="dropdown-ps-scroll">
-                    {activeProject?.subprojects.map((subproject, index) => (
-                      <motion.div 
-                        key={subproject.id}
-                        className={`dropdown-ps-item ${selectedIndex === index ? 'selected' : ''}`}
-                        onClick={() => handleSelection(activeProject, subproject)}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
-                        whileHover={{ x: 5 }}
-                      >
-                        <div className="item-content-ps">
-                          <div className="item-text-ps">{subproject.name}</div>
-                          <div className="item-description-ps">
-                            {activeProject.name}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                Frequently Used
+              </motion.button>
+              <motion.button
+                className={`px-4 text-sm font-medium rounded-lg border transition-all duration-500 flex items-center justify-center ${
+                  activeTab === 'quick-start' 
+                    ? 'bg-white/95 text-indigo-600 shadow-lg border-white/20' 
+                    : 'bg-white/70 text-gray-600 hover:text-gray-800 hover:bg-white/80 border-white/20'
+                }`}
+                onClick={() => setActiveTab('quick-start')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  minWidth: '120px',
+                  height: '36px', // Slightly smaller to fit within container padding
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: activeTab === 'quick-start' ? '0 4px 16px rgba(139, 92, 246, 0.2)' : 'none',
+                  transform: activeTab === 'quick-start' ? 'translateY(-1px)' : 'translateY(0)',
+                  transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                }}
+              >
+                Quick Start
+              </motion.button>
 
-        {/* Tabs */}
-        <motion.div 
-          className="flex justify-center mb-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="flex items-center p-1 rounded-xl gap-1" 
-               style={{
-                 background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(167, 139, 250, 0.08) 100%)',
-                 backdropFilter: 'blur(10px)',
-                 border: '1px solid rgba(255, 255, 255, 0.2)',
-                 width: 'fit-content'
-               }}>
-            <motion.button
-              className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-500 ${
-                activeTab === 'frequent' 
-                  ? 'bg-white/95 text-indigo-600 shadow-lg border-white/20' 
-                  : 'bg-white/70 text-gray-600 hover:text-gray-800 hover:bg-white/80 border-white/20'
-              }`}
-              onClick={() => setActiveTab('frequent')}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              style={{
-                minWidth: '120px',
-                backdropFilter: 'blur(10px)',
-                boxShadow: activeTab === 'frequent' ? '0 4px 16px rgba(139, 92, 246, 0.2)' : 'none',
-                transform: activeTab === 'frequent' ? 'translateY(-1px)' : 'translateY(0)',
-                transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-              }}
-            >
-              Frequently Used
-            </motion.button>
-            <motion.button
-              className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-500 ${
-                activeTab === 'quick-start' 
-                  ? 'bg-white/95 text-indigo-600 shadow-lg border-white/20' 
-                  : 'bg-white/70 text-gray-600 hover:text-gray-800 hover:bg-white/80 border-white/20'
-              }`}
-              onClick={() => setActiveTab('quick-start')}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              style={{
-                minWidth: activeTab === 'quick-start' ? '100px' : '120px',
-                backdropFilter: 'blur(10px)',
-                boxShadow: activeTab === 'quick-start' ? '0 4px 16px rgba(139, 92, 246, 0.2)' : 'none',
-                transform: activeTab === 'quick-start' ? 'translateY(-1px)' : 'translateY(0)',
-                transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-              }}
-            >
-              Quick Start
-            </motion.button>
-            <motion.button
-              onClick={() => setIsEditDialogOpen(true)}
-              className="flex items-center justify-center text-white rounded-lg border-none cursor-pointer overflow-hidden"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                width: activeTab === 'quick-start' ? '32px' : '0px',
-                height: '32px',
-                padding: activeTab === 'quick-start' ? '8px' : '0px',
-                opacity: activeTab === 'quick-start' ? 1 : 0,
-                transform: activeTab === 'quick-start' ? 'scale(1)' : 'scale(0.8)',
-                background: 'rgba(139, 92, 246, 0.9)',
-                transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-              }}
-            >
-              <Edit3 className="h-3.5 w-3.5" />
-            </motion.button>
-          </div>
-        </motion.div>
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Content Area */}
@@ -886,6 +877,7 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
+              className="relative h-full"
             >
               <motion.div
                 className="grid gap-4"
@@ -920,6 +912,38 @@ const ProjectSelector = forwardRef<ProjectSelectorRef, ProjectSelectorProps>(({
                   );
                 })}
               </motion.div>
+              
+              {/* Edit Button - Bottom Right */}
+              <motion.button
+                onClick={() => setIsEditDialogOpen(true)}
+                className="absolute bottom-2 right-2 flex items-center justify-center rounded-full border-none cursor-pointer shadow-sm"
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 4px 12px rgba(139, 92, 246, 0.25)'
+                }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.5 }}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  background: 'rgba(139, 92, 246, 0.15)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(139, 92, 246, 0.2)',
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(139, 92, 246, 0.25)';
+                  e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(139, 92, 246, 0.15)';
+                  e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.2)';
+                }}
+              >
+                <Edit3 className="h-3.5 w-3.5 text-indigo-600" />
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>

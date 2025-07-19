@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { format, isSameDay, parseISO } from 'date-fns';
 import { TimeLog } from '@/types';
 
@@ -17,6 +17,21 @@ const DailyView: React.FC<DailyViewProps> = ({
   onEditEntry,
   onDeleteEntry
 }) => {
+  // Add event listener for switchToDailyView event
+  useEffect(() => {
+    const handleSwitchToDailyView = () => {
+      // This event will be triggered when a time entry is saved
+      // The component will re-render with updated timeLogs from props
+      console.log('Switching to Daily View with updated logs');
+    };
+
+    window.addEventListener('switchToDailyView', handleSwitchToDailyView);
+    
+    return () => {
+      window.removeEventListener('switchToDailyView', handleSwitchToDailyView);
+    };
+  }, []);
+
   // Filter logs for the selected date
   const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
   const dailyLogs = timeLogs.filter(log => log.date === selectedDateStr);

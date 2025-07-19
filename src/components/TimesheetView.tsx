@@ -78,11 +78,13 @@ const TimesheetView: React.FC = () => {
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('time-logs-updated', handleTimeLogsUpdate);
     window.addEventListener('switch-to-daily-view', handleSwitchToDailyView);
+    window.addEventListener('switchToDailyView', handleSwitchToDailyView);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('time-logs-updated', handleTimeLogsUpdate);
       window.removeEventListener('switch-to-daily-view', handleSwitchToDailyView);
+      window.removeEventListener('switchToDailyView', handleSwitchToDailyView);
     };
   }, []);
 

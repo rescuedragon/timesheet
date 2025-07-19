@@ -107,6 +107,9 @@ const StopwatchManager: React.FC<StopwatchManagerProps> = ({
     }
     setIsRunning(false);
     setStartTime(null);
+    // Reset timer to 0 when paused
+    setElapsedTime(0);
+    setDisplayTime(0);
   };
 
   const handleStop = () => {
@@ -117,6 +120,9 @@ const StopwatchManager: React.FC<StopwatchManagerProps> = ({
     }
     setIsRunning(false);
     setStartTime(null);
+    // Reset timer to 0 when stopped
+    // We'll keep the elapsed time for logging, but reset display time
+    setDisplayTime(0);
     // Don't reset elapsed time here - let the parent component handle it after logging
   };
 
