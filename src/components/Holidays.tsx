@@ -311,7 +311,7 @@ const PersonalJournal: React.FC = React.memo(() => {
   }, [entries]);
 
   return (
-    <div className="w-[95%] mx-auto h-full min-h-0 min-w-0 bg-transparent text-black font-sans">
+    <div className="w-[95%] mx-auto h-full min-h-0 min-w-0 bg-gray-50 text-black font-sans p-5">
       <style>
         {`
           .task-completed {
@@ -341,111 +341,89 @@ const PersonalJournal: React.FC = React.memo(() => {
       />
       
       <div className="w-full h-full">
-        {/* Top Navigation */}
-        <div className="px-6 py-4 mb-8">
-          <div className="flex items-center justify-end">
-            <div className="flex items-center gap-4">
-              <button
-                style={{ backgroundColor: containerBgColor, color: containerTextColor }}
-                className="px-6 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                onClick={() => setShowPlannedLeaves(!showPlannedLeaves)}
-              >
-                📅 Planned Leaves
-              </button>
-              <Dialog open={showHolidaysDialog} onOpenChange={(open) => { 
-                setShowHolidaysDialog(open); 
-                if (!open) { setHolidayOverviewMode('overview'); setSelectedHolidayMonth(null); }
-              }}>
-                <DialogTrigger asChild>
-                  <button
-                    style={{ backgroundColor: containerBgColor, color: containerTextColor }}
-                    className="px-6 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                    onClick={() => { setHolidayOverviewMode('overview'); setSelectedHolidayMonth(null); }}
-                  >
-                    📅 Holidays
-                  </button>
-                </DialogTrigger>
-                {holidayOverviewMode === 'overview' ? (
-                  <HolidayOverview 
-                    holidays={holidays}
-                    getHolidaysForMonth={getHolidaysForMonth}
-                    setSelectedHolidayMonth={setSelectedHolidayMonth}
-                    setHolidayOverviewMode={setHolidayOverviewMode}
-                  />
-                ) : (
-                  <HolidayDetail 
-                    selectedHolidayMonth={selectedHolidayMonth}
-                    getHolidaysForMonth={getHolidaysForMonth}
-                    handleRemoveHoliday={handleRemoveHoliday}
-                    setHolidayOverviewMode={setHolidayOverviewMode}
-                  />
-                )}
-              </Dialog>
-            </div>
+        
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-500 text-white p-5 rounded-2xl mb-8 flex justify-between items-center">
+          <div className="flex gap-3">
+            <button
+              className="px-5 py-2 bg-white/20 border-none rounded-lg text-white cursor-pointer text-sm flex items-center gap-2 hover:bg-white/30 transition-all duration-200"
+              onClick={() => setShowPlannedLeaves(!showPlannedLeaves)}
+            >
+              🗓️ Planned Leaves
+            </button>
+            <Dialog open={showHolidaysDialog} onOpenChange={(open) => { 
+              setShowHolidaysDialog(open); 
+              if (!open) { setHolidayOverviewMode('overview'); setSelectedHolidayMonth(null); }
+            }}>
+              <DialogTrigger asChild>
+                <button
+                  className="px-5 py-2 bg-white/20 border-none rounded-lg text-white cursor-pointer text-sm flex items-center gap-2 hover:bg-white/30 transition-all duration-200"
+                  onClick={() => { setHolidayOverviewMode('overview'); setSelectedHolidayMonth(null); }}
+                >
+                  🗓️ Holidays
+                </button>
+              </DialogTrigger>
+              {holidayOverviewMode === 'overview' ? (
+                <HolidayOverview 
+                  holidays={holidays}
+                  getHolidaysForMonth={getHolidaysForMonth}
+                  setSelectedHolidayMonth={setSelectedHolidayMonth}
+                  setHolidayOverviewMode={setHolidayOverviewMode}
+                />
+              ) : (
+                <HolidayDetail 
+                  selectedHolidayMonth={selectedHolidayMonth}
+                  getHolidaysForMonth={getHolidaysForMonth}
+                  handleRemoveHoliday={handleRemoveHoliday}
+                  setHolidayOverviewMode={setHolidayOverviewMode}
+                />
+              )}
+            </Dialog>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="space-y-6">
-          <CalendarUI 
-            month={currentMonth}
-            nextMonth={nextMonth}
-            prevMonth={prevMonth}
-            containerBgColor={containerBgColor}
-            containerTextColor={containerTextColor}
-            getHolidayDates={getHolidayDates}
-            getPlannedLeaveDates={getPlannedLeaveDates}
-            showPlannedLeaves={showPlannedLeaves}
-            entries={entries}
-            selectedDate={selectedDate}
-            setSelectedDateForEntries={setSelectedDateForEntries}
-            isSameDay={isSameDay}
-          />
-          
-          {/* Bottom Sections */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Holidays Section */}
-            {getHolidaysForMonth(currentMonth).length > 0 && (
-              <HolidaySection 
-                holidays={getHolidaysForMonth(currentMonth)}
-                containerBgColor={containerBgColor}
-                containerTextColor={containerTextColor}
-                handleRemoveHoliday={handleRemoveHoliday}
-              />
-            )}
-
-            {/* Planned Leaves Section */}
-            {showPlannedLeaves && (
-              <PlannedLeavesSection 
-                plannedLeaves={plannedLeaves}
-                containerBgColor={containerBgColor}
-                containerTextColor={containerTextColor}
-                isAddingLeave={isAddingLeave}
-                setIsAddingLeave={setIsAddingLeave}
-                newLeave={newLeave}
-                setNewLeave={setNewLeave}
-                handleAddPlannedLeave={handleAddPlannedLeave}
-                handleRemovePlannedLeave={handleRemovePlannedLeave}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Entries Dialog */}
-        <Dialog open={selectedDateForEntries !== null} onOpenChange={() => setSelectedDateForEntries(null)}>
-          {selectedDateForEntries && (
-            <EntryPopup 
-              date={selectedDateForEntries}
-              entries={entries}
-              saveEntry={saveEntry}
-              deleteEntry={deleteEntry}
-              updateEntry={updateEntry}
-              editingEntry={editingEntry}
-              setEditingEntry={setEditingEntry}
-              isSameDay={isSameDay}
+        {/* Calendar Container */}
+        <CalendarUI 
+          month={currentMonth}
+          nextMonth={nextMonth}
+          prevMonth={prevMonth}
+          containerBgColor={containerBgColor}
+          containerTextColor={containerTextColor}
+          getHolidayDates={getHolidayDates}
+          getPlannedLeaveDates={getPlannedLeaveDates}
+          showPlannedLeaves={showPlannedLeaves}
+          entries={entries}
+          selectedDate={selectedDate}
+          setSelectedDateForEntries={() => {}} // Remove entry popup functionality
+          isSameDay={isSameDay}
+        />
+        
+        {/* Bottom Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          {/* Holidays Section - Only show if there are holidays for current month */}
+          {getHolidaysForMonth(currentMonth).length > 0 && (
+            <HolidaySection 
+              holidays={getHolidaysForMonth(currentMonth)}
+              containerBgColor={containerBgColor}
+              containerTextColor={containerTextColor}
+              handleRemoveHoliday={handleRemoveHoliday}
             />
           )}
-        </Dialog>
+
+          {/* Planned Leaves Section - Only show when toggled */}
+          {showPlannedLeaves && (
+            <PlannedLeavesSection 
+              plannedLeaves={plannedLeaves}
+              containerBgColor={containerBgColor}
+              containerTextColor={containerTextColor}
+              isAddingLeave={isAddingLeave}
+              setIsAddingLeave={setIsAddingLeave}
+              newLeave={newLeave}
+              setNewLeave={setNewLeave}
+              handleAddPlannedLeave={handleAddPlannedLeave}
+              handleRemovePlannedLeave={handleRemovePlannedLeave}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

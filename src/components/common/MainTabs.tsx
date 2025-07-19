@@ -65,8 +65,8 @@ const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, a
               style={{
                 isolation: 'isolate',
                 contain: 'layout style paint',
-                background: activeTab === 'holidays' ? 'linear-gradient(135deg, #7E2EFF 0%, #6366f1 100%)' : 'transparent',
-                boxShadow: activeTab === 'holidays' ? '0 4px 16px rgba(126, 46, 255, 0.3), 0 2px 8px rgba(99, 102, 241, 0.2)' : 'none'
+                background: activeTab === 'holidays' ? 'linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0f766e 100%)' : 'transparent',
+                boxShadow: activeTab === 'holidays' ? '0 4px 16px rgba(13, 148, 136, 0.3), 0 2px 8px rgba(20, 184, 166, 0.2)' : 'none'
               }}
             >
               <Calendar className="h-4 w-4" />

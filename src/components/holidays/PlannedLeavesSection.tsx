@@ -37,12 +37,16 @@ const PlannedLeavesSection: React.FC<PlannedLeavesSectionProps> = ({
   handleRemovePlannedLeave
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div className="px-6 py-4 border-b flex items-center justify-between" style={{ backgroundColor: containerBgColor }}>
-        <h3 className="text-lg font-bold" style={{ color: containerTextColor }}>Planned Leaves</h3>
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      {/* Section Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-emerald-500 rounded-lg flex items-center justify-center text-white text-base">
+          🏖️
+        </div>
+        <div className="text-lg font-semibold text-gray-800 flex-1">Planned Leaves</div>
         <Dialog open={isAddingLeave} onOpenChange={setIsAddingLeave}>
           <DialogTrigger asChild>
-            <button className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-700 transition-all flex items-center gap-1">
+            <button className="bg-gradient-to-br from-teal-600 to-emerald-500 text-white border-none px-4 py-2 rounded-lg text-sm cursor-pointer flex items-center gap-2 ml-auto hover:from-teal-700 hover:to-emerald-600 transition-all duration-200">
               <Plus size={14} />
               Add Leave
             </button>
@@ -102,32 +106,39 @@ const PlannedLeavesSection: React.FC<PlannedLeavesSectionProps> = ({
           </DialogContent>
         </Dialog>
       </div>
-      <div className="p-6">
-        {plannedLeaves.length > 0 ? (
-          plannedLeaves.map(leave => (
-            <div key={leave.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-              <div>
-                <h4 className="font-bold text-gray-900">{leave.name}</h4>
-                <p className="text-sm font-medium text-gray-600">
+      
+      {/* Leave Items */}
+      {plannedLeaves.length > 0 ? (
+        <div>
+          {plannedLeaves.map(leave => (
+            <div key={leave.id} className="flex items-center gap-3 py-4 border-b border-gray-100 last:border-b-0 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-teal-600 to-emerald-500 rounded-lg flex items-center justify-center text-white text-sm">
+                🏖️
+              </div>
+              <div className="flex-1">
+                <h4 className="text-base font-semibold text-gray-800 mb-1">{leave.name}</h4>
+                <p className="text-sm text-teal-600">
                   {leave.employee} • {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                 </p>
               </div>
               <button
-                className="text-red-500 hover:text-red-700 p-1 rounded transition-colors"
+                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 p-1 rounded transition-all duration-200"
                 onClick={() => handleRemovePlannedLeave(leave.id)}
               >
                 <Trash2 size={16} />
               </button>
             </div>
-          ))
-        ) : (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-4">📅</div>
-            <p className="font-medium text-gray-900">No planned leaves added yet</p>
-            <p className="text-sm font-medium text-gray-600">Click "Add Leave" to create one</p>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-10">
+          <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-5 text-white text-2xl opacity-80">
+            🏖️
           </div>
-        )}
-      </div>
+          <h3 className="text-gray-800 text-lg mb-2">No planned leaves added yet</h3>
+          <p className="text-teal-600 text-sm">Click "Add Leave" to create your first leave request</p>
+        </div>
+      )}
     </div>
   );
 };
