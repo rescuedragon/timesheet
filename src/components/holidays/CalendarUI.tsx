@@ -123,7 +123,7 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
   return (
     <div className="w-full">
       {/* Modern Card Design with Teal Theme */}
-      <div className="bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/30 backdrop-blur-xl rounded-3xl shadow-2xl border border-teal-100/60 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:border-teal-200/80 hover:scale-[1.01]">
+      <div className="bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/30 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-teal-100/60 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:border-teal-200/80 hover:scale-[1.01]">
 
         {/* Floating Header with Glassmorphism */}
         <div className="px-8 py-6 relative overflow-hidden">
@@ -134,8 +134,8 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
             {/* Left side - Calendar icon and title */}
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-3xl blur-lg opacity-30"></div>
-                <div className="relative p-3 rounded-3xl bg-gradient-to-br from-teal-100 to-emerald-100 shadow-xl border border-teal-200/50">
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-[1.5rem] blur-lg opacity-30"></div>
+                <div className="relative p-3 rounded-[1.5rem] bg-gradient-to-br from-teal-100 to-emerald-100 shadow-xl border border-teal-200/50">
                   <Calendar size={24} className="text-teal-600" />
                 </div>
               </div>
@@ -149,13 +149,13 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
             <div className="flex items-center gap-4">
               <button
                 onClick={prevMonth}
-                className="group relative w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-md flex items-center justify-center hover:bg-teal-50/80 transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl text-gray-700 border border-teal-100/50 hover:border-teal-200/70"
+                className="group relative w-12 h-12 rounded-[1rem] bg-white/70 backdrop-blur-md flex items-center justify-center hover:bg-teal-50/80 transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl text-gray-700 border border-teal-100/50 hover:border-teal-200/70"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 to-transparent rounded-[1rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <span className="relative text-xl font-bold group-hover:-translate-x-0.5 transition-transform duration-300 text-teal-600">‹</span>
               </button>
 
-              <div className="px-6 py-3 rounded-2xl bg-white/60 backdrop-blur-md border border-teal-100/50 shadow-lg">
+              <div className="px-6 py-3 rounded-[1rem] bg-white/60 backdrop-blur-md border border-teal-100/50 shadow-lg">
                 <div className="text-xl font-bold text-center tracking-tight text-gray-800 min-w-44">
                   {months[month.getMonth()]} {month.getFullYear()}
                 </div>
@@ -163,9 +163,9 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
 
               <button
                 onClick={nextMonth}
-                className="group relative w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-md flex items-center justify-center hover:bg-teal-50/80 transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl text-gray-700 border border-teal-100/50 hover:border-teal-200/70"
+                className="group relative w-12 h-12 rounded-[1rem] bg-white/70 backdrop-blur-md flex items-center justify-center hover:bg-teal-50/80 transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl text-gray-700 border border-teal-100/50 hover:border-teal-200/70"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 to-transparent rounded-[1rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <span className="relative text-xl font-bold group-hover:translate-x-0.5 transition-transform duration-300 text-teal-600">›</span>
               </button>
             </div>
@@ -174,13 +174,13 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
 
         {/* Calendar Grid with Enhanced Design */}
         <div className="px-8 pb-8">
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-teal-100/40 shadow-lg p-6">
+          <div className="bg-white/60 backdrop-blur-sm rounded-[1.5rem] border border-teal-100/40 shadow-lg p-6">
             <div className="grid grid-cols-7 gap-1">
               {/* Day headers with enhanced styling */}
               {daysOfWeek.map((day, index) => (
                 <div
                   key={day}
-                  className={`h-16 flex items-center justify-center text-center font-semibold text-xl tracking-wider uppercase mb-2 rounded-3xl ${index >= 5
+                  className={`h-16 flex items-center justify-center text-center font-semibold text-xl tracking-wider uppercase mb-2 rounded-[1.5rem] ${index >= 5
                       ? 'text-teal-500 bg-teal-50/50'
                       : 'text-gray-600 bg-gray-50/50'
                     }`}
