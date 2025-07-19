@@ -8,12 +8,9 @@ const TimesheetView: React.FC = () => {
   const [timeLogs, setTimeLogs] = useState<TimeLog[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'weekly' | 'daily'>('weekly');
-  
+
   // Function to load time logs from storage
   const loadTimeLogs = () => {
-    // Clear cache to ensure we get fresh data
-    storageService.clearAllCache();
-    
     // Get logs directly from localStorage to ensure we have the latest data
     let logs;
     try {
@@ -23,11 +20,11 @@ const TimesheetView: React.FC = () => {
       console.error('Error loading time logs:', error);
       logs = [];
     }
-    
+
     // If no logs exist, create a sample entry for today
     if (!logs || logs.length === 0) {
       const today = new Date().toISOString().split('T')[0];
-      
+
       const sampleEntry: TimeLog = {
         id: `sample_${Date.now()}`,
         projectId: 'project_123',
@@ -40,34 +37,33 @@ const TimesheetView: React.FC = () => {
         description: 'Created sample marketing materials',
         date: today
       };
-      
+
       logs = [sampleEntry];
       storageService.saveTimeLogs(logs);
     }
-    
+
     console.log('TimesheetView - loaded time logs:', logs);
     setTimeLogs(logs);
   };
-  
+
   // Load initial time logs
   useEffect(() => {
-    
+
     loadTimeLogs();
-    
+
     // Listen for storage changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'timesheet-logs') {
         loadTimeLogs();
       }
     };
-    
+
     // Listen for custom events
     const handleTimeLogsUpdate = () => {
       loadTimeLogs();
-      // Switch to daily view when a time log is updated
-      setViewMode('daily');
+      // Don't automatically switch to daily view when a time log is updated
     };
-    
+
     // Listen for switch to daily view event
     const handleSwitchToDailyView = () => {
       console.log('TimesheetView - switching to daily view');
@@ -78,11 +74,11 @@ const TimesheetView: React.FC = () => {
       // Switch to daily view
       setViewMode('daily');
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('time-logs-updated', handleTimeLogsUpdate);
     window.addEventListener('switch-to-daily-view', handleSwitchToDailyView);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('time-logs-updated', handleTimeLogsUpdate);
@@ -98,7 +94,7 @@ const TimesheetView: React.FC = () => {
   };
 
   const currentDayTotal = getCurrentDayTotal();
-  
+
   // Handle adding a new time log
   const handleAddTimeLog = (newLog: TimeLog) => {
     // Generate a unique ID for the new log if not already present
@@ -106,42 +102,42 @@ const TimesheetView: React.FC = () => {
       ...newLog,
       id: newLog.id || `log_${Date.now()}`
     };
-    
+
     console.log('Adding new time log:', logWithId);
-    
+
     // Add to state and storage
     const updatedLogs = [...timeLogs, logWithId];
     setTimeLogs(updatedLogs);
     storageService.saveTimeLogs(updatedLogs);
-    
+
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('time-logs-updated'));
   };
-  
+
   // Handle updating an existing time log
   const handleUpdateTimeLog = (updatedLog: TimeLog) => {
     console.log('Updating time log:', updatedLog);
-    
-    const updatedLogs = timeLogs.map(log => 
+
+    const updatedLogs = timeLogs.map(log =>
       log.id === updatedLog.id ? updatedLog : log
     );
-    
+
     setTimeLogs(updatedLogs);
     storageService.saveTimeLogs(updatedLogs);
-    
+
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('time-logs-updated'));
   };
-  
+
   // Handle deleting a time log
   const handleDeleteTimeLog = (logToDelete: TimeLog) => {
     console.log('Deleting time log:', logToDelete);
-    
+
     const updatedLogs = timeLogs.filter(log => log.id !== logToDelete.id);
-    
+
     setTimeLogs(updatedLogs);
     storageService.saveTimeLogs(updatedLogs);
-    
+
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('time-logs-updated'));
   };
@@ -149,7 +145,7 @@ const TimesheetView: React.FC = () => {
   return (
     <div className="w-full h-full flex flex-col">
       {/* Progress Bar */}
-      <div className="w-full max-w-7xl mx-auto px-4 pt-4">
+      <div className="w-full max-w-full mx-auto px-4 pt-4">
         <ProgressBar
           currentHours={currentDayTotal}
           targetHours={8}
@@ -157,11 +153,11 @@ const TimesheetView: React.FC = () => {
           enabled={true}
         />
       </div>
-      
+
       {/* Apple-style Weekly/Daily Calendar View */}
-      <div className="flex-1 w-full max-w-7xl mx-auto px-4 pb-4 mt-6 overflow-hidden">
+      <div className="flex-1 w-full max-w-full mx-auto px-4 pb-4 mt-6 overflow-hidden">
         <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] shadow-sm p-6 h-full">
-          <WeeklyCalendarView 
+          <WeeklyCalendarView
             selectedDate={selectedDate}
             onDateChange={setSelectedDate}
             timeLogs={timeLogs}

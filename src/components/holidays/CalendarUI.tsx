@@ -1,21 +1,28 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 
+/**
+ * Props interface for the CalendarUI component
+ */
 interface CalendarUIProps {
-  month: Date;
-  nextMonth: () => void;
-  prevMonth: () => void;
-  containerBgColor: string;
-  containerTextColor: string;
-  getHolidayDates: () => Date[];
-  getPlannedLeaveDates: () => Date[];
-  showPlannedLeaves: boolean;
-  entries: any[];
-  selectedDate: Date | undefined;
-  setSelectedDateForEntries: (date: Date) => void;
-  isSameDay: (date1: Date, date2: Date) => boolean;
+  month: Date;                                    // Current month to display
+  nextMonth: () => void;                          // Function to navigate to next month
+  prevMonth: () => void;                          // Function to navigate to previous month
+  containerBgColor: string;                       // Background color for calendar header
+  containerTextColor: string;                     // Text color for calendar header
+  getHolidayDates: () => Date[];                  // Function to get holiday dates
+  getPlannedLeaveDates: () => Date[];             // Function to get planned leave dates
+  showPlannedLeaves: boolean;                     // Whether to show planned leaves
+  entries: any[];                                 // Time entries for the calendar
+  selectedDate: Date | undefined;                 // Currently selected date
+  setSelectedDateForEntries: (date: Date) => void; // Function to set selected date
+  isSameDay: (date1: Date, date2: Date) => boolean; // Function to compare dates
 }
 
+/**
+ * Calendar UI Component
+ * Displays an interactive calendar with holidays, planned leaves, and time entries
+ */
 const CalendarUI: React.FC<CalendarUIProps> = ({
   month,
   nextMonth,
@@ -30,20 +37,35 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
   setSelectedDateForEntries,
   isSameDay
 }) => {
+  // Constants for calendar display
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+  /**
+   * Helper function: Get number of days in a month
+   */
   const getDaysInMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
+  /**
+   * Helper function: Get first day of month (0-6, Monday-Sunday)
+   */
   const getFirstDayOfMonth = (date: Date) => {
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    return firstDay === 0 ? 6 : firstDay - 1;
+    return firstDay === 0 ? 6 : firstDay - 1; // Adjust Sunday from 0 to 6
   };
 
+  /**
+   * Handle date selection
+   */
   const handleDateClick = (day: number) => {
     const clickedDate = new Date(month.getFullYear(), month.getMonth(), day);
     setSelectedDateForEntries(clickedDate);
   };
 
+  /**
+   * Render calendar days with appropriate styling based on date type
+   * (weekend, holiday, leave, has entries, etc.)
+   */
   const renderCalendarDays = () => {
     const daysInMonth = getDaysInMonth(month);
     const firstDay = getFirstDayOfMonth(month);
@@ -51,10 +73,12 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
     const holidayDates = getHolidayDates();
     const leaveDates = getPlannedLeaveDates();
 
+    // Add empty cells for days before the first day of month
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="w-12 h-12"></div>);
     }
 
+    // Generate calendar days
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(month.getFullYear(), month.getMonth(), day);
       const hasEntries = entries.some(entry => isSameDay(entry.date, date));
@@ -64,6 +88,7 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
       const isSelected = selectedDate && selectedDate.toDateString() === date.toDateString();
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
+      // Build className based on date type
       let className = "w-12 h-12 flex items-center justify-center rounded-lg font-semibold cursor-pointer transition-all duration-200 text-xl relative hover:scale-105";
       if (isWeekend) className += " bg-gray-100 text-gray-500 hover:bg-gray-200";
       else className += " hover:bg-gray-100 text-gray-700";
@@ -92,6 +117,7 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
   return (
     <div className="w-full">
       <div className="bg-white/10 rounded-xl shadow-2xl border border-black/5 overflow-hidden backdrop-blur-md">
+        {/* Calendar Header */}
         <div className="p-6 shadow-inner" style={{ backgroundColor: containerBgColor, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.1)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -119,7 +145,10 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Calendar Body */}
         <div className="p-6">
+          {/* Day headers (Mon, Tue, etc.) */}
           <div className="grid grid-cols-7 gap-2 mb-4">
             {daysOfWeek.map((day, index) => (
               <div key={day} className={`w-12 text-center font-bold py-2 text-lg ${index >= 5 ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -127,6 +156,8 @@ const CalendarUI: React.FC<CalendarUIProps> = ({
               </div>
             ))}
           </div>
+
+          {/* Calendar days grid */}
           <div className="grid grid-cols-7 gap-2">
             {renderCalendarDays()}
           </div>

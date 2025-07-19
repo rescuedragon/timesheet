@@ -1,24 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+/**
+ * Props interface for LoginPage component
+ */
 interface LoginPageProps {
-  onLogin: () => void;
+  onLogin: () => void;  // Callback function when login is successful
 }
 
+/**
+ * LoginPage Component
+ * Renders a login form with username and password fields
+ */
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+  // State management
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [currentDate, setCurrentDate] = useState('');
 
+  /**
+   * Effect: Initialize and update date display
+   */
   useEffect(() => {
     updateDate();
-    const interval = setInterval(updateDate, 60000);
+    const interval = setInterval(updateDate, 60000); // Update every minute
     return () => clearInterval(interval);
   }, []);
 
+  /**
+   * Function: Format and update the current date
+   */
   const updateDate = () => {
     const now = new Date();
     const options: Intl.DateTimeFormatOptions = { 
@@ -30,6 +44,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setCurrentDate(now.toLocaleDateString('en-US', options));
   };
 
+  /**
+   * Function: Handle form submission
+   */
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     onLogin();

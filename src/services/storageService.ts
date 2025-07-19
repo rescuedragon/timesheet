@@ -73,13 +73,9 @@ class StorageService {
 
   // Time logs management
   getTimeLogs(): TimeLog[] {
-    const cached = this.getCached<TimeLog[]>('timeLogs');
-    if (cached) return cached;
-
     try {
       const saved = localStorage.getItem('timesheet-logs');
       const logs = saved ? JSON.parse(saved) : [];
-      this.setCached('timeLogs', logs);
       return logs;
     } catch (error) {
       console.error('Error loading time logs:', error);
@@ -90,7 +86,6 @@ class StorageService {
   saveTimeLogs(timeLogs: TimeLog[]): void {
     try {
       localStorage.setItem('timesheet-logs', JSON.stringify(timeLogs));
-      this.setCached('timeLogs', timeLogs);
     } catch (error) {
       console.error('Error saving time logs:', error);
     }

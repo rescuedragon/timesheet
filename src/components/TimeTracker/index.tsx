@@ -54,6 +54,7 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
     const [resumedProject, setResumedProject] = useState<any>(undefined);
     const [currentFocus, setCurrentFocus] = useState<'project' | 'subproject' | 'timer'>('project');
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [autoStartTimer, setAutoStartTimer] = useState<NodeJS.Timeout | null>(null);
 
     // Debug logging
     console.log('TimeTracker - projects:', projects);
@@ -117,6 +118,58 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
         };
     }, [projects, selectedSubprojectId]);
 
+    // Auto-start timer when both project and subproject are selected
+    useEffect(() => {
+        // Clear any existing timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
+
+        // Only start auto-timer if both project and subproject are selected and timer is not running
+        if (selectedProjectId && selectedSubprojectId && !isTimerRunning) {
+            const timer = setTimeout(() => {
+                // Auto-start the timer
+                if (stopwatchRef.current) {
+                    stopwatchRef.current.handleStart();
+                }
+            }, 10000); // 10 seconds
+
+            setAutoStartTimer(timer);
+        }
+
+        // Cleanup function
+        return () => {
+            if (autoStartTimer) {
+                clearTimeout(autoStartTimer);
+            }
+        };
+    }, [selectedProjectId, selectedSubprojectId, isTimerRunning, autoStartTimer]);
+
+    // Auto-deselect project and subproject after 10 seconds if timer doesn't start
+    useEffect(() => {
+        let deselectionTimer: NodeJS.Timeout | null = null;
+
+        if (selectedProjectId && selectedSubprojectId && !isTimerRunning) {
+            deselectionTimer = setTimeout(() => {
+                // Clear selections if timer hasn't started
+                if (!isTimerRunning) {
+                    setSelectedProjectId('');
+                    setSelectedSubprojectId('');
+                    if (projectSelectorRef.current) {
+                        projectSelectorRef.current.clearSelection();
+                    }
+                }
+            }, 10000); // 10 seconds
+        }
+
+        return () => {
+            if (deselectionTimer) {
+                clearTimeout(deselectionTimer);
+            }
+        };
+    }, [selectedProjectId, selectedSubprojectId, isTimerRunning]);
+
     const addSubproject = (projectId: string, subprojectName: string) => {
         // This function seems to be missing the setProjects call
         // You'll need to implement this properly based on your project management hook
@@ -154,6 +207,12 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
 
     const handlePauseProject = (queuedProject: any) => {
         pauseProject(queuedProject);
+        // Deselect project and subproject when timer is paused
+        setSelectedProjectId('');
+        setSelectedSubprojectId('');
+        if (projectSelectorRef.current) {
+            projectSelectorRef.current.clearSelection();
+        }
     };
 
     const handleResumeProject = (queuedProject: any) => {
@@ -166,15 +225,38 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
 
     // Add this handler to clear subproject when project changes
     const handleProjectSelect = (projectId: string) => {
+        // Clear any existing auto-start timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
         setSelectedProjectId(projectId);
         setSelectedSubprojectId('');
     };
 
-    // Don't deselect project/subproject when timer is stopped - keep them for the dialog
+    // Handler for subproject selection
+    const handleSubprojectSelect = (subprojectId: string) => {
+        // Clear any existing auto-start timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
+        setSelectedSubprojectId(subprojectId);
+    };
+
+    // Clear selections when timer is stopped
     const handleTimerStopped = () => {
-        // Keep the project and subproject selected for the time entry dialog
-        // Only clear if user explicitly cancels the dialog
-        projectSelectorRef.current?.clearSelection();
+        // Clear any existing auto-start timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
+        // Clear project and subproject selections
+        setSelectedProjectId('');
+        setSelectedSubprojectId('');
+        if (projectSelectorRef.current) {
+            projectSelectorRef.current.clearSelection();
+        }
     };
 
     // Ensure only one timer runs at a time, pause and queue previous if needed
@@ -226,7 +308,7 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
                 selectedProjectId={selectedProjectId}
                 selectedSubprojectId={selectedSubprojectId}
                 onProjectSelect={handleProjectSelect}
-                onSubprojectSelect={setSelectedSubprojectId}
+                onSubprojectSelect={handleSubprojectSelect}
                 onAddProject={addProject}
                 onAddSubproject={addSubproject}
                 selectedProject={selectedProject}

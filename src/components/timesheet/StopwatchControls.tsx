@@ -1,19 +1,28 @@
-// Stopwatch control buttons component
-// Handles start, pause, and stop functionality with visual feedback
+/**
+ * StopwatchControls Component
+ * Handles start, pause, and stop functionality with visual feedback
+ */
 
 import React from 'react';
 import { Play, Pause, Square } from 'lucide-react';
 
+/**
+ * Props interface for StopwatchControls component
+ */
 interface StopwatchControlsProps {
-  isRunning: boolean;
-  canStart: boolean;
-  canPauseOrStop: boolean;
-  onStart: () => void;
-  onPause: () => void;
-  onStop: () => void;
-  compact?: boolean;
+  isRunning: boolean;         // Whether the stopwatch is currently running
+  canStart: boolean;          // Whether the start button should be enabled
+  canPauseOrStop: boolean;    // Whether pause/stop buttons should be enabled
+  onStart: () => void;        // Handler for start button click
+  onPause: () => void;        // Handler for pause button click
+  onStop: () => void;         // Handler for stop button click
+  compact?: boolean;          // Whether to use compact styling
 }
 
+/**
+ * Component that renders stopwatch control buttons (start, pause, stop)
+ * with animated visual feedback
+ */
 const StopwatchControls: React.FC<StopwatchControlsProps> = ({
   isRunning,
   canStart,
@@ -23,14 +32,19 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
   onStop,
   compact = false
 }) => {
+  // Base styling for buttons based on compact mode
   const buttonBaseStyle = compact
     ? "relative h-12 px-6 rounded-xl font-semibold text-base font-sans transition-all duration-300 transform hover:scale-[1.05] active:scale-[0.95] focus:outline-none overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
     : "relative h-14 px-8 rounded-2xl font-semibold text-lg font-sans transition-all duration-300 transform hover:scale-[1.05] active:scale-[0.95] focus:outline-none overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
+  
+  // Minimum width for buttons based on compact mode
   const minWidth = compact ? { minWidth: '110px' } : { minWidth: '140px' };
 
   return (
     <div className="flex items-center gap-6 z-10">
+      {/* Conditionally render Start or Stop button based on isRunning state */}
       {!isRunning ? (
+        // Start Button (Purple)
         <button
           onClick={onStart}
           disabled={!canStart}
@@ -59,6 +73,7 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
           <div className="absolute inset-0 -top-2 -bottom-2 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
         </button>
       ) : (
+        // Stop Button (Red)
         <button
           onClick={onStop}
           disabled={!canPauseOrStop}
@@ -88,6 +103,7 @@ const StopwatchControls: React.FC<StopwatchControlsProps> = ({
         </button>
       )}
       
+      {/* Pause Button (White) */}
       <button
         onClick={onPause}
         disabled={!canPauseOrStop}

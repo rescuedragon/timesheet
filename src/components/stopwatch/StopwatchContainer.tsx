@@ -68,10 +68,7 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
       // Force switch to the Timesheet tab
       window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
       
-      // Then dispatch the event that TimesheetView is listening for to switch to daily view
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('switch-to-daily-view'));
-      }, 100);
+      // Removed automatic switch to daily view
     }
     setShowDescriptionDialog(false);
     setDescription('');
