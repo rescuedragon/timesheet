@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useProjectManagement } from '@/hooks/useProjectManagement';
 import { useTimeLogging } from '@/hooks/useTimeLogging';
 import { storageService } from '@/services/storageService';
+import { apiService } from '@/services/apiService';
 import ClickSpark from '../common/ClickSpark';
 import CurrentSelectionDisplay from './CurrentSelectionDisplay';
 import TimeTrackerLayout from './TimeTrackerLayout';
@@ -176,7 +177,7 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
         console.warn('addSubproject function needs to be implemented');
     };
 
-    const handleLogTime = (duration: number, description: string, startTime: Date, endTime: Date, projectId?: string, subprojectId?: string) => {
+    const handleLogTime = async (duration: number, description: string, startTime: Date, endTime: Date, projectId?: string, subprojectId?: string) => {
         const targetProjectId = projectId || selectedProjectId;
         const targetSubprojectId = subprojectId || selectedSubprojectId;
 
@@ -185,9 +186,8 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
 
         if (!project || !subproject) return;
 
-                // Compose the new log object
+        // Compose the new log object
         const newLog = {
-          id: Date.now().toString(),
           projectId: targetProjectId,
           subprojectId: targetSubprojectId,
           projectName: project.name,
@@ -198,7 +198,27 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
           startTime: startTime.toLocaleTimeString(),
           endTime: endTime.toLocaleTimeString()
         };
-        onAddTimeLog(newLog);
+        
+        try {
+          // Save to database via API
+          const savedLog = await apiService.createTimeLog(newLog);
+          console.log('TimeTracker - saved to database:', savedLog);
+          
+          // Add to local state
+          onAddTimeLog(savedLog);
+          
+          // Save directly to storage to ensure it's available to other components
+          const existingLogs = JSON.parse(localStorage.getItem('timesheet-logs') || '[]');
+          const updatedLogs = [savedLog, ...existingLogs];
+          localStorage.setItem('timesheet-logs', JSON.stringify(updatedLogs));
+          
+          // Dispatch events to ensure DailyView is updated with the new entry
+          window.dispatchEvent(new CustomEvent('time-logs-updated'));
+          window.dispatchEvent(new CustomEvent('switchToDailyView'));
+        } catch (error) {
+          console.error('Failed to save time log to database:', error);
+          alert('Failed to save time log to database. Please try again.');
+        }
     };
 
     const switchToExcelView = () => {

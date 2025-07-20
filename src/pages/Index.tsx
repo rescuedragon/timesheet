@@ -7,6 +7,7 @@ import HeaderControls from '@/components/common/HeaderControls';
 import AppHeader from '@/components/common/AppHeader';
 import MainTabs from '@/components/common/MainTabs';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useTimeLogging } from '@/hooks/useTimeLogging';
 import { storageService } from '@/services/storageService';
 
 const Index = React.memo(() => {
@@ -14,24 +15,18 @@ const Index = React.memo(() => {
   const [activeTab, setActiveTab] = useState('tracker');
 
   // --- LIFTED STATE ---
-  const [timeLogs, setTimeLogs] = useState(() => {
-    const saved = localStorage.getItem('timesheet-logs');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { timeLogs, logTime } = useTimeLogging();
+  
   const addTimeLog = (newLog) => {
     console.log('Index.tsx - addTimeLog called with:', newLog);
-    setTimeLogs(prev => {
-      const updated = newLog ? [newLog, ...prev] : prev;
-      localStorage.setItem('timesheet-logs', JSON.stringify(updated));
-      console.log('Index.tsx - saved logs to localStorage:', updated);
-      // Dispatch event to notify TimesheetView
-      window.dispatchEvent(new CustomEvent('time-logs-updated'));
-      return updated;
-    });
+    // The useTimeLogging hook will handle the state management
+    // This function is kept for backward compatibility
   };
+  
   const replaceTimeLogs = (logs) => {
-    setTimeLogs(logs);
-    localStorage.setItem('timesheet-logs', JSON.stringify(logs));
+    // This function is kept for backward compatibility
+    // The useTimeLogging hook handles state management
+    console.log('Index.tsx - replaceTimeLogs called with:', logs);
   };
   // --- END LIFTED STATE ---
 
@@ -90,7 +85,7 @@ const Index = React.memo(() => {
       />
       
       <AppHeader>
-        <MainTabs activeTab={activeTab} onTabChange={setActiveTab} timeLogs={timeLogs} addTimeLog={addTimeLog} setTimeLogs={setTimeLogs} replaceTimeLogs={replaceTimeLogs} />
+        <MainTabs activeTab={activeTab} onTabChange={setActiveTab} timeLogs={timeLogs} addTimeLog={addTimeLog} replaceTimeLogs={replaceTimeLogs} />
       </AppHeader>
     </>
   );

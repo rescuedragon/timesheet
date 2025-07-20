@@ -23,12 +23,25 @@ const DailyView: React.FC<DailyViewProps> = ({
       // This event will be triggered when a time entry is saved
       // The component will re-render with updated timeLogs from props
       console.log('Switching to Daily View with updated logs');
+      
+      // Force a re-render by using a state update
+      // This is a workaround to ensure the component updates with the latest timeLogs
+      const forceUpdate = () => {
+        // Dispatch a custom event to force parent components to reload time logs
+        window.dispatchEvent(new CustomEvent('reload-time-logs'));
+      };
+      forceUpdate();
     };
 
+    // Listen for all relevant events that should trigger a refresh
     window.addEventListener('switchToDailyView', handleSwitchToDailyView);
+    window.addEventListener('time-logs-updated', handleSwitchToDailyView);
+    window.addEventListener('stopwatch-log-saved', handleSwitchToDailyView);
     
     return () => {
       window.removeEventListener('switchToDailyView', handleSwitchToDailyView);
+      window.removeEventListener('time-logs-updated', handleSwitchToDailyView);
+      window.removeEventListener('stopwatch-log-saved', handleSwitchToDailyView);
     };
   }, []);
 
@@ -73,12 +86,13 @@ const DailyView: React.FC<DailyViewProps> = ({
       <div className="bg-white dark:bg-[#1C1C1E] rounded-xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden shadow-sm">
         {/* Table header */}
         <div className="grid grid-cols-12 gap-2 bg-[#F2F2F7] dark:bg-[#2C2C2E] px-4 py-3 border-b border-[#E5E5EA] dark:border-[#38383A]">
+          <div className="col-span-2 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">DATE</div>
           <div className="col-span-2 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">PROJECT</div>
-          <div className="col-span-2 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">SUBPROJECT</div>
-          <div className="col-span-2 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">START</div>
-          <div className="col-span-2 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">END</div>
+          <div className="col-span-1 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">SUBPROJECT</div>
+          <div className="col-span-1 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">START</div>
+          <div className="col-span-1 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">END</div>
           <div className="col-span-2 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">DURATION (HRS)</div>
-          <div className="col-span-1 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">DESCRIPTION</div>
+          <div className="col-span-2 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">DESCRIPTION</div>
           <div className="col-span-1 text-sm font-medium text-[#8E8E93] dark:text-[#8E8E93]">ACTIONS</div>
         </div>
         
@@ -89,14 +103,17 @@ const DailyView: React.FC<DailyViewProps> = ({
               key={index} 
               className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F2F2F7] dark:hover:bg-[#2C2C2E] transition-colors"
             >
+              <div className="col-span-2 text-sm text-[#000000] dark:text-white">
+                {format(parseISO(log.date), 'MMM d, yyyy')}
+              </div>
               <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.projectName || '-'}</div>
-              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.subprojectName || '-'}</div>
-              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.startTime || '-'}</div>
-              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.endTime || '-'}</div>
+              <div className="col-span-1 text-sm text-[#000000] dark:text-white">{log.subprojectName || '-'}</div>
+              <div className="col-span-1 text-sm text-[#000000] dark:text-white">{log.startTime || '-'}</div>
+              <div className="col-span-1 text-sm text-[#000000] dark:text-white">{log.endTime || '-'}</div>
               <div className="col-span-2 text-sm font-medium text-[#000000] dark:text-white">
                 {(log.duration / 3600).toFixed(1)}
               </div>
-              <div className="col-span-1 text-sm text-[#000000] dark:text-white">{log.description || '-'}</div>
+              <div className="col-span-2 text-sm text-[#000000] dark:text-white">{log.description || '-'}</div>
               <div className="col-span-1 flex gap-2">
                 <button 
                   onClick={() => onEditEntry && onEditEntry(log)}

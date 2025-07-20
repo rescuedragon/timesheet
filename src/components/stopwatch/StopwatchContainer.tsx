@@ -5,6 +5,7 @@ import TimeLogDialog from '../timesheet/TimeLogDialog';
 import StopwatchManager from '../timesheet/StopwatchManager';
 import { Project, Subproject } from '../TimeTracker';
 import { QueuedProject } from '../QueuedProjects';
+import { apiService } from '@/services/apiService';
 
 interface StopwatchContainerProps {
   selectedProject: Project | undefined;
@@ -35,13 +36,12 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
   const [currentDuration, setCurrentDuration] = React.useState(0);
   const [currentStartTime, setCurrentStartTime] = React.useState<Date | undefined>(undefined);
 
-  const handleConfirmLog = () => {
+  const handleConfirmLog = async () => {
     if (pendingLogData && selectedProject && selectedSubproject) {
       // Use the current start time (which may have been updated by duration changes)
       const startTimeToUse = currentStartTime || pendingLogData.startTime;
       
       const newLog = {
-        id: Date.now().toString(),
         projectId: selectedProject.id,
         subprojectId: selectedSubproject.id,
         projectName: selectedProject.name,
@@ -52,22 +52,36 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
         startTime: startTimeToUse.toLocaleTimeString(),
         endTime: pendingLogData.endTime.toLocaleTimeString()
       };
-      console.log('StopwatchContainer - created new log:', newLog);
+      console.log('StopwatchContainer - creating new log:', newLog);
       
-      // Add the time log
-      onAddTimeLog(newLog);
-      
-      // Save directly to storage to ensure it's available to other components
-      const existingLogs = JSON.parse(localStorage.getItem('timesheet-logs') || '[]');
-      const updatedLogs = [newLog, ...existingLogs];
-      localStorage.setItem('timesheet-logs', JSON.stringify(updatedLogs));
-      
-      // Dispatch time-logs-updated event first to ensure TimesheetView loads the updated logs
-      window.dispatchEvent(new CustomEvent('time-logs-updated'));
-      
-      // Force switch to the Timesheet tab and daily view
-      window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
-      window.dispatchEvent(new CustomEvent('switchToDailyView'));
+      try {
+        // Save to database via API
+        const savedLog = await apiService.createTimeLog(newLog);
+        console.log('StopwatchContainer - saved to database:', savedLog);
+        
+        // Add the time log to local state
+        onAddTimeLog(savedLog);
+        
+        // Save directly to storage to ensure it's available to other components
+        const existingLogs = JSON.parse(localStorage.getItem('timesheet-logs') || '[]');
+        const updatedLogs = [savedLog, ...existingLogs];
+        localStorage.setItem('timesheet-logs', JSON.stringify(updatedLogs));
+        
+        // Dispatch time-logs-updated event first to ensure TimesheetView loads the updated logs
+        window.dispatchEvent(new CustomEvent('time-logs-updated'));
+        
+        // Dispatch a specific event for stopwatch logs being saved
+        window.dispatchEvent(new CustomEvent('stopwatch-log-saved', { 
+          detail: { log: savedLog }
+        }));
+        
+        // Force switch to the Timesheet tab and daily view
+        window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
+        window.dispatchEvent(new CustomEvent('switchToDailyView'));
+      } catch (error) {
+        console.error('Failed to save time log to database:', error);
+        alert('Failed to save time log to database. Please try again.');
+      }
     }
     setShowDescriptionDialog(false);
     setDescription('');

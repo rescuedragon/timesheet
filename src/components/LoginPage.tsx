@@ -53,17 +53,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30 relative overflow-hidden">
-      {/* Subtle background elements */}
+    <div className="min-h-screen bg-[#FAFAFA] relative overflow-hidden">
+      {/* Apple-style background elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 via-transparent to-purple-600/10"></div>
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/3 left-1/5 w-80 h-80 bg-gradient-to-tr from-blue-400/8 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-100/40 via-transparent to-purple-200/30"></div>
+        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-purple-300/20 to-purple-400/10 rounded-full blur-3xl transform rotate-12"></div>
+        <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-gradient-to-tr from-purple-200/30 to-transparent rounded-full blur-3xl"></div>
       </div>
 
-      {/* Top Left Branding */}
-      <div className="absolute top-6 left-6 z-20">
-        <div className="text-2xl font-semibold text-slate-800 tracking-tight">
+      {/* Top Left Branding - Apple Style */}
+      <div className="absolute top-8 left-8 z-20">
+        <div className="text-2xl font-medium text-purple-900/90 tracking-tight">
           Timesheet
         </div>
       </div>
@@ -73,25 +73,25 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         {/* Top Section - Date and Branding */}
         <div className="flex-1 flex flex-col justify-center items-center px-6 py-12">
           <div className="w-full max-w-md space-y-8">
-            {/* Date Display */}
-            <div className="text-center space-y-2">
-              <div className="text-3xl font-light text-slate-800 tracking-tight">
+            {/* Date Display - Apple Style */}
+            <div className="text-center space-y-3">
+              <div className="text-4xl font-medium text-purple-900/90 tracking-tight">
                 Welcome back
               </div>
-              <div className="text-sm font-medium text-slate-500 tracking-wide">
+              <div className="text-sm font-medium text-purple-700/60 tracking-wide">
                 {currentDate}
               </div>
             </div>
 
             {/* Login Card */}
-            <Card className="bg-white/80 backdrop-blur-xl border-0 shadow-2xl shadow-purple-500/10 rounded-3xl overflow-hidden">
-              <CardContent className="p-8 space-y-6">
+            <Card className="bg-white/90 backdrop-blur-2xl border border-purple-100/50 shadow-xl shadow-purple-200/30 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-purple-300/30">
+              <CardContent className="p-10 space-y-7">
                 <form onSubmit={handleLogin} className="space-y-6">
                   {/* Username Field */}
                   <div className="space-y-2">
                     <Label 
                       htmlFor="username" 
-                      className="text-sm font-medium text-slate-700"
+                      className="text-sm font-medium text-purple-900/80"
                     >
                       Email or Username
                     </Label>
@@ -100,7 +100,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="h-12 rounded-2xl border-2 border-slate-200 bg-white/70 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-slate-800 placeholder:text-slate-400 shadow-sm"
+                      className="h-14 rounded-2xl border border-purple-100 bg-white/80 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-300/30 transition-all duration-300 text-purple-900 placeholder:text-purple-300 shadow-sm hover:border-purple-200"
                       placeholder="Enter your email or username"
                     />
                   </div>
@@ -109,7 +109,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   <div className="space-y-2">
                     <Label 
                       htmlFor="password" 
-                      className="text-sm font-medium text-slate-700"
+                      className="text-sm font-medium text-purple-900/80"
                     >
                       Password
                     </Label>
@@ -118,7 +118,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="h-12 rounded-2xl border-2 border-slate-200 bg-white/70 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-slate-800 placeholder:text-slate-400 shadow-sm"
+                      className="h-14 rounded-2xl border border-purple-100 bg-white/80 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-300/30 transition-all duration-300 text-purple-900 placeholder:text-purple-300 shadow-sm hover:border-purple-200"
                       placeholder="Enter your password"
                     />
                   </div>
@@ -126,17 +126,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   {/* Sign In Button */}
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium rounded-2xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] border-0"
+                    className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-2xl shadow-lg shadow-purple-300/30 hover:shadow-xl hover:shadow-purple-400/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] border-0"
                   >
-                    Sign In
+                    Continue
                   </Button>
                 </form>
 
                 {/* Additional Options */}
-                <div className="pt-4 border-t border-slate-100">
+                <div className="pt-5 border-t border-purple-50">
                   <div className="text-center">
-                    <button className="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors duration-200">
-                      Forgot your password?
+                    <button className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors duration-300">
+                      Forgot password?
                     </button>
                   </div>
                 </div>
@@ -144,10 +144,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </Card>
 
             {/* Bottom Text */}
-            <div className="text-center text-xs text-slate-500 space-y-1">
-              <div>Secure login powered by advanced encryption</div>
-              <div className="flex items-center justify-center space-x-1">
-                <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+            <div className="text-center text-xs text-purple-500/70 space-y-2 mt-8">
+              <div>Secure login with end-to-end encryption</div>
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse"></div>
                 <span>Protected connection</span>
               </div>
             </div>
@@ -156,8 +156,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
         {/* Footer */}
         <div className="pb-8 text-center">
-          <div className="text-xs text-slate-400">
-            © 2025 TimeTracker. Designed with precision.
+          <div className="text-xs text-purple-400/70">
+            © 2025 TimeTracker. Crafted with care.
           </div>
         </div>
       </div>

@@ -9,11 +9,11 @@ interface MainTabsProps {
   onTabChange: (value: string) => void;
   timeLogs: any[];
   addTimeLog: (newLog: any) => void;
-  setTimeLogs: React.Dispatch<any>;
+  setTimeLogs?: React.Dispatch<any>;
   replaceTimeLogs: (logs: any[]) => void;
 }
 
-const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, addTimeLog, setTimeLogs, replaceTimeLogs }) => {
+const MainTabs: React.FC<MainTabsProps> = ({ activeTab, onTabChange, timeLogs, addTimeLog, replaceTimeLogs }) => {
   return (
     <div className="w-[95%] mx-auto animate-slide-up mt-12">
       <div className="relative w-full mb-4 h-16 rounded-2xl bg-white/95 dark:bg-gray-900/95 p-1 shadow-xl backdrop-blur-xl border border-gray-200/30 dark:border-gray-700/30">

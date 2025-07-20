@@ -112,9 +112,21 @@ const QueuedProjects: React.FC<QueuedProjectsProps> = ({
       // Dispatch time-logs-updated event to ensure TimesheetView loads the updated logs
       window.dispatchEvent(new CustomEvent('time-logs-updated'));
       
+      // Dispatch a specific event for stopwatch logs being saved
+      window.dispatchEvent(new CustomEvent('stopwatch-log-saved', { 
+        detail: { log: newLog }
+      }));
+      
       // Force switch to the Timesheet tab and daily view
       window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
       window.dispatchEvent(new CustomEvent('switchToDailyView'));
+      
+      // Ensure the DailyView component is updated with the new entry
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('stopwatch-log-saved'));
+        window.dispatchEvent(new CustomEvent('time-logs-updated'));
+        window.dispatchEvent(new CustomEvent('switchToDailyView'));
+      }, 100);
       
       onStopProject(stoppingProject.id);
     } else {

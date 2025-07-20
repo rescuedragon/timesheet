@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TimeLog } from '@/types';
 import { storageService } from '@/services/storageService';
+import { apiService } from '@/services/apiService';
 import { formatDateString, getCurrentTimeString } from '@/utils/timeUtils';
 
 export const useTimeLogging = () => {
@@ -11,8 +12,27 @@ export const useTimeLogging = () => {
 
   // Load time logs on mount
   useEffect(() => {
-    const loadedTimeLogs = storageService.getTimeLogs();
-    setTimeLogs(loadedTimeLogs);
+    const loadTimeLogs = async () => {
+      try {
+        // First load from localStorage for immediate display
+        const localTimeLogs = storageService.getTimeLogs();
+        setTimeLogs(localTimeLogs);
+        
+        // Then fetch from API and update
+        const apiTimeLogs = await apiService.getTimeLogs();
+        setTimeLogs(apiTimeLogs);
+        
+        // Update localStorage with the latest data from API
+        storageService.saveTimeLogs(apiTimeLogs);
+      } catch (error) {
+        console.error('Failed to load time logs from API:', error);
+        // Fall back to localStorage if API fails
+        const localTimeLogs = storageService.getTimeLogs();
+        setTimeLogs(localTimeLogs);
+      }
+    };
+    
+    loadTimeLogs();
   }, []);
 
   // Save time logs whenever they change
@@ -22,7 +42,7 @@ export const useTimeLogging = () => {
     window.dispatchEvent(new CustomEvent('time-logs-updated'));
   }, [timeLogs]);
 
-  const logTime = useCallback((
+  const logTime = useCallback(async (
     duration: number,
     description: string,
     startTime: Date,
@@ -32,8 +52,7 @@ export const useTimeLogging = () => {
     projectName: string,
     subprojectName: string
   ) => {
-    const newTimeLog: TimeLog = {
-      id: Date.now().toString(),
+    const newTimeLogData = {
       projectId,
       subprojectId,
       projectName,
@@ -45,23 +64,93 @@ export const useTimeLogging = () => {
       endTime: endTime.toLocaleTimeString()
     };
 
-    setTimeLogs(prev => {
-      const updated = [newTimeLog, ...prev];
-      storageService.saveTimeLogs(updated);
-      window.dispatchEvent(new CustomEvent('time-logs-updated'));
-      return updated;
-    });
-    return newTimeLog;
+    try {
+      // Save to database via API
+      const savedTimeLog = await apiService.createTimeLog(newTimeLogData);
+      
+      // Update local state
+      setTimeLogs(prev => {
+        const updated = [savedTimeLog, ...prev];
+        storageService.saveTimeLogs(updated);
+        window.dispatchEvent(new CustomEvent('time-logs-updated'));
+        return updated;
+      });
+      
+      return savedTimeLog;
+    } catch (error) {
+      console.error('Failed to save time log to database:', error);
+      
+      // Fall back to local storage only if API fails
+      const localTimeLog = {
+        id: Date.now().toString(),
+        ...newTimeLogData
+      };
+      
+      setTimeLogs(prev => {
+        const updated = [localTimeLog, ...prev];
+        storageService.saveTimeLogs(updated);
+        window.dispatchEvent(new CustomEvent('time-logs-updated'));
+        return updated;
+      });
+      
+      return localTimeLog;
+    }
   }, []);
 
-  const updateTimeLog = useCallback((logId: string, updates: Partial<TimeLog>) => {
-    setTimeLogs(prev => prev.map(log => 
-      log.id === logId ? { ...log, ...updates } : log
-    ));
+  const updateTimeLog = useCallback(async (logId: string, updates: Partial<TimeLog>) => {
+    try {
+      // Update in database via API
+      const updatedLog = await apiService.updateTimeLog(logId, updates);
+      
+      // Update local state
+      setTimeLogs(prev => prev.map(log => 
+        log.id === logId ? updatedLog : log
+      ));
+      
+      // Update localStorage
+      const currentLogs = storageService.getTimeLogs();
+      const updatedLogs = currentLogs.map(log => 
+        log.id === logId ? updatedLog : log
+      );
+      storageService.saveTimeLogs(updatedLogs);
+    } catch (error) {
+      console.error('Failed to update time log in database:', error);
+      
+      // Fall back to local update only if API fails
+      setTimeLogs(prev => prev.map(log => 
+        log.id === logId ? { ...log, ...updates } : log
+      ));
+      
+      const currentLogs = storageService.getTimeLogs();
+      const updatedLogs = currentLogs.map(log => 
+        log.id === logId ? { ...log, ...updates } : log
+      );
+      storageService.saveTimeLogs(updatedLogs);
+    }
   }, []);
 
-  const deleteTimeLog = useCallback((logId: string) => {
-    setTimeLogs(prev => prev.filter(log => log.id !== logId));
+  const deleteTimeLog = useCallback(async (logId: string) => {
+    try {
+      // Delete from database via API
+      await apiService.deleteTimeLog(logId);
+      
+      // Update local state
+      setTimeLogs(prev => prev.filter(log => log.id !== logId));
+      
+      // Update localStorage
+      const currentLogs = storageService.getTimeLogs();
+      const updatedLogs = currentLogs.filter(log => log.id !== logId);
+      storageService.saveTimeLogs(updatedLogs);
+    } catch (error) {
+      console.error('Failed to delete time log from database:', error);
+      
+      // Fall back to local delete only if API fails
+      setTimeLogs(prev => prev.filter(log => log.id !== logId));
+      
+      const currentLogs = storageService.getTimeLogs();
+      const updatedLogs = currentLogs.filter(log => log.id !== logId);
+      storageService.saveTimeLogs(updatedLogs);
+    }
   }, []);
 
   const updateLogDuration = useCallback((logId: string, newDuration: number) => {

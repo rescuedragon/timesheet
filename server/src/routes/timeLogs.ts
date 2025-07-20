@@ -80,49 +80,92 @@ router.get('/:id', async (req, res) => {
 // POST /api/time-logs - Create new time log
 router.post('/', async (req, res) => {
   try {
-    const data = createTimeLogSchema.parse(req.body);
+    console.log('[DEBUG] Creating new time log with data:', JSON.stringify(req.body, null, 2));
     
-    // Create time log and update project/subproject totals
-    const timeLog = await prisma.$transaction(async (tx) => {
-      // Create the time log
-      const newTimeLog = await tx.timeLog.create({
-        data,
-        include: {
-          project: true,
-          subproject: true
-        }
+    // Validate the request data
+    try {
+      const data = createTimeLogSchema.parse(req.body);
+      console.log('[DEBUG] Validation passed for time log data');
+      
+      // Check if project and subproject exist
+      const project = await prisma.project.findUnique({
+        where: { id: data.projectId }
       });
       
-      // Update project total time
-      await tx.project.update({
-        where: { id: data.projectId },
-        data: {
-          totalTime: {
-            increment: data.duration
+      if (!project) {
+        console.error(`[ERROR] Project with ID ${data.projectId} not found`);
+        return res.status(404).json({ error: `Project with ID ${data.projectId} not found` });
+      }
+      
+      const subproject = await prisma.subproject.findUnique({
+        where: { id: data.subprojectId }
+      });
+      
+      if (!subproject) {
+        console.error(`[ERROR] Subproject with ID ${data.subprojectId} not found`);
+        return res.status(404).json({ error: `Subproject with ID ${data.subprojectId} not found` });
+      }
+      
+      console.log('[DEBUG] Project and subproject found, proceeding with time log creation');
+      
+      // Create time log and update project/subproject totals
+      const timeLog = await prisma.$transaction(async (tx) => {
+        // Create the time log
+        console.log('[DEBUG] Creating time log in transaction');
+        const newTimeLog = await tx.timeLog.create({
+          data,
+          include: {
+            project: true,
+            subproject: true
           }
-        }
-      });
-      
-      // Update subproject total time
-      await tx.subproject.update({
-        where: { id: data.subprojectId },
-        data: {
-          totalTime: {
-            increment: data.duration
+        });
+        console.log('[DEBUG] Time log created:', newTimeLog.id);
+        
+        // Update project total time
+        console.log('[DEBUG] Updating project total time');
+        await tx.project.update({
+          where: { id: data.projectId },
+          data: {
+            totalTime: {
+              increment: data.duration
+            }
           }
-        }
+        });
+        
+        // Update subproject total time
+        console.log('[DEBUG] Updating subproject total time');
+        await tx.subproject.update({
+          where: { id: data.subprojectId },
+          data: {
+            totalTime: {
+              increment: data.duration
+            }
+          }
+        });
+        
+        return newTimeLog;
       });
       
-      return newTimeLog;
-    });
-    
-    res.status(201).json(timeLog);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.errors });
+      console.log('[DEBUG] Transaction completed successfully, returning time log');
+      res.status(201).json(timeLog);
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        console.error('[ERROR] Validation error:', validationError.errors);
+        return res.status(400).json({ error: validationError.errors });
+      }
+      throw validationError;
     }
-    console.error('Error creating time log:', error);
-    res.status(500).json({ error: 'Failed to create time log' });
+  } catch (error) {
+    console.error('[ERROR] Error creating time log:', error);
+    if (error instanceof Error) {
+      console.error('[ERROR] Error message:', error.message);
+      console.error('[ERROR] Error stack:', error.stack);
+    }
+    res.status(500).json({ 
+      error: 'Failed to create time log',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      details: error instanceof Error && 'code' in error ? (error as any).code : undefined
+    });
   }
 });
 
