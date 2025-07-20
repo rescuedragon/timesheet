@@ -7,12 +7,12 @@ interface ProgressBarProps {
   enabled?: boolean;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
+const ProgressBar = ({
   currentHours,
   targetHours = 8,
   color = '#006994',
   enabled = false
-}) => {
+}: ProgressBarProps): JSX.Element => {
   const progressPercentage = Math.min(currentHours / 3600 / targetHours * 100, 100);
   const hours = (currentHours / 3600).toFixed(1);
 
@@ -633,25 +633,29 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
   if (!enabled) {
     return (
-      <div className="mb-6 p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in backdrop-blur-sm">
-        <div className="flex items-center justify-between">
+      <div className="mb-6 p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in backdrop-blur-sm overflow-hidden relative">
+        <div className="flex items-center justify-between relative z-10 rounded-2xl overflow-hidden">
           <div>
             <div className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Total Time Today</div>
             <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">{hours} hrs</div>
           </div>
           <div className="text-right">
-            <div className="w-20 h-20 rounded-full bg-gray-900 flex items-center justify-center border border-gray-800 dark:border-gray-700">
+            <div className="w-20 h-20 rounded-full bg-gray-900 flex items-center justify-center border border-gray-800 dark:border-gray-700 overflow-hidden">
               <div className="text-2xl font-bold text-white">{Math.round(parseFloat(hours))}</div>
             </div>
           </div>
         </div>
       </div>
-    );
+    ) as JSX.Element;
   }
   return (
     <div
       ref={containerRef}
-      className="mb-6 p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in relative backdrop-blur-sm h-44"
+      className="mb-6 p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in relative backdrop-blur-sm h-44 overflow-hidden relative"
+      style={{
+        isolation: 'isolate',
+        borderRadius: '1rem'
+      }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800" />
 
