@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import TimeTracker from '@/components/TimeTracker';
-import ExcelView from '@/components/ExcelView';
 import Holidays from '@/components/Holidays';
 import LoginPage from '@/components/LoginPage';
 import HeaderControls from '@/components/common/HeaderControls';
 import AppHeader from '@/components/common/AppHeader';
 import MainTabs from '@/components/common/MainTabs';
+import ApiDebug from '@/components/ApiDebug';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useTimeLogging } from '@/hooks/useTimeLogging';
 import { storageService } from '@/services/storageService';
@@ -15,10 +15,10 @@ const Index = React.memo(() => {
   const [activeTab, setActiveTab] = useState('tracker');
 
   // --- LIFTED STATE ---
-  const { timeLogs, logTime } = useTimeLogging();
+  const { timeLogs, logTime, refreshTimeLogs } = useTimeLogging();
   
   const addTimeLog = (newLog) => {
-    console.log('Index.tsx - addTimeLog called with:', newLog);
+    console.log('[Index] addTimeLog called with:', newLog);
     // The useTimeLogging hook will handle the state management
     // This function is kept for backward compatibility
   };
@@ -26,7 +26,7 @@ const Index = React.memo(() => {
   const replaceTimeLogs = (logs) => {
     // This function is kept for backward compatibility
     // The useTimeLogging hook handles state management
-    console.log('Index.tsx - replaceTimeLogs called with:', logs);
+    console.log('[Index] replaceTimeLogs called with:', logs);
   };
   // --- END LIFTED STATE ---
 
@@ -34,31 +34,45 @@ const Index = React.memo(() => {
     setIsLoggedIn(true);
   }, [setIsLoggedIn]);
 
-  const handleSwitchToExcel = useCallback(() => {
-    setActiveTab('data');
-  }, []);
+
 
   const handleSwitchToDaily = useCallback(() => {
+    console.log('[Index] Switching to Daily view');
     setActiveTab('data');
+    
+    // Add a small delay to ensure the tab has switched
+    setTimeout(() => {
+      console.log('[Index] Dispatching time-logs-updated event');
+      window.dispatchEvent(new CustomEvent('time-logs-updated'));
+      window.dispatchEvent(new CustomEvent('force-refresh-daily-view'));
+    }, 300);
   }, []);
   
   const handleSwitchToTimesheetTab = useCallback((event) => {
+    console.log('[Index] Switching to Timesheet tab');
     setActiveTab('data');
-    // Dispatch another event to notify TimesheetView to switch to daily view
-    window.dispatchEvent(new CustomEvent('switch-to-daily-view'));
-  }, []);
+    
+    // Add a small delay to ensure the tab has switched
+    setTimeout(() => {
+      console.log('[Index] Dispatching switchToDailyView event');
+      window.dispatchEvent(new CustomEvent('switchToDailyView'));
+      window.dispatchEvent(new CustomEvent('time-logs-updated'));
+      window.dispatchEvent(new CustomEvent('force-refresh-daily-view'));
+      
+      // Force a refresh of time logs from API
+      refreshTimeLogs();
+    }, 300);
+  }, [refreshTimeLogs]);
 
   useEffect(() => {
-    window.addEventListener('switchToExcelView', handleSwitchToExcel);
     window.addEventListener('switchToDailyView', handleSwitchToDaily);
     window.addEventListener('switchToTimesheetTab', handleSwitchToTimesheetTab);
     
     return () => {
-      window.removeEventListener('switchToExcelView', handleSwitchToExcel);
       window.removeEventListener('switchToDailyView', handleSwitchToDaily);
       window.removeEventListener('switchToTimesheetTab', handleSwitchToTimesheetTab);
     };
-  }, [handleSwitchToExcel, handleSwitchToDaily, handleSwitchToTimesheetTab]);
+  }, [handleSwitchToDaily, handleSwitchToTimesheetTab]);
 
   const handleClearStorage = useCallback(() => {
     localStorage.clear();
@@ -87,6 +101,11 @@ const Index = React.memo(() => {
       <AppHeader>
         <MainTabs activeTab={activeTab} onTabChange={setActiveTab} timeLogs={timeLogs} addTimeLog={addTimeLog} replaceTimeLogs={replaceTimeLogs} />
       </AppHeader>
+      
+      {/* Temporary API Debug Component */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <ApiDebug />
+      </div>
     </>
   );
 });

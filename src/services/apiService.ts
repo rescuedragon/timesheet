@@ -71,6 +71,7 @@ class ApiService {
   }
 
   async createTimeLog(timeLog: Omit<TimeLog, 'id'>): Promise<TimeLog> {
+    console.log('[API] Creating time log with data:', timeLog);
     return this.fetchWithErrorHandling<TimeLog>(`${API_BASE_URL}/time-logs`, {
       method: 'POST',
       headers: {

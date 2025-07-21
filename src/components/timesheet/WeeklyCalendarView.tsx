@@ -13,6 +13,7 @@ interface WeeklyCalendarViewProps {
   onDeleteTimeLog?: (log: TimeLog) => void;
   initialViewMode?: 'weekly' | 'daily';
   onViewModeChange?: (mode: 'weekly' | 'daily') => void;
+  forceRefresh?: number; // Add this prop to force refresh
 }
 
 const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
@@ -23,7 +24,8 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
   onUpdateTimeLog,
   onDeleteTimeLog,
   initialViewMode = 'weekly',
-  onViewModeChange
+  onViewModeChange,
+  forceRefresh
 }) => {
   const [currentDate, setCurrentDate] = useState<Date>(selectedDate);
   const [weekDays, setWeekDays] = useState<Date[]>([]);
@@ -31,10 +33,35 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
   const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
   const [currentEntry, setCurrentEntry] = useState<TimeLog | undefined>(undefined);
   
-  // Update viewMode when initialViewMode changes
+  // Update viewMode when initialViewMode changes or forceRefresh changes
   useEffect(() => {
     setViewMode(initialViewMode);
-  }, [initialViewMode]);
+    console.log('[WeeklyCalendarView] viewMode updated to:', initialViewMode);
+  }, [initialViewMode, forceRefresh]);
+  
+  // Listen for events to refresh data
+  useEffect(() => {
+    const handleTimeLogsUpdated = () => {
+      console.log('[WeeklyCalendarView] time logs updated');
+      // If we're in daily view, make sure we stay there
+      if (viewMode === 'daily') {
+        setViewMode('daily');
+        if (onViewModeChange) {
+          onViewModeChange('daily');
+        }
+      }
+    };
+    
+    window.addEventListener('time-logs-updated', handleTimeLogsUpdated);
+    window.addEventListener('stopwatch-log-saved', handleTimeLogsUpdated);
+    window.addEventListener('force-refresh-daily-view', handleTimeLogsUpdated);
+    
+    return () => {
+      window.removeEventListener('time-logs-updated', handleTimeLogsUpdated);
+      window.removeEventListener('stopwatch-log-saved', handleTimeLogsUpdated);
+      window.removeEventListener('force-refresh-daily-view', handleTimeLogsUpdated);
+    };
+  }, [viewMode, onViewModeChange]);
   
   // Calculate week days whenever the current date changes
   useEffect(() => {
@@ -99,6 +126,9 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
     if (onDateChange) {
       onDateChange(day);
     }
+    if (onViewModeChange) {
+      onViewModeChange('daily');
+    }
   };
   
   // Handle adding a new entry
@@ -148,6 +178,9 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
         console.error('Error parsing entry date:', error);
       }
     }
+    
+    // Dispatch event to refresh the view
+    window.dispatchEvent(new CustomEvent('time-logs-updated'));
   };
   
   return (

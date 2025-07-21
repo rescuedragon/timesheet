@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useProjectManagement } from '@/hooks/useProjectManagement';
 import { useTimeLogging } from '@/hooks/useTimeLogging';
 import { storageService } from '@/services/storageService';
-import { apiService } from '@/services/apiService';
 import ClickSpark from '../common/ClickSpark';
 import CurrentSelectionDisplay from './CurrentSelectionDisplay';
 import TimeTrackerLayout from './TimeTrackerLayout';
@@ -184,37 +183,53 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
         const project = projects.find(p => p.id === targetProjectId);
         const subproject = project?.subprojects.find(s => s.id === targetSubprojectId);
 
-        if (!project || !subproject) return;
+        if (!project || !subproject) {
+            console.error('TimeTracker - Cannot log time: Project or subproject not found', {
+                targetProjectId,
+                targetSubprojectId,
+                projectFound: !!project,
+                subprojectFound: !!subproject,
+                availableProjects: projects.map(p => ({ id: p.id, name: p.name }))
+            });
+            alert('Cannot log time: Project or subproject not found. Please select a valid project and subproject.');
+            return;
+        }
 
-        // Compose the new log object
-        const newLog = {
-          projectId: targetProjectId,
-          subprojectId: targetSubprojectId,
-          projectName: project.name,
-          subprojectName: subproject.name,
-          duration,
-          description,
-          date: new Date().toISOString().split('T')[0],
-          startTime: startTime.toLocaleTimeString(),
-          endTime: endTime.toLocaleTimeString()
-        };
-        
         try {
-          // Save to database via API
-          const savedLog = await apiService.createTimeLog(newLog);
-          console.log('TimeTracker - saved to database:', savedLog);
+          console.log('TimeTracker - Logging time with project data:', {
+            projectId: targetProjectId,
+            projectName: project.name,
+            subprojectId: targetSubprojectId,
+            subprojectName: subproject.name
+          });
+          
+          // Use the logTime function from useTimeLogging hook
+          const savedLog = await logTime(
+            duration,
+            description,
+            startTime,
+            endTime,
+            targetProjectId,
+            targetSubprojectId,
+            project.name,
+            subproject.name
+          );
+          
+          console.log('TimeTracker - saved to database via hook:', savedLog);
           
           // Add to local state
           onAddTimeLog(savedLog);
           
-          // Save directly to storage to ensure it's available to other components
-          const existingLogs = JSON.parse(localStorage.getItem('timesheet-logs') || '[]');
-          const updatedLogs = [savedLog, ...existingLogs];
-          localStorage.setItem('timesheet-logs', JSON.stringify(updatedLogs));
-          
-          // Dispatch events to ensure DailyView is updated with the new entry
-          window.dispatchEvent(new CustomEvent('time-logs-updated'));
-          window.dispatchEvent(new CustomEvent('switchToDailyView'));
+          // Dispatch a single event with all necessary data
+          window.dispatchEvent(new CustomEvent('stopwatch-log-saved', { 
+            detail: { 
+              log: savedLog,
+              projectId: targetProjectId,
+              subprojectId: targetSubprojectId,
+              projectName: project.name,
+              subprojectName: subproject.name
+            }
+          }));
         } catch (error) {
           console.error('Failed to save time log to database:', error);
           alert('Failed to save time log to database. Please try again.');

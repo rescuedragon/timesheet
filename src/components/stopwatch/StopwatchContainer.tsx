@@ -5,7 +5,7 @@ import TimeLogDialog from '../timesheet/TimeLogDialog';
 import StopwatchManager from '../timesheet/StopwatchManager';
 import { Project, Subproject } from '../TimeTracker';
 import { QueuedProject } from '../QueuedProjects';
-import { apiService } from '@/services/apiService';
+import { useTimeLogging } from '@/hooks/useTimeLogging';
 
 interface StopwatchContainerProps {
   selectedProject: Project | undefined;
@@ -30,6 +30,7 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
   onTimerStopped,
   onAddTimeLog
 }) => {
+  const { logTime } = useTimeLogging();
   const [showDescriptionDialog, setShowDescriptionDialog] = React.useState(false);
   const [description, setDescription] = React.useState('');
   const [pendingLogData, setPendingLogData] = React.useState<{duration: number, startTime: Date, endTime: Date} | null>(null);
@@ -41,47 +42,72 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
       // Use the current start time (which may have been updated by duration changes)
       const startTimeToUse = currentStartTime || pendingLogData.startTime;
       
-      const newLog = {
-        projectId: selectedProject.id,
-        subprojectId: selectedSubproject.id,
-        projectName: selectedProject.name,
-        subprojectName: selectedSubproject.name,
-        duration: currentDuration,
-        description,
-        date: new Date().toISOString().split('T')[0],
-        startTime: startTimeToUse.toLocaleTimeString(),
-        endTime: pendingLogData.endTime.toLocaleTimeString()
-      };
-      console.log('StopwatchContainer - creating new log:', newLog);
-      
       try {
-        // Save to database via API
-        const savedLog = await apiService.createTimeLog(newLog);
-        console.log('StopwatchContainer - saved to database:', savedLog);
+        // Ensure we have valid project and subproject data
+        if (!selectedProject.id || !selectedSubproject.id || !selectedProject.name || !selectedSubproject.name) {
+          console.error('[StopwatchContainer] Invalid project or subproject data:', {
+            projectId: selectedProject?.id,
+            subprojectId: selectedSubproject?.id,
+            projectName: selectedProject?.name,
+            subprojectName: selectedSubproject?.name
+          });
+          throw new Error('Invalid project or subproject data');
+        }
+        
+        console.log('[StopwatchContainer] Saving time log with:', {
+          duration: currentDuration,
+          description,
+          startTime: startTimeToUse,
+          endTime: pendingLogData.endTime,
+          projectId: selectedProject.id,
+          subprojectId: selectedSubproject.id,
+          projectName: selectedProject.name,
+          subprojectName: selectedSubproject.name
+        });
+        
+        // Use the logTime function from useTimeLogging hook with explicit project/subproject data
+        const savedLog = await logTime(
+          currentDuration,
+          description,
+          startTimeToUse,
+          pendingLogData.endTime,
+          selectedProject.id,
+          selectedSubproject.id,
+          selectedProject.name,
+          selectedSubproject.name
+        );
+        
+        console.log('[StopwatchContainer] Saved to database via hook:', savedLog);
         
         // Add the time log to local state
-        onAddTimeLog(savedLog);
+        if (onAddTimeLog) {
+          onAddTimeLog(savedLog);
+        }
         
-        // Save directly to storage to ensure it's available to other components
-        const existingLogs = JSON.parse(localStorage.getItem('timesheet-logs') || '[]');
-        const updatedLogs = [savedLog, ...existingLogs];
-        localStorage.setItem('timesheet-logs', JSON.stringify(updatedLogs));
-        
-        // Dispatch time-logs-updated event first to ensure TimesheetView loads the updated logs
-        window.dispatchEvent(new CustomEvent('time-logs-updated'));
-        
-        // Dispatch a specific event for stopwatch logs being saved
+        // Dispatch a single event with all necessary data
         window.dispatchEvent(new CustomEvent('stopwatch-log-saved', { 
-          detail: { log: savedLog }
+          detail: { 
+            log: savedLog,
+            projectId: selectedProject.id,
+            subprojectId: selectedSubproject.id,
+            projectName: selectedProject.name,
+            subprojectName: selectedSubproject.name
+          }
         }));
         
-        // Force switch to the Timesheet tab and daily view
+        // Force switch to the Timesheet tab
         window.dispatchEvent(new CustomEvent('switchToTimesheetTab'));
-        window.dispatchEvent(new CustomEvent('switchToDailyView'));
       } catch (error) {
-        console.error('Failed to save time log to database:', error);
+        console.error('[StopwatchContainer] Failed to save time log to database:', error);
         alert('Failed to save time log to database. Please try again.');
       }
+    } else {
+      console.error('[StopwatchContainer] Cannot save time log: Missing project or subproject information', {
+        pendingLogData,
+        selectedProject,
+        selectedSubproject
+      });
+      alert('Cannot save time log: Missing project or subproject information');
     }
     setShowDescriptionDialog(false);
     setDescription('');
@@ -151,6 +177,8 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
             const finalDuration = state.displayTime;
             
             if (finalDuration > 0) {
+              console.log('[StopwatchContainer] Stopping timer with project:', selectedProject.name, 'and subproject:', selectedSubproject.name);
+              
               setPendingLogData({
                 duration: finalDuration,
                 startTime: state.startTime,
@@ -202,4 +230,4 @@ const StopwatchContainer: React.FC<StopwatchContainerProps> = ({
   );
 };
 
-export default StopwatchContainer; 
+export default StopwatchContainer;

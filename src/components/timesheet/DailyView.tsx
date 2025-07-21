@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { format, isSameDay, parseISO } from 'date-fns';
+import React, { useEffect, useState, useCallback } from 'react';
+import { format, parseISO } from 'date-fns';
 import { TimeLog } from '@/types';
+import { apiService } from '@/services/apiService';
 
 interface DailyViewProps {
   selectedDate: Date;
@@ -17,51 +18,71 @@ const DailyView: React.FC<DailyViewProps> = ({
   onEditEntry,
   onDeleteEntry
 }) => {
-  // Add event listener for switchToDailyView event
+  const [localTimeLogs, setLocalTimeLogs] = useState<TimeLog[]>(timeLogs);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Update local logs when props change
   useEffect(() => {
-    const handleSwitchToDailyView = () => {
-      // This event will be triggered when a time entry is saved
-      // The component will re-render with updated timeLogs from props
-      console.log('Switching to Daily View with updated logs');
+    console.log('[DailyView] Received new timeLogs from props:', timeLogs);
+    setLocalTimeLogs(timeLogs);
+  }, [timeLogs]);
+
+  // Function to refresh logs from API
+  const refreshLogsFromApi = useCallback(async () => {
+    console.log('[DailyView] Refreshing logs from API');
+    setIsRefreshing(true);
+    try {
+      const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
+      console.log(`[DailyView] Fetching logs for date: ${selectedDateStr}`);
+      const refreshedLogs = await apiService.getTimeLogs({ date: selectedDateStr });
+      console.log('[DailyView] Refreshed time logs from API:', refreshedLogs);
+      setLocalTimeLogs(refreshedLogs);
       
-      // Force a re-render by using a state update
-      // This is a workaround to ensure the component updates with the latest timeLogs
-      const forceUpdate = () => {
-        // Dispatch a custom event to force parent components to reload time logs
-        window.dispatchEvent(new CustomEvent('reload-time-logs'));
-      };
-      forceUpdate();
+      // Dispatch a custom event to force parent components to reload time logs
+      window.dispatchEvent(new CustomEvent('reload-time-logs'));
+    } catch (error) {
+      console.error('[DailyView] Failed to refresh time logs:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [selectedDate]);
+
+  // Add event listener for various events that should trigger a refresh
+  useEffect(() => {
+    const handleRefreshEvents = () => {
+      console.log('[DailyView] Refresh event received');
+      refreshLogsFromApi();
     };
 
     // Listen for all relevant events that should trigger a refresh
-    window.addEventListener('switchToDailyView', handleSwitchToDailyView);
-    window.addEventListener('time-logs-updated', handleSwitchToDailyView);
-    window.addEventListener('stopwatch-log-saved', handleSwitchToDailyView);
+    window.addEventListener('switchToDailyView', handleRefreshEvents);
+    window.addEventListener('time-logs-updated', handleRefreshEvents);
+    window.addEventListener('stopwatch-log-saved', handleRefreshEvents);
+    window.addEventListener('switch-to-daily-view', handleRefreshEvents);
+    window.addEventListener('force-refresh-daily-view', handleRefreshEvents);
     
     return () => {
-      window.removeEventListener('switchToDailyView', handleSwitchToDailyView);
-      window.removeEventListener('time-logs-updated', handleSwitchToDailyView);
-      window.removeEventListener('stopwatch-log-saved', handleSwitchToDailyView);
+      window.removeEventListener('switchToDailyView', handleRefreshEvents);
+      window.removeEventListener('time-logs-updated', handleRefreshEvents);
+      window.removeEventListener('stopwatch-log-saved', handleRefreshEvents);
+      window.removeEventListener('switch-to-daily-view', handleRefreshEvents);
+      window.removeEventListener('force-refresh-daily-view', handleRefreshEvents);
     };
-  }, []);
+  }, [refreshLogsFromApi]);
+
+  // Refresh logs when selected date changes
+  useEffect(() => {
+    refreshLogsFromApi();
+  }, [selectedDate, refreshLogsFromApi]);
 
   // Filter logs for the selected date
   const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
-  const dailyLogs = timeLogs.filter(log => log.date === selectedDateStr);
+  const dailyLogs = localTimeLogs.filter(log => log.date === selectedDateStr);
+  
+  console.log(`[DailyView] Filtered logs for ${selectedDateStr}:`, dailyLogs);
   
   // Calculate total hours for the day
   const totalHours = dailyLogs.reduce((total, log) => total + log.duration, 0) / 3600;
-  
-  // Group logs by date for display
-  const groupedLogs: Record<string, TimeLog[]> = {};
-  
-  dailyLogs.forEach(log => {
-    const dateKey = log.date;
-    if (!groupedLogs[dateKey]) {
-      groupedLogs[dateKey] = [];
-    }
-    groupedLogs[dateKey].push(log);
-  });
   
   return (
     <div className="w-full">
@@ -97,10 +118,14 @@ const DailyView: React.FC<DailyViewProps> = ({
         </div>
         
         {/* Table body */}
-        {dailyLogs.length > 0 ? (
+        {isRefreshing ? (
+          <div className="px-4 py-8 text-center">
+            <p className="text-[#8E8E93] dark:text-[#8E8E93]">Loading time entries...</p>
+          </div>
+        ) : dailyLogs.length > 0 ? (
           dailyLogs.map((log, index) => (
             <div 
-              key={index} 
+              key={log.id || index} 
               className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F2F2F7] dark:hover:bg-[#2C2C2E] transition-colors"
             >
               <div className="col-span-2 text-sm text-[#000000] dark:text-white">

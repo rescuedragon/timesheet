@@ -25,15 +25,19 @@ router.get('/', async (req, res) => {
   try {
     const { date, startDate, endDate } = req.query;
     
+    console.log('[DEBUG] GET /api/time-logs with query params:', { date, startDate, endDate });
+    
     let whereClause: any = {};
     
     if (date) {
       whereClause.date = date as string;
+      console.log(`[DEBUG] Filtering by date: ${date}`);
     } else if (startDate && endDate) {
       whereClause.date = {
         gte: startDate as string,
         lte: endDate as string
       };
+      console.log(`[DEBUG] Filtering by date range: ${startDate} to ${endDate}`);
     }
     
     const timeLogs = await prisma.timeLog.findMany({
@@ -48,9 +52,10 @@ router.get('/', async (req, res) => {
       ]
     });
     
+    console.log(`[DEBUG] Found ${timeLogs.length} time logs`);
     res.json(timeLogs);
   } catch (error) {
-    console.error('Error fetching time logs:', error);
+    console.error('[ERROR] Error fetching time logs:', error);
     res.status(500).json({ error: 'Failed to fetch time logs' });
   }
 });
@@ -58,6 +63,8 @@ router.get('/', async (req, res) => {
 // GET /api/time-logs/:id - Get single time log
 router.get('/:id', async (req, res) => {
   try {
+    console.log(`[DEBUG] GET /api/time-logs/${req.params.id}`);
+    
     const timeLog = await prisma.timeLog.findUnique({
       where: { id: req.params.id },
       include: {
@@ -67,12 +74,14 @@ router.get('/:id', async (req, res) => {
     });
     
     if (!timeLog) {
+      console.log(`[DEBUG] Time log with ID ${req.params.id} not found`);
       return res.status(404).json({ error: 'Time log not found' });
     }
     
+    console.log(`[DEBUG] Found time log with ID ${req.params.id}`);
     res.json(timeLog);
   } catch (error) {
-    console.error('Error fetching time log:', error);
+    console.error('[ERROR] Error fetching time log:', error);
     res.status(500).json({ error: 'Failed to fetch time log' });
   }
 });
@@ -146,7 +155,7 @@ router.post('/', async (req, res) => {
         return newTimeLog;
       });
       
-      console.log('[DEBUG] Transaction completed successfully, returning time log');
+      console.log('[DEBUG] Transaction completed successfully, returning time log:', timeLog);
       res.status(201).json(timeLog);
     } catch (validationError) {
       if (validationError instanceof z.ZodError) {
@@ -172,6 +181,8 @@ router.post('/', async (req, res) => {
 // PUT /api/time-logs/:id - Update time log
 router.put('/:id', async (req, res) => {
   try {
+    console.log(`[DEBUG] PUT /api/time-logs/${req.params.id} with data:`, JSON.stringify(req.body, null, 2));
+    
     const data = updateTimeLogSchema.parse(req.body);
     
     // Get the existing time log to calculate duration difference
@@ -180,11 +191,13 @@ router.put('/:id', async (req, res) => {
     });
     
     if (!existingTimeLog) {
+      console.log(`[DEBUG] Time log with ID ${req.params.id} not found`);
       return res.status(404).json({ error: 'Time log not found' });
     }
     
     const timeLog = await prisma.$transaction(async (tx) => {
       // Update the time log
+      console.log('[DEBUG] Updating time log in transaction');
       const updatedTimeLog = await tx.timeLog.update({
         where: { id: req.params.id },
         data,
@@ -198,6 +211,7 @@ router.put('/:id', async (req, res) => {
       if (data.duration !== undefined) {
         const durationDiff = data.duration - existingTimeLog.duration;
         
+        console.log(`[DEBUG] Updating project total time by ${durationDiff}`);
         await tx.project.update({
           where: { id: existingTimeLog.projectId },
           data: {
@@ -207,6 +221,7 @@ router.put('/:id', async (req, res) => {
           }
         });
         
+        console.log(`[DEBUG] Updating subproject total time by ${durationDiff}`);
         await tx.subproject.update({
           where: { id: existingTimeLog.subprojectId },
           data: {
@@ -220,12 +235,14 @@ router.put('/:id', async (req, res) => {
       return updatedTimeLog;
     });
     
+    console.log('[DEBUG] Time log updated successfully:', timeLog);
     res.json(timeLog);
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error('[ERROR] Validation error:', error.errors);
       return res.status(400).json({ error: error.errors });
     }
-    console.error('Error updating time log:', error);
+    console.error('[ERROR] Error updating time log:', error);
     res.status(500).json({ error: 'Failed to update time log' });
   }
 });
@@ -233,21 +250,26 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/time-logs/:id - Delete time log
 router.delete('/:id', async (req, res) => {
   try {
+    console.log(`[DEBUG] DELETE /api/time-logs/${req.params.id}`);
+    
     const timeLog = await prisma.timeLog.findUnique({
       where: { id: req.params.id }
     });
     
     if (!timeLog) {
+      console.log(`[DEBUG] Time log with ID ${req.params.id} not found`);
       return res.status(404).json({ error: 'Time log not found' });
     }
     
     await prisma.$transaction(async (tx) => {
       // Delete the time log
+      console.log('[DEBUG] Deleting time log in transaction');
       await tx.timeLog.delete({
         where: { id: req.params.id }
       });
       
       // Update project total time
+      console.log(`[DEBUG] Updating project total time by -${timeLog.duration}`);
       await tx.project.update({
         where: { id: timeLog.projectId },
         data: {
@@ -258,6 +280,7 @@ router.delete('/:id', async (req, res) => {
       });
       
       // Update subproject total time
+      console.log(`[DEBUG] Updating subproject total time by -${timeLog.duration}`);
       await tx.subproject.update({
         where: { id: timeLog.subprojectId },
         data: {
@@ -268,9 +291,10 @@ router.delete('/:id', async (req, res) => {
       });
     });
     
+    console.log('[DEBUG] Time log deleted successfully');
     res.status(204).send();
   } catch (error) {
-    console.error('Error deleting time log:', error);
+    console.error('[ERROR] Error deleting time log:', error);
     res.status(500).json({ error: 'Failed to delete time log' });
   }
 });
@@ -280,12 +304,15 @@ router.get('/stats/summary', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
+    console.log('[DEBUG] GET /api/time-logs/stats/summary with query params:', { startDate, endDate });
+    
     let whereClause: any = {};
     if (startDate && endDate) {
       whereClause.date = {
         gte: startDate as string,
         lte: endDate as string
       };
+      console.log(`[DEBUG] Filtering by date range: ${startDate} to ${endDate}`);
     }
     
     const [totalTime, totalLogs, projectStats] = await Promise.all([
@@ -309,13 +336,16 @@ router.get('/stats/summary', async (req, res) => {
       })
     ]);
     
-    res.json({
+    const result = {
       totalTime: totalTime._sum.duration || 0,
       totalLogs,
       projectStats
-    });
+    };
+    
+    console.log('[DEBUG] Stats summary:', result);
+    res.json(result);
   } catch (error) {
-    console.error('Error fetching time log stats:', error);
+    console.error('[ERROR] Error fetching time log stats:', error);
     res.status(500).json({ error: 'Failed to fetch statistics' });
   }
 });

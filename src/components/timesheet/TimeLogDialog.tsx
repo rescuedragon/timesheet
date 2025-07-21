@@ -47,12 +47,29 @@ const TimeLogDialog: React.FC<TimeLogDialogProps> = ({
 
   useEffect(() => {
     if (open) {
+      console.log('[TimeLogDialog] Opening dialog with project:', selectedProject?.name, 'and subproject:', selectedSubproject?.name);
+      
+      // Debug logging for project and subproject data
+      if (selectedProject && selectedSubproject) {
+        console.log('[TimeLogDialog] Project and subproject details:', {
+          projectId: selectedProject.id,
+          projectName: selectedProject.name,
+          subprojectId: selectedSubproject.id,
+          subprojectName: selectedSubproject.name
+        });
+      } else {
+        console.warn('[TimeLogDialog] Missing project or subproject data:', {
+          project: selectedProject,
+          subproject: selectedSubproject
+        });
+      }
+      
       const timer = setTimeout(() => setIsExpanded(true), 100);
       return () => clearTimeout(timer);
     } else {
       setIsExpanded(false);
     }
-  }, [open]);
+  }, [open, selectedProject, selectedSubproject]);
 
   const formatTimeString = (date?: Date) => {
     if (!date) return '--:--';
@@ -305,7 +322,16 @@ const TimeLogDialog: React.FC<TimeLogDialogProps> = ({
               Cancel
             </Button>
             <Button 
-              onClick={onConfirm}
+              onClick={() => {
+                // Log project and subproject data before confirming
+                console.log('[TimeLogDialog] Confirming with project data:', {
+                  projectId: selectedProject?.id,
+                  projectName: selectedProject?.name,
+                  subprojectId: selectedSubproject?.id,
+                  subprojectName: selectedSubproject?.name
+                });
+                onConfirm();
+              }}
               className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
             >
               <Check className="h-4 w-4 mr-2" />

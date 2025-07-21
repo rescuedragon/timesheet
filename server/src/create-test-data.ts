@@ -6,7 +6,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 // Load environment variables
-dotenv.config({ path: 'server/.env' });
+dotenv.config();
 
 async function createTestData() {
   try {
@@ -15,7 +15,7 @@ async function createTestData() {
     // Run Prisma migrations
     console.log('\nRunning Prisma migrations...');
     try {
-      const { stdout, stderr } = await execAsync('npx prisma migrate dev --name init --schema=server/prisma/schema.prisma');
+      const { stdout, stderr } = await execAsync('npx prisma migrate dev --name init');
       console.log('Migration output:', stdout);
       if (stderr) console.error('Migration errors:', stderr);
     } catch (error) {
