@@ -73,13 +73,9 @@ class StorageService {
 
   // Time logs management
   getTimeLogs(): TimeLog[] {
-    const cached = this.getCached<TimeLog[]>('timeLogs');
-    if (cached) return cached;
-
     try {
       const saved = localStorage.getItem('timesheet-logs');
       const logs = saved ? JSON.parse(saved) : [];
-      this.setCached('timeLogs', logs);
       return logs;
     } catch (error) {
       console.error('Error loading time logs:', error);
@@ -90,7 +86,6 @@ class StorageService {
   saveTimeLogs(timeLogs: TimeLog[]): void {
     try {
       localStorage.setItem('timesheet-logs', JSON.stringify(timeLogs));
-      this.setCached('timeLogs', timeLogs);
     } catch (error) {
       console.error('Error saving time logs:', error);
     }
@@ -154,8 +149,8 @@ class StorageService {
     try {
       const settings = {
         progressBar: {
-          enabled: this.getBooleanSetting('progressbar-enabled', false),
-          color: this.getStringSetting('progressbar-color', '#10b981'),
+          enabled: this.getBooleanSetting('progressbar-enabled', true), // Changed default to true
+          color: this.getStringSetting('progressbar-color', '#006994'), // Changed to ocean blue
           targetHours: 8
         },
         colorCodedProjects: this.getBooleanSetting('color-coded-projects-enabled', false),
@@ -268,8 +263,8 @@ class StorageService {
   private getDefaultSettings(): AppSettings {
     return {
       progressBar: {
-        enabled: false,
-        color: '#10b981',
+        enabled: true, // Changed default to true
+        color: '#006994', // Changed to ocean blue
         targetHours: 8
       },
       colorCodedProjects: false,

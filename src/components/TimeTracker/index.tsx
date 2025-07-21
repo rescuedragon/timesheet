@@ -54,13 +54,14 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
     const [resumedProject, setResumedProject] = useState<any>(undefined);
     const [currentFocus, setCurrentFocus] = useState<'project' | 'subproject' | 'timer'>('project');
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [autoStartTimer, setAutoStartTimer] = useState<NodeJS.Timeout | null>(null);
 
     // Debug logging
     console.log('TimeTracker - projects:', projects);
     console.log('TimeTracker - selectedProjectId:', selectedProjectId);
 
     // Use custom hooks
-    const { isTimerRunning } = useTimerStatus();
+    const { isTimerRunning, elapsedTime } = useTimerStatus();
     const { queuedProjects, handlePauseProject: pauseProject, handleResumeProject: resumeProject, handleStopQueuedProject } = useQueuedProjects();
 
     // Reference to the stopwatch panel for keyboard actions
@@ -117,35 +118,122 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
         };
     }, [projects, selectedSubprojectId]);
 
+    // Auto-start timer when both project and subproject are selected
+    useEffect(() => {
+        // Clear any existing timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
+
+        // Only start auto-timer if both project and subproject are selected and timer is not running
+        if (selectedProjectId && selectedSubprojectId && !isTimerRunning) {
+            const timer = setTimeout(() => {
+                // Auto-start the timer
+                if (stopwatchRef.current) {
+                    stopwatchRef.current.handleStart();
+                }
+            }, 10000); // 10 seconds
+
+            setAutoStartTimer(timer);
+        }
+
+        // Cleanup function
+        return () => {
+            if (autoStartTimer) {
+                clearTimeout(autoStartTimer);
+            }
+        };
+    }, [selectedProjectId, selectedSubprojectId, isTimerRunning, autoStartTimer]);
+
+    // Auto-deselect project and subproject after 10 seconds if timer doesn't start
+    useEffect(() => {
+        let deselectionTimer: NodeJS.Timeout | null = null;
+
+        if (selectedProjectId && selectedSubprojectId && !isTimerRunning) {
+            deselectionTimer = setTimeout(() => {
+                // Clear selections if timer hasn't started
+                if (!isTimerRunning) {
+                    setSelectedProjectId('');
+                    setSelectedSubprojectId('');
+                    if (projectSelectorRef.current) {
+                        projectSelectorRef.current.clearSelection();
+                    }
+                }
+            }, 10000); // 10 seconds
+        }
+
+        return () => {
+            if (deselectionTimer) {
+                clearTimeout(deselectionTimer);
+            }
+        };
+    }, [selectedProjectId, selectedSubprojectId, isTimerRunning]);
+
     const addSubproject = (projectId: string, subprojectName: string) => {
         // This function seems to be missing the setProjects call
         // You'll need to implement this properly based on your project management hook
         console.warn('addSubproject function needs to be implemented');
     };
 
-    const handleLogTime = (duration: number, description: string, startTime: Date, endTime: Date, projectId?: string, subprojectId?: string) => {
+    const handleLogTime = async (duration: number, description: string, startTime: Date, endTime: Date, projectId?: string, subprojectId?: string) => {
         const targetProjectId = projectId || selectedProjectId;
         const targetSubprojectId = subprojectId || selectedSubprojectId;
 
         const project = projects.find(p => p.id === targetProjectId);
         const subproject = project?.subprojects.find(s => s.id === targetSubprojectId);
 
-        if (!project || !subproject) return;
+        if (!project || !subproject) {
+            console.error('TimeTracker - Cannot log time: Project or subproject not found', {
+                targetProjectId,
+                targetSubprojectId,
+                projectFound: !!project,
+                subprojectFound: !!subproject,
+                availableProjects: projects.map(p => ({ id: p.id, name: p.name }))
+            });
+            alert('Cannot log time: Project or subproject not found. Please select a valid project and subproject.');
+            return;
+        }
 
-        // Compose the new log object
-        const newLog = {
-            id: Date.now().toString(),
+        try {
+          console.log('TimeTracker - Logging time with project data:', {
             projectId: targetProjectId,
-            subprojectId: targetSubprojectId,
             projectName: project.name,
-            subprojectName: subproject.name,
+            subprojectId: targetSubprojectId,
+            subprojectName: subproject.name
+          });
+          
+          // Use the logTime function from useTimeLogging hook
+          const savedLog = await logTime(
             duration,
             description,
-            date: new Date().toISOString().split('T')[0],
-            startTime: startTime.toLocaleTimeString(),
-            endTime: endTime.toLocaleTimeString()
-        };
-        onAddTimeLog(newLog);
+            startTime,
+            endTime,
+            targetProjectId,
+            targetSubprojectId,
+            project.name,
+            subproject.name
+          );
+          
+          console.log('TimeTracker - saved to database via hook:', savedLog);
+          
+          // Add to local state
+          onAddTimeLog(savedLog);
+          
+          // Dispatch a single event with all necessary data
+          window.dispatchEvent(new CustomEvent('stopwatch-log-saved', { 
+            detail: { 
+              log: savedLog,
+              projectId: targetProjectId,
+              subprojectId: targetSubprojectId,
+              projectName: project.name,
+              subprojectName: subproject.name
+            }
+          }));
+        } catch (error) {
+          console.error('Failed to save time log to database:', error);
+          alert('Failed to save time log to database. Please try again.');
+        }
     };
 
     const switchToExcelView = () => {
@@ -154,6 +242,12 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
 
     const handlePauseProject = (queuedProject: any) => {
         pauseProject(queuedProject);
+        // Deselect project and subproject when timer is paused
+        setSelectedProjectId('');
+        setSelectedSubprojectId('');
+        if (projectSelectorRef.current) {
+            projectSelectorRef.current.clearSelection();
+        }
     };
 
     const handleResumeProject = (queuedProject: any) => {
@@ -166,15 +260,38 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
 
     // Add this handler to clear subproject when project changes
     const handleProjectSelect = (projectId: string) => {
+        // Clear any existing auto-start timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
         setSelectedProjectId(projectId);
         setSelectedSubprojectId('');
     };
 
-    // Deselect project/subproject when timer is stopped
+    // Handler for subproject selection
+    const handleSubprojectSelect = (subprojectId: string) => {
+        // Clear any existing auto-start timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
+        setSelectedSubprojectId(subprojectId);
+    };
+
+    // Clear selections when timer is stopped
     const handleTimerStopped = () => {
+        // Clear any existing auto-start timer
+        if (autoStartTimer) {
+            clearTimeout(autoStartTimer);
+            setAutoStartTimer(null);
+        }
+        // Clear project and subproject selections
         setSelectedProjectId('');
         setSelectedSubprojectId('');
-        projectSelectorRef.current?.clearSelection();
+        if (projectSelectorRef.current) {
+            projectSelectorRef.current.clearSelection();
+        }
     };
 
     // Ensure only one timer runs at a time, pause and queue previous if needed
@@ -217,69 +334,43 @@ const TimeTracker = ({ onAddTimeLog }: { onAddTimeLog: (newLog: any) => void }) 
     const selectedSubproject = selectedProject?.subprojects.find(s => s.id === selectedSubprojectId);
 
     return (
-        <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <div className="relative min-h-screen bg-transparent">
             {/* Subtle background pattern */}
-            <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-                style={{
-                    backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0)`,
-                    backgroundSize: '24px 24px'
-                }} />
+            {/* Remove background pattern overlay to ensure full transparency */}
 
-            <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-6">
-                {/* Current Selection Display with ClickSpark */}
-                <div className="w-full max-w-7xl mb-8">
-                    <ClickSpark
-                        sparkColor='#fff'
-                        sparkSize={10}
-                        sparkRadius={15}
-                        sparkCount={8}
-                        duration={400}
-                    >
-                        <CurrentSelectionDisplay
-                            selectedProject={selectedProject}
-                            selectedSubproject={selectedSubproject}
-                            isTimerRunning={isTimerRunning}
-                            currentTime={currentTime}
-                        />
-                    </ClickSpark>
-                </div>
+            <TimeTrackerLayout
+                projects={projects}
+                selectedProjectId={selectedProjectId}
+                selectedSubprojectId={selectedSubprojectId}
+                onProjectSelect={handleProjectSelect}
+                onSubprojectSelect={handleSubprojectSelect}
+                onAddProject={addProject}
+                onAddSubproject={addSubproject}
+                selectedProject={selectedProject}
+                selectedSubproject={selectedSubproject}
+                onLogTime={handleLogTime}
+                onPauseProject={handlePauseProject}
+                resumedProject={resumedProject}
+                onResumedProjectHandled={handleResumedProjectHandled}
+                currentFocus={currentFocus}
+                onFocusChange={setCurrentFocus}
+                projectSelectorRef={projectSelectorRef}
+                stopwatchRef={stopwatchRef}
+                handleStartNewTimerForProject={handleStartNewTimerForProject}
+                onTimerStopped={handleTimerStopped}
+                isTimerRunning={isTimerRunning}
+                onAddTimeLog={onAddTimeLog}
+                elapsedTime={elapsedTime}
+            />
 
-                {/* Main Layout */}
-                <div className="w-full max-w-7xl mb-8">
-                    <TimeTrackerLayout
-                        projects={projects}
-                        selectedProjectId={selectedProjectId}
-                        selectedSubprojectId={selectedSubprojectId}
-                        onProjectSelect={handleProjectSelect}
-                        onSubprojectSelect={setSelectedSubprojectId}
-                        onAddProject={addProject}
-                        onAddSubproject={addSubproject}
-                        selectedProject={selectedProject}
-                        selectedSubproject={selectedSubproject}
-                        onLogTime={handleLogTime}
-                        onPauseProject={handlePauseProject}
-                        resumedProject={resumedProject}
-                        onResumedProjectHandled={handleResumedProjectHandled}
-                        currentFocus={currentFocus}
-                        onFocusChange={setCurrentFocus}
-                        projectSelectorRef={projectSelectorRef}
-                        stopwatchRef={stopwatchRef}
-                        handleStartNewTimerForProject={handleStartNewTimerForProject}
-                        onTimerStopped={handleTimerStopped}
-                        isTimerRunning={isTimerRunning}
-                        onAddTimeLog={onAddTimeLog}
-                    />
-                </div>
-
-                {/* Queued Projects */}
-                <div className="w-full max-w-7xl">
-                    <QueuedProjects
-                        queuedProjects={queuedProjects}
-                        onResumeProject={handleResumeProject}
-                        onStopProject={handleStopQueuedProject}
-                        onLogTime={handleLogTime}
-                    />
-                </div>
+            <div className="w-[95%] mx-auto flex flex-col min-h-0 p-6">
+                <QueuedProjects
+                    queuedProjects={queuedProjects}
+                    onResumeProject={handleResumeProject}
+                    onStopProject={handleStopQueuedProject}
+                    onLogTime={handleLogTime}
+                    isTimerRunning={isTimerRunning}
+                />
             </div>
         </div>
     );

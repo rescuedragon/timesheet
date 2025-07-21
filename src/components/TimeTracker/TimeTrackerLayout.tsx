@@ -6,6 +6,8 @@ import { QueuedProject } from '../QueuedProjects';
 import { ProjectSelectorRef } from '../ProjectSelector';
 import { StopwatchPanelRef } from '../StopwatchPanel';
 import ProjectSubprojectSearchBar from '../project-selector/ProjectSubprojectSearchBar';
+import CurrentTrackingDisplay from '../common/CurrentTrackingDisplay';
+import { useState } from 'react';
 
 interface TimeTrackerLayoutProps {
     projects: Project[];
@@ -29,6 +31,7 @@ interface TimeTrackerLayoutProps {
     onTimerStopped: () => void;
     isTimerRunning: boolean;
     onAddTimeLog: (newLog: any) => void;
+    elapsedTime: number;
 }
 
 const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
@@ -52,55 +55,56 @@ const TimeTrackerLayout: React.FC<TimeTrackerLayoutProps> = ({
     handleStartNewTimerForProject,
     onTimerStopped,
     isTimerRunning,
-    onAddTimeLog
+    onAddTimeLog,
+    elapsedTime
 }) => {
+    // Responsive layout: top, search row, main row, bottom
+    const [leftTab, setLeftTab] = useState<'projects' | 'quickstart'>('projects');
+    // Main container that auto-fits to screen size
     return (
-        <div className="w-full flex flex-col gap-6">
-            {/* Search Bar remains above the split */}
-            <div className="w-full max-w-7xl mx-auto relative">
-                <ProjectSubprojectSearchBar
-                    projects={projects}
-                    selectedProjectId={selectedProjectId}
-                    selectedSubprojectId={selectedSubprojectId}
-                    onProjectSelect={onProjectSelect}
-                    onSubprojectSelect={onSubprojectSelect}
-                />
-            </div>
-
-            {/* Strict 50/50 split, both panels w-1/2, h-[90%], min-h-0 */}
-            <div className="w-full max-w-7xl mx-auto flex flex-row gap-6 h-[76.5vh] min-h-0">
-                {/* Left: ProjectSelector */}
-                <div className="w-1/2 h-full min-h-0 flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-0 m-0">
-                    <ProjectSelector
-                        ref={projectSelectorRef}
-                        projects={projects}
-                        selectedProjectId={selectedProjectId}
-                        selectedSubprojectId={selectedSubprojectId}
-                        onProjectSelect={onProjectSelect}
-                        onSubprojectSelect={onSubprojectSelect}
-                        onAddProject={onAddProject}
-                        onAddSubproject={onAddSubproject}
-                        currentFocus={currentFocus}
-                        onFocusChange={onFocusChange}
-                        stopwatchRef={stopwatchRef}
-                        handleStartNewTimerForProject={handleStartNewTimerForProject}
-                        isTimerRunning={isTimerRunning}
-                    />
-                </div>
-                {/* Right: StopwatchPanel */}
-                <div className="w-1/2 h-full min-h-0 flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                    <StopwatchPanel
-                        ref={stopwatchRef}
+        <div className="w-full h-[90vh] flex flex-col min-h-0">
+            <div className="w-[95%] mx-auto flex flex-col min-h-0 flex-1 p-6 gap-6 h-full">
+                {/* Top: Currently Tracking (fixed height) */}
+                <div className="w-full flex-shrink-0 currently-tracking-material rounded-2xl box-border" style={{ minHeight: '120px', maxHeight: '160px', color: '#fff' }}>
+                    <CurrentTrackingDisplay
                         selectedProject={selectedProject}
                         selectedSubproject={selectedSubproject}
-                        onLogTime={onLogTime}
-                        onPauseProject={onPauseProject}
-                        resumedProject={resumedProject}
-                        onResumedProjectHandled={onResumedProjectHandled}
-                        currentFocus={currentFocus}
-                        onTimerStopped={onTimerStopped}
-                        onAddTimeLog={onAddTimeLog}
+                        isTimerRunning={isTimerRunning}
+                        currentTime={new Date()}
+                        elapsedTime={elapsedTime}
                     />
+                </div>
+                {/* Main Content Row: fills all available space */}
+                <div className="flex-1 min-h-0 flex flex-row gap-4">
+                    {/* Left Glass Subcontainer: ProjectSelector */}
+                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md border border-white/40 rounded-2xl shadow-md relative" style={{ background: 'rgba(255, 255, 255, 0.9)' }}>
+                        <div className="flex-1 min-h-0 flex flex-col">
+                            <ProjectSelector
+                                ref={projectSelectorRef}
+                                projects={projects}
+                                onProjectSelect={onProjectSelect}
+                                onSubprojectSelect={onSubprojectSelect}
+                                onStartTimer={handleStartNewTimerForProject}
+                            />
+                        </div>
+                    </div>
+                    {/* Right Glass Subcontainer: StopwatchPanel */}
+                    <div className="flex-1 min-h-0 flex flex-col backdrop-blur-md border border-white/40 rounded-2xl shadow-md" style={{ background: 'rgba(255, 255, 255, 0.9)' }}>
+                        <div className="flex-1 min-h-0 flex flex-col">
+                            <StopwatchPanel
+                                ref={stopwatchRef}
+                                selectedProject={selectedProject}
+                                selectedSubproject={selectedSubproject}
+                                onLogTime={onLogTime}
+                                onPauseProject={onPauseProject}
+                                resumedProject={resumedProject}
+                                onResumedProjectHandled={onResumedProjectHandled}
+                                currentFocus={currentFocus}
+                                onTimerStopped={onTimerStopped}
+                                onAddTimeLog={onAddTimeLog}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

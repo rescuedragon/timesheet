@@ -1,34 +1,24 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Moon, Sun } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface HeaderControlsProps {
-  isDarkMode: boolean;
-  onDarkModeToggle: () => void;
   onClearStorage: () => void;
   onForceReloadProjects: () => void;
 }
 
 const HeaderControls: React.FC<HeaderControlsProps> = ({
-  isDarkMode,
-  onDarkModeToggle,
   onClearStorage,
   onForceReloadProjects
 }) => {
   return (
-    <>
-      {/* Dark Mode Toggle */}
-      <div className="fixed top-6 left-6 z-50">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onDarkModeToggle}
-          className="p-4 rounded-2xl shadow-2xl hover:shadow-2xl bg-card/90 backdrop-blur-xl border border-border/30 hover:border-border/50 transition-all duration-300"
-        >
-          {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+    <div className="fixed top-2 right-2 z-50 flex gap-2">
+      <Link to="/api-test">
+        <Button variant="outline" size="sm">
+          API Test
         </Button>
-      </div>
-    </>
+      </Link>
+    </div>
   );
 };
 

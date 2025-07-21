@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
 export const useSettings = () => {
-  // Progress bar settings
+  // Progress bar settings - always enabled by default
   const [progressBarEnabled, setProgressBarEnabled] = useState(() => {
     const saved = localStorage.getItem('progressbar-enabled');
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true; // Changed default to true
   });
   
   const [progressBarColor, setProgressBarColor] = useState(() => {
     const saved = localStorage.getItem('progressbar-color');
-    return saved || '#10b981';
+    return saved || '#006994'; // Changed to ocean blue
   });
 
   // Color-coded projects settings

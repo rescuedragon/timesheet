@@ -12,28 +12,28 @@ export const generateProjectColor = (projectName: string): string => {
   // Get existing project colors from localStorage to avoid duplicates
   const existingColors = getExistingProjectColors();
   
-  // Extended set of beautiful, matte, bright-yet-soft solid colors
-  const softColors = [
-    '#FFB4A2', // Soft coral
-    '#B5EAD7', // Mint
-    '#A0C4FF', // Baby blue
-    '#FFD6A5', // Peach
-    '#BDB2FF', // Lavender
-    '#FDFFB6', // Light yellow
-    '#FFADAD', // Light red
-    '#CAFFBF', // Light green
-    '#9BF6FF', // Sky blue
-    '#FFC6FF', // Pink
-    '#D0F4DE', // Pale green
-    '#FFF1E6', // Cream
-    '#F1C0E8', // Orchid
-    '#FDE2E4', // Blush
-    '#CDEAC0', // Pale mint
-    '#FFF5BA', // Light gold
-    '#B5D0FF', // Soft blue
-    '#E2F0CB', // Light lime
-    '#F6DFEB', // Pale pink
-    '#E4C1F9', // Soft purple
+  // Google Material-inspired, bold, matte, accessible project colors
+  const materialColors = [
+    '#4285F4', // Google Blue
+    '#EA4335', // Google Red
+    '#FBBC05', // Google Yellow
+    '#34A853', // Google Green
+    '#A142F4', // Material Purple
+    '#F44292', // Material Pink
+    '#00B8D4', // Material Cyan
+    '#FF7043', // Material Orange
+    '#8E24AA', // Deep Purple
+    '#F4B400', // Google Gold
+    '#0B8043', // Google Dark Green
+    '#C5221F', // Google Deep Red
+    '#F09300', // Material Amber
+    '#5E35B1', // Material Indigo
+    '#039BE5', // Material Light Blue
+    '#7CB342', // Material Light Green
+    '#F4511E', // Material Deep Orange
+    '#6D4C41', // Material Brown
+    '#757575', // Material Gray
+    '#009688', // Material Teal
   ];
   
   // Check if this project already has a color assigned
@@ -42,9 +42,9 @@ export const generateProjectColor = (projectName: string): string => {
     return existingColor;
   }
   
-  // Find an unused color
+  // Replace all uses of 'softColors' with 'materialColors'
   const usedColors = Object.values(existingColors);
-  const availableColors = softColors.filter(color => !usedColors.includes(color));
+  const availableColors = materialColors.filter(color => !usedColors.includes(color));
   
   let selectedColor;
   if (availableColors.length > 0) {
@@ -53,8 +53,8 @@ export const generateProjectColor = (projectName: string): string => {
     selectedColor = availableColors[index];
   } else {
     // If all colors are used, fall back to hash-based selection
-    const index = Math.abs(hash) % softColors.length;
-    selectedColor = softColors[index];
+    const index = Math.abs(hash) % materialColors.length;
+    selectedColor = materialColors[index];
   }
   
   // Store the color assignment

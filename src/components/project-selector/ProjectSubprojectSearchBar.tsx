@@ -21,6 +21,8 @@ interface ProjectSubprojectSearchBarProps {
   selectedSubprojectId: string;
   onProjectSelect: (projectId: string) => void;
   onSubprojectSelect: (subprojectId: string) => void;
+  showProjectSearch?: boolean;
+  showSubprojectSearch?: boolean;
 }
 
 const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
@@ -29,6 +31,8 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
   selectedSubprojectId,
   onProjectSelect,
   onSubprojectSelect,
+  showProjectSearch = true,
+  showSubprojectSearch = true,
 }) => {
   const [projectSearch, setProjectSearch] = useState('');
   const [subprojectSearch, setSubprojectSearch] = useState('');
@@ -148,130 +152,167 @@ const ProjectSubprojectSearchBar: React.FC<ProjectSubprojectSearchBarProps> = ({
     }
   }, [subprojectDropdownIndex, showSubprojectDropdown]);
 
+  const bothShown = showProjectSearch && showSubprojectSearch;
   return (
-    <div className="flex w-full items-stretch gap-2">
+    <div className="flex w-full items-stretch">
       {/* Main Project Search */}
-      <div className="w-1/2 m-0 p-0 h-full">
-        <div className="bg-gray-900 rounded-xl w-full h-full min-h-16 flex items-center relative">
-          <input
-            ref={projectInputRef}
-            type="text"
-            placeholder={undefined}
-            value={projectSearch}
-            onChange={(e) => {
-              setProjectSearch(e.target.value);
-              setProjectDropdownSearch(e.target.value);
-              setShowProjectDropdown(true);
-            }}
-            onClick={() => {
-              setShowProjectDropdown(true);
-              setProjectDropdownIndex(-1);
-            }}
-            onKeyDown={handleProjectInputKeyDown}
-            onFocus={() => {
-              setFocusedInput('project');
-              setShowProjectDropdown(true);
-              setProjectDropdownIndex(-1);
-            }}
-            onBlur={() => setTimeout(() => setShowProjectDropdown(false), 150)}
-            className="w-full h-16 px-5 py-4 pr-12 text-white bg-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
-            style={{ fontSize: '1.125rem' }}
-          />
-          <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            {projectSearch === '' && <ShinyText text="Search for main project" className="text-lg" />}
-          </div>
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
-            <Search size={24} strokeWidth={2} />
-          </div>
-          {/* Apple-style Elite dropdown for project */}
-          <div className={showProjectDropdown ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0 }}>
-            {filteredProjects.length > 0 ? (
-              filteredProjects.map((project, idx) => (
-                <div
-                  key={project.id}
-                  className={`dropdown-item${projectDropdownIndex === idx ? ' selected' : ''}`}
-                  onClick={() => {
-                    onProjectSelect(project.id);
-                    setShowProjectDropdown(false);
-                    setProjectDropdownIndex(-1);
-                  }}
-                  tabIndex={0}
-                >
-                  <div className="item-content">
-                    <div className="item-text">{project.name}</div>
-                    {/* <div className="item-description">Optional description</div> */}
+      {showProjectSearch && (
+        <div className={bothShown ? "w-1/2 m-0 p-0 h-full" : "w-full m-0 p-0 h-full"}>
+          <div className="w-full h-full min-h-16 flex items-center relative" style={{ background: '#e8f0fe', borderRadius: '1rem' }}>
+            <input
+              ref={projectInputRef}
+              type="text"
+              value={projectSearch}
+              onChange={(e) => {
+                setProjectSearch(e.target.value);
+                setProjectDropdownSearch(e.target.value);
+                setShowProjectDropdown(true);
+              }}
+              onClick={() => {
+                setShowProjectDropdown(true);
+                setProjectDropdownIndex(-1);
+              }}
+              onKeyDown={handleProjectInputKeyDown}
+              onFocus={() => {
+                setFocusedInput('project');
+                setShowProjectDropdown(true);
+                setProjectDropdownIndex(-1);
+              }}
+              onBlur={() => setTimeout(() => setShowProjectDropdown(false), 150)}
+              className="w-full h-16 px-5 py-4 pr-12 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-base font-medium text-lg border"
+              style={{
+                fontSize: '1.125rem',
+                background: '#e8f0fe',
+                color: '#6b7280',
+                borderColor: '#cbd5e1',
+                boxShadow: 'none',
+                backgroundImage: 'none',
+                backgroundClip: 'padding-box',
+                backgroundOrigin: 'padding-box',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                outline: 'none',
+                transition: 'all 0.2s',
+                fontWeight: 500,
+                zIndex: 1,
+              }}
+              placeholder="Search for main project"
+            />
+            <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              {projectSearch === '' && <ShinyText text="Search for main project" className="text-lg" />}
+            </div>
+            <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-opacity duration-200 ${projectSearch === '' ? 'opacity-100' : 'opacity-0'}`}>
+              <Search size={24} strokeWidth={2} className="text-gray-400" />
+            </div>
+            {/* Apple-style Elite dropdown for project */}
+            <div className={showProjectDropdown ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0 }}>
+              {filteredProjects.length > 0 ? (
+                filteredProjects.map((project, idx) => (
+                  <div
+                    key={project.id}
+                    className={`dropdown-item${projectDropdownIndex === idx ? ' selected' : ''}`}
+                    onClick={() => {
+                      onProjectSelect(project.id);
+                      setShowProjectDropdown(false);
+                      setProjectDropdownIndex(-1);
+                    }}
+                    tabIndex={0}
+                  >
+                    <div className="item-content">
+                      <div className="item-text">{project.name}</div>
+                      {/* <div className="item-description">Optional description</div> */}
+                    </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="dropdown-item">
-                No projects found
-              </div>
-            )}
+                ))
+              ) : (
+                <div className="dropdown-item disabled">No projects found</div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {/* Subproject Search */}
-      <div className="w-1/2 m-0 p-0 h-full">
-        <div className="bg-gray-900 rounded-xl w-full h-full min-h-16 flex items-center relative">
-          <input
-            ref={subprojectInputRef}
-            type="text"
-            placeholder={undefined}
-            value={subprojectSearch}
-            onChange={(e) => {
-              setSubprojectSearch(e.target.value);
-              setSubprojectDropdownSearch(e.target.value);
-              setShowSubprojectDropdown(true);
-            }}
-            onClick={() => {
-              setShowSubprojectDropdown(true);
-              setSubprojectDropdownIndex(-1);
-            }}
-            onFocus={() => {
-              setFocusedInput('subproject');
-              setShowSubprojectDropdown(true);
-              setSubprojectDropdownIndex(-1);
-            }}
-            onBlur={() => setTimeout(() => setShowSubprojectDropdown(false), 150)}
-            onKeyDown={handleSubprojectInputKeyDown}
-            className="w-full h-16 px-5 py-4 pr-12 text-white bg-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200 text-base font-medium placeholder-gray-400 text-lg"
-            style={{ fontSize: '1.125rem' }}
-          />
-          <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            {subprojectSearch === '' && <ShinyText text="Search for subproject" className="text-lg" />}
-          </div>
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white">
-            <Search size={24} strokeWidth={2} />
-          </div>
-          {/* Apple-style Elite dropdown for subproject */}
-          <div className={showSubprojectDropdown && selectedProject ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0, zIndex: 1000 }}>
-            {filteredSubprojects.length > 0 ? (
-              filteredSubprojects.map((subproject, idx) => (
-                <div
-                  key={subproject.id}
-                  className={`dropdown-item${subprojectDropdownIndex === idx ? ' selected' : ''}`}
-                  onClick={() => {
-                    onSubprojectSelect(subproject.id);
-                    setShowSubprojectDropdown(false);
-                    setSubprojectDropdownIndex(-1);
-                  }}
-                  tabIndex={0}
-                >
-                  <div className="item-content">
-                    <div className="item-text">{subproject.name}</div>
-                    {/* <div className="item-description">Optional description</div> */}
+      {showSubprojectSearch && (
+        <div className={bothShown ? "w-1/2 m-0 p-0 h-full" : "w-full m-0 p-0 h-full"}>
+          <div className="w-full h-full min-h-16 flex items-center relative">
+            <input
+              ref={subprojectInputRef}
+              type="text"
+              value={subprojectSearch}
+              onChange={(e) => {
+                setSubprojectSearch(e.target.value);
+                setSubprojectDropdownSearch(e.target.value);
+                setShowSubprojectDropdown(true);
+              }}
+              onClick={() => {
+                setShowSubprojectDropdown(true);
+                setSubprojectDropdownIndex(-1);
+              }}
+              onKeyDown={handleSubprojectInputKeyDown}
+              onFocus={() => {
+                setFocusedInput('subproject');
+                setShowSubprojectDropdown(true);
+                setSubprojectDropdownIndex(-1);
+              }}
+              onBlur={() => setTimeout(() => setShowSubprojectDropdown(false), 150)}
+              className="w-full h-16 px-5 py-4 pr-12 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-base font-medium text-lg border"
+              style={{
+                fontSize: '1.125rem',
+                background: '#e8f0fe',
+                color: '#6b7280',
+                borderColor: '#cbd5e1',
+                boxShadow: 'none',
+                backgroundImage: 'none',
+                backgroundClip: 'padding-box',
+                backgroundOrigin: 'padding-box',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                outline: 'none',
+                transition: 'all 0.2s',
+                fontWeight: 500,
+                zIndex: 1,
+                // Add !important to key properties
+                ...(typeof window !== 'undefined' ? {
+                  setProperty: (prop, value) => document.documentElement.style.setProperty(prop, value, 'important')
+                } : {}),
+              }}
+              placeholder="Search for subproject"
+            />
+            <div className="absolute left-5 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              {subprojectSearch === '' && <ShinyText text="Search for subproject" className="text-lg" />}
+            </div>
+            <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-opacity duration-200 ${subprojectSearch === '' ? 'opacity-100' : 'opacity-0'}`}>
+              <Search size={24} strokeWidth={2} className="text-gray-400" />
+            </div>
+            {/* Apple-style Elite dropdown for subproject */}
+            <div className={showSubprojectDropdown && selectedProject ? 'dropdown show' : 'dropdown'} style={{ position: 'absolute', top: 'calc(100% + 12px)', left: 0, right: 0, zIndex: 1000 }}>
+              {filteredSubprojects.length > 0 ? (
+                filteredSubprojects.map((subproject, idx) => (
+                  <div
+                    key={subproject.id}
+                    className={`dropdown-item${subprojectDropdownIndex === idx ? ' selected' : ''}`}
+                    onClick={() => {
+                      onSubprojectSelect(subproject.id);
+                      setShowSubprojectDropdown(false);
+                      setSubprojectDropdownIndex(-1);
+                    }}
+                    tabIndex={0}
+                  >
+                    <div className="item-content">
+                      <div className="item-text">{subproject.name}</div>
+                      {/* <div className="item-description">Optional description</div> */}
+                    </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="dropdown-item">
-                No subprojects found
-              </div>
-            )}
+                ))
+              ) : (
+                <div className="dropdown-item disabled">No subprojects found</div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
